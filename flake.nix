@@ -1,12 +1,10 @@
 {
-  description = "With this library, you can control research versions of Franka Robotics robots.";
+  description = "ROS integration for Franka research robots";
 
-  inputs = {
-    nix-ros-overlay.url = "github:lopsided98/nix-ros-overlay/master";
-  };
+  inputs.nix-ros-overlay.url = "github:lopsided98/nix-ros-overlay/master";
 
   outputs =
-    { nixpkgs, nix-ros-overlay, self, ... }:
+    { nix-ros-overlay, self, ... }:
     nix-ros-overlay.inputs.flake-utils.lib.eachDefaultSystem (
       system:
       let
@@ -18,7 +16,26 @@
       {
         packages = {
           default = self.packages.${system}.libfranka;
-          libfranka = pkgs.callPackage ./default.nix {};
+          libfranka = pkgs.rosPackages.humble.libfranka.overrideAttrs {
+            src = pkgs.lib.fileset.toSource {
+              root = ./.;
+              fileset = pkgs.lib.fileset.unions [
+                ./cmake
+                ./common
+                ./doc
+                ./examples
+                ./include
+                ./scripts
+                ./src
+                ./test
+                ./CHANGELOG.md
+                ./CMakeLists.txt
+                ./LICENSE
+                ./NOTICE
+                ./README
+              ];
+            };
+          };
         };
       }
     );
