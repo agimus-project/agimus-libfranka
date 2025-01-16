@@ -17,11 +17,15 @@
         packages = {
           default = self.packages.${system}.libfranka;
           libfranka = pkgs.rosPackages.humble.libfranka.overrideAttrs {
+            preBuild = ''
+              echo "Checking out submodules"
+              git submodule update --init --recursive
+            '';
+
             src = pkgs.lib.fileset.toSource {
               root = ./.;
               fileset = pkgs.lib.fileset.unions [
                 ./cmake
-                ./common
                 ./doc
                 ./examples
                 ./include
