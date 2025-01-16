@@ -26,6 +26,7 @@
               root = ./.;
               fileset = pkgs.lib.fileset.unions [
                 ./cmake
+                (pkgs.lib.fileset.maybeMissing ./common)
                 ./doc
                 ./examples
                 ./include
