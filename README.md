@@ -5,6 +5,14 @@
 
 With this library, you can control research versions of Franka Robotics robots. See the [Franka Control Interface (FCI) documentation][fci-docs] for more information about what `libfranka` can do and how to set it up. The [generated API documentation][api-docs] also gives an overview of its capabilities.
 
+## Note
+
+This is a fork of the https://github.com/tingelst/libfranka which is a fork of https://github.com/frankaemika/libfranka.
+This library is is originally deprecated for the oldest robots. Hence in order to
+prevent the original owners to delete this package we created this fork.
+
+This library has been tested with ROS2 on Panda robot in LAAS-CNRS and CTU-Prague.
+
 ## License
 
 `libfranka` is licensed under the [Apache 2.0 license][apache-2.0].
