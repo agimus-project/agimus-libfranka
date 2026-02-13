@@ -99,14 +99,14 @@ target_link_libraries(franka PRIVATE
 )
 
 target_link_libraries(franka PUBLIC
-  agimus_libfranka-common
+  agimus-libfranka-common
 )
 
 ## Installation
 include(GNUInstallDirs)
 set(INSTALL_CMAKE_CONFIG_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 
-install(TARGETS franka agimus_libfranka-common
+install(TARGETS franka agimus-libfranka-common
   EXPORT ${PROJECT_NAME}Targets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
