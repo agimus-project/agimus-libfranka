@@ -9,15 +9,15 @@ project(agimus_${BASE_NAME}
   LANGUAGES CXX
 )
 
-list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
-set(THIRDPARTY_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty" CACHE PATH
-  "Directory for third-party sources")
+option(BUILD_TESTING "Build tests" ON)
 
 ## Dependencies
 find_package(Poco REQUIRED COMPONENTS Net Foundation)
 find_package(Eigen3 REQUIRED CONFIG)
 find_package(agimus-libfranka-common REQUIRED CONFIG)
+if(BUILD_TESTING)
+  find_package(GTest REQUIRED CONFIG)
+endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -140,7 +140,6 @@ install(EXPORT ${PROJECT_NAME}Targets
 # Ignore find_package(agimus_libfranka) in subprojects.
 set(FRANKA_IS_FOUND TRUE)
 
-option(BUILD_TESTING "Build tests" ON)
 if(BUILD_TESTING)
   enable_testing()
   add_subdirectory(test)
