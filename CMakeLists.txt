@@ -16,7 +16,8 @@ set(THIRDPARTY_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty" CACHE PATH
 
 ## Dependencies
 find_package(Poco REQUIRED COMPONENTS Net Foundation)
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 REQUIRED CONFIG)
+find_package(agimus-libfranka-common REQUIRED CONFIG)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -28,9 +29,6 @@ if(BUILD_COVERAGE)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
 endif()
-
-## Submodules
-add_subdirectory(common)
 
 ## Library
 add_library(${PROJECT_NAME} SHARED
@@ -91,25 +89,25 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PRIVATE
   Poco::Foundation
   Poco::Net
-  Eigen3::Eigen3
+  Eigen3::Eigen
   Threads::Threads
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
-  agimus-libfranka-common
+  agimus-libfranka-common::agimus-libfranka-common
 )
 
 ## Installation
 include(GNUInstallDirs)
 set(INSTALL_CMAKE_CONFIG_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 
-install(TARGETS ${PROJECT_NAME} agimus-libfranka-common
+install(TARGETS ${PROJECT_NAME}
   EXPORT ${PROJECT_NAME}Targets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
-install(DIRECTORY include/ common/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
   USE_SOURCE_PERMISSIONS
 )
 
@@ -162,13 +160,11 @@ endif()
 file(GLOB_RECURSE SOURCES
   src/*.cpp
   examples/*.cpp
-  common/*.cpp
 )
 file(GLOB_RECURSE HEADERS
   include/*.h
   src/*.h
   examples/*.h
-  common/*.h
 )
 file(GLOB_RECURSE TEST_FILES
   test/*.h

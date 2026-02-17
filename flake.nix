@@ -8,10 +8,6 @@
     nix-ros-overlay.follows = "gazebros2nix/nix-ros-overlay";
     systems.follows = "gazebros2nix/systems";
     treefmt-nix.follows = "gazebros2nix/treefmt-nix";
-    agimus-libfranka-common = {
-      url = "github:agimus-project/agimus-libfranka-common/fork";
-      flake = false;
-    };
   };
 
   outputs =
@@ -46,10 +42,6 @@
                     ./README.md
                   ];
                 };
-                # CMake has a `add_subdirectory(common)` which is a git submodule
-                preConfigure = ''
-                  ln -s ${inputs.agimus-libfranka-common} common
-                '';
               };
             };
           in

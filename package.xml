@@ -11,6 +11,7 @@
 
   <build_depend>eigen</build_depend>
   <build_depend>libpoco-dev</build_depend>
+  <build_depend>agimus_libfranka_common</build_depend>
 
   <exec_depend>libpoco-dev</exec_depend>
 
