@@ -7,5 +7,5 @@ if(NOT TARGET agimus_libfranka::agimus_libfranka)
   include("${agimus_libfranka_CMAKE_DIR}/agimus_libfrankaTargets.cmake")
 endif()
 
-set(agimus_franka_LIBRARIES agimus_libfranka::agimus_libfranka)
+set(agimus_libfranka_LIBRARIES agimus_libfranka::agimus_libfranka)
 get_target_property(agimus_libfranka_INCLUDE_DIRS agimus_libfranka::agimus_libfranka INTERFACE_INCLUDE_DIRECTORIES)
