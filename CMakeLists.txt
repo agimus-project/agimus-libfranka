@@ -3,8 +3,9 @@ cmake_minimum_required(VERSION 3.22)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(BASE_NAME libfranka)
+set(${BASE_NAME}_VERSION 0.9.3)
 project(agimus_${BASE_NAME}
-  VERSION 0.9.3
+  VERSION ${${BASE_NAME}_VERSION}
   LANGUAGES CXX
 )
 
