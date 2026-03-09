@@ -55,8 +55,10 @@ target_link_libraries(motion_with_control Poco::Foundation)
 target_link_libraries(motion_with_control_external_control_loop
                       Poco::Foundation)
 
-include(GNUInstallDirs)
-install(
-  TARGETS ${EXAMPLES}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+if(INSTALL_EXAMPLES)
+  include(GNUInstallDirs)
+  install(
+    TARGETS ${EXAMPLES}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()

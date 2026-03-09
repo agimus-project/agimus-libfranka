@@ -138,6 +138,7 @@ if(BUILD_TESTING)
 endif()
 
 option(BUILD_EXAMPLES "Build example code" ON)
+option(INSTALL_EXAMPLES "Install examples" OFF)
 if(BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
