@@ -17,6 +17,7 @@ jobs:
           - {ROS_DISTRO: rolling}
     env:
       UPSTREAM_WORKSPACE: github:agimus-project/agimus-libfranka-common#main
+      ROSDEP_SKIP_KEYS: agimus_libfranka_common
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
