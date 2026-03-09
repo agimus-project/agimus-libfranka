@@ -5,8 +5,8 @@
 
 #include <gmock/gmock.h>
 
-#include <franka/exception.h>
-#include <franka/vacuum_gripper.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/vacuum_gripper.h>
 #include <agimus_research_interface/vacuum_gripper/types.h>
 
 #include "helpers.h"
@@ -15,9 +15,9 @@
 using ::testing::_;
 using ::testing::Return;
 
-using franka::IncompatibleVersionException;
-using franka::NetworkException;
-using franka::VacuumGripper;
+using agimus_franka::IncompatibleVersionException;
+using agimus_franka::NetworkException;
+using agimus_franka::VacuumGripper;
 
 using agimus_research_interface::vacuum_gripper::Connect;
 using agimus_research_interface::vacuum_gripper::VacuumGripperState;

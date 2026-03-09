@@ -3,8 +3,8 @@
 #include <cmath>
 #include <iostream>
 
-#include <franka/exception.h>
-#include <franka/robot.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/robot.h>
 
 #include "examples_common.h"
 
@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
     return -1;
   }
   try {
-    franka::Robot robot(argv[1]);
+    agimus_franka::Robot robot(argv[1]);
     setDefaultBehavior(robot);
 
     // First move the robot to a suitable joint configuration
@@ -49,27 +49,27 @@ int main(int argc, char** argv) {
         double time_max = 4.0;
         double omega_max = 0.2;
         double time = 0.0;
-        robot.control([=, &time](const franka::RobotState&,
-                                 franka::Duration period) -> franka::JointVelocities {
+        robot.control([=, &time](const agimus_franka::RobotState&,
+                                 agimus_franka::Duration period) -> agimus_franka::JointVelocities {
           time += period.toSec();
 
           double cycle = std::floor(std::pow(-1.0, (time - std::fmod(time, time_max)) / time_max));
           double omega = cycle * omega_max / 2.0 * (1.0 - std::cos(2.0 * M_PI / time_max * time));
 
-          franka::JointVelocities velocities = {{0.0, 0.0, omega, 0.0, 0.0, 0.0, 0.0}};
+          agimus_franka::JointVelocities velocities = {{0.0, 0.0, omega, 0.0, 0.0, 0.0, 0.0}};
           if (time >= 2 * time_max) {
             std::cout << std::endl << "Finished motion." << std::endl;
-            return franka::MotionFinished(velocities);
+            return agimus_franka::MotionFinished(velocities);
           }
           return velocities;
         });
-      } catch (const franka::ControlException& e) {
+      } catch (const agimus_franka::ControlException& e) {
         std::cout << e.what() << std::endl;
         std::cout << "Running error recovery..." << std::endl;
         robot.automaticErrorRecovery();
       }
     }
-  } catch (const franka::Exception& e) {
+  } catch (const agimus_franka::Exception& e) {
     std::cout << e.what() << std::endl;
     return -1;
   }

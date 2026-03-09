@@ -3,8 +3,8 @@
 #include <iostream>
 #include <iterator>
 
-#include <franka/exception.h>
-#include <franka/model.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/model.h>
 
 /**
  * @example print_joint_poses.cpp
@@ -28,16 +28,16 @@ int main(int argc, char** argv) {
   }
 
   try {
-    franka::Robot robot(argv[1]);
+    agimus_franka::Robot robot(argv[1]);
 
-    franka::RobotState state = robot.readOnce();
+    agimus_franka::RobotState state = robot.readOnce();
 
-    franka::Model model(robot.loadModel());
-    for (franka::Frame frame = franka::Frame::kJoint1; frame <= franka::Frame::kEndEffector;
+    agimus_franka::Model model(robot.loadModel());
+    for (agimus_franka::Frame frame = agimus_franka::Frame::kJoint1; frame <= agimus_franka::Frame::kEndEffector;
          frame++) {
       std::cout << model.pose(frame, state) << std::endl;
     }
-  } catch (franka::Exception const& e) {
+  } catch (agimus_franka::Exception const& e) {
     std::cout << e.what() << std::endl;
     return -1;
   }

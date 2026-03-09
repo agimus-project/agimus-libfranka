@@ -7,18 +7,18 @@
 #include <mutex>
 #include <string>
 
-#include <franka/control_types.h>
-#include <franka/duration.h>
-#include <franka/lowpass_filter.h>
-#include <franka/robot_state.h>
+#include <agimus_franka/control_types.h>
+#include <agimus_franka/duration.h>
+#include <agimus_franka/lowpass_filter.h>
+#include <agimus_franka/robot_state.h>
 #include <agimus_research_interface/robot/service_types.h>
 
 /**
  * @file robot.h
- * Contains the franka::Robot type.
+ * Contains the agimus_franka::Robot type.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 class Model;
 
@@ -43,7 +43,7 @@ class ActiveControlBase;
  *
  * @anchor ne-frame
  * @par Nominal end effector frame NE
- * The nominal end effector frame is configured outside of libfranka (in DESK) and cannot be changed
+ * The nominal end effector frame is configured outside of libagimus_franka (in DESK) and cannot be changed
  * here. It may be used to set end effector frames which are rarely changed.
  *
  * @anchor ee-frame
@@ -74,16 +74,16 @@ class Robot {
   /**
    * Establishes a connection with the robot.
    *
-   * @param[in] franka_address IP/hostname of the robot.
+   * @param[in] agimus_franka_address IP/hostname of the robot.
    * @param[in] realtime_config if set to Enforce, an exception will be thrown if realtime priority
    * cannot be set when required. Setting realtime_config to Ignore disables this behavior.
    * @param[in] log_size sets how many last states should be kept for logging purposes.
    * The log is provided when a ControlException is thrown.
    *
    * @throw NetworkException if the connection is unsuccessful.
-   * @throw IncompatibleVersionException if this version of `libfranka` is not supported.
+   * @throw IncompatibleVersionException if this version of `libagimus_franka` is not supported.
    */
-  explicit Robot(const std::string& franka_address,
+  explicit Robot(const std::string& agimus_franka_address,
                  RealtimeConfig realtime_config = RealtimeConfig::kEnforce,
                  size_t log_size = 50);
 
@@ -114,7 +114,7 @@ class Robot {
    * The following methods allow to perform motion generation and/or send joint-level torque
    * commands without gravity and friction by providing callback functions.
    *
-   * Only one of these methods can be active at the same time; a franka::ControlException is thrown
+   * Only one of these methods can be active at the same time; a agimus_franka::ControlException is thrown
    * otherwise.
    *
    * @anchor callback-docs
@@ -124,23 +124,23 @@ class Robot {
    * a 1 kHz frequency, the callback functions have to compute their result in a short time frame
    * in order to be accepted. Callback functions take two parameters:
    *
-   * * A franka::RobotState showing the current robot state.
-   * * A franka::Duration to indicate the time since the last callback invocation. Thus, the
+   * * A agimus_franka::RobotState showing the current robot state.
+   * * A agimus_franka::Duration to indicate the time since the last callback invocation. Thus, the
    *   duration is zero on the first invocation of the callback function!
    *
    * The following incomplete example shows the general structure of a callback function:
    *
    * @code{.cpp}
    * double time = 0.0;
-   * auto control_callback = [&time](const franka::RobotState& robot_state,
-   *                                 franka::Duration time_step) -> franka::JointPositions {
+   * auto control_callback = [&time](const agimus_franka::RobotState& robot_state,
+   *                                 agimus_franka::Duration time_step) -> agimus_franka::JointPositions {
    *   time += time_step.toSec();  // Update time at the beginning of the callback.
    *
-   *   franka::JointPositions output = getJointPositions(time);
+   *   agimus_franka::JointPositions output = getJointPositions(time);
    *
    *   if (time >= max_time) {
    *     // Return MotionFinished at the end of the trajectory.
-   *     return franka::MotionFinished(output);
+   *     return agimus_franka::MotionFinished(output);
    *   }
    *
    *   return output;
@@ -161,7 +161,7 @@ class Robot {
    * @param[in] limit_rate True if rate limiting should be activated. False by default.
    * This could distort your motion!
    * @param[in] cutoff_frequency Cutoff frequency for a first order low-pass filter applied on
-   * the user commanded signal. Set to franka::kMaxCutoffFrequency to disable.
+   * the user commanded signal. Set to agimus_franka::kMaxCutoffFrequency to disable.
    *
    * @throw ControlException if an error related to torque control or motion generation occurred.
    * @throw InvalidOperationException if a conflicting operation is already running.
@@ -171,7 +171,7 @@ class Robot {
    *
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
-  void control(std::function<Torques(const RobotState&, franka::Duration)> control_callback,
+  void control(std::function<Torques(const RobotState&, agimus_franka::Duration)> control_callback,
                bool limit_rate = false,
                double cutoff_frequency = kDefaultCutoffFrequency);
 
@@ -188,7 +188,7 @@ class Robot {
    * @param[in] limit_rate True if rate limiting should be activated. False by default.
    * This could distort your motion!
    * @param[in] cutoff_frequency Cutoff frequency for a first order low-pass filter applied on
-   * the user commanded signal. Set to franka::kMaxCutoffFrequency to disable.
+   * the user commanded signal. Set to agimus_franka::kMaxCutoffFrequency to disable.
    *
    * @throw ControlException if an error related to torque control or motion generation occurred.
    * @throw InvalidOperationException if a conflicting operation is already running.
@@ -200,8 +200,8 @@ class Robot {
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
   void control(
-      std::function<Torques(const RobotState&, franka::Duration)> control_callback,
-      std::function<JointPositions(const RobotState&, franka::Duration)> motion_generator_callback,
+      std::function<Torques(const RobotState&, agimus_franka::Duration)> control_callback,
+      std::function<JointPositions(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
       bool limit_rate = false,
       double cutoff_frequency = kDefaultCutoffFrequency);
 
@@ -218,7 +218,7 @@ class Robot {
    * @param[in] limit_rate True if rate limiting should be activated. False by default.
    * This could distort your motion!
    * @param[in] cutoff_frequency Cutoff frequency for a first order low-pass filter applied on
-   * the user commanded signal. Set to franka::kMaxCutoffFrequency to disable.
+   * the user commanded signal. Set to agimus_franka::kMaxCutoffFrequency to disable.
    *
    * @throw ControlException if an error related to torque control or motion generation occurred.
    * @throw InvalidOperationException if a conflicting operation is already running.
@@ -230,8 +230,8 @@ class Robot {
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
   void control(
-      std::function<Torques(const RobotState&, franka::Duration)> control_callback,
-      std::function<JointVelocities(const RobotState&, franka::Duration)> motion_generator_callback,
+      std::function<Torques(const RobotState&, agimus_franka::Duration)> control_callback,
+      std::function<JointVelocities(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
       bool limit_rate = false,
       double cutoff_frequency = kDefaultCutoffFrequency);
 
@@ -248,7 +248,7 @@ class Robot {
    * @param[in] limit_rate True if rate limiting should be activated. False by default.
    * This could distort your motion!
    * @param[in] cutoff_frequency Cutoff frequency for a first order low-pass filter applied on
-   * the user commanded signal. Set to franka::kMaxCutoffFrequency to disable.
+   * the user commanded signal. Set to agimus_franka::kMaxCutoffFrequency to disable.
    *
    * @throw ControlException if an error related to torque control or motion generation occurred.
    * @throw InvalidOperationException if a conflicting operation is already running.
@@ -260,8 +260,8 @@ class Robot {
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
   void control(
-      std::function<Torques(const RobotState&, franka::Duration)> control_callback,
-      std::function<CartesianPose(const RobotState&, franka::Duration)> motion_generator_callback,
+      std::function<Torques(const RobotState&, agimus_franka::Duration)> control_callback,
+      std::function<CartesianPose(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
       bool limit_rate = false,
       double cutoff_frequency = kDefaultCutoffFrequency);
 
@@ -278,7 +278,7 @@ class Robot {
    * @param[in] limit_rate True if rate limiting should be activated. False by default.
    * This could distort your motion!
    * @param[in] cutoff_frequency Cutoff frequency for a first order low-pass filter applied on
-   * the user commanded signal. Set to franka::kMaxCutoffFrequency to disable.
+   * the user commanded signal. Set to agimus_franka::kMaxCutoffFrequency to disable.
    *
    * @throw ControlException if an error related to torque control or motion generation occurred.
    * @throw InvalidOperationException if a conflicting operation is already running.
@@ -289,8 +289,8 @@ class Robot {
    *
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
-  void control(std::function<Torques(const RobotState&, franka::Duration)> control_callback,
-               std::function<CartesianVelocities(const RobotState&, franka::Duration)>
+  void control(std::function<Torques(const RobotState&, agimus_franka::Duration)> control_callback,
+               std::function<CartesianVelocities(const RobotState&, agimus_franka::Duration)>
                    motion_generator_callback,
                bool limit_rate = false,
                double cutoff_frequency = kDefaultCutoffFrequency);
@@ -307,7 +307,7 @@ class Robot {
    * @param[in] limit_rate True if rate limiting should be activated. False by default.
    * This could distort your motion!
    * @param[in] cutoff_frequency Cutoff frequency for a first order low-pass filter applied on
-   * the user commanded signal. Set to franka::kMaxCutoffFrequency to disable.
+   * the user commanded signal. Set to agimus_franka::kMaxCutoffFrequency to disable.
    *
    * @throw ControlException if an error related to motion generation occurred.
    * @throw InvalidOperationException if a conflicting operation is already running.
@@ -318,7 +318,7 @@ class Robot {
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
   void control(
-      std::function<JointPositions(const RobotState&, franka::Duration)> motion_generator_callback,
+      std::function<JointPositions(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
       ControllerMode controller_mode = ControllerMode::kJointImpedance,
       bool limit_rate = false,
       double cutoff_frequency = kDefaultCutoffFrequency);
@@ -335,7 +335,7 @@ class Robot {
    * @param[in] limit_rate True if rate limiting should be activated. False by default.
    * This could distort your motion!
    * @param[in] cutoff_frequency Cutoff frequency for a first order low-pass filter applied on
-   * the user commanded signal. Set to franka::kMaxCutoffFrequency to disable.
+   * the user commanded signal. Set to agimus_franka::kMaxCutoffFrequency to disable.
    *
    * @throw ControlException if an error related to motion generation occurred.
    * @throw InvalidOperationException if a conflicting operation is already running.
@@ -346,7 +346,7 @@ class Robot {
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
   void control(
-      std::function<JointVelocities(const RobotState&, franka::Duration)> motion_generator_callback,
+      std::function<JointVelocities(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
       ControllerMode controller_mode = ControllerMode::kJointImpedance,
       bool limit_rate = false,
       double cutoff_frequency = kDefaultCutoffFrequency);
@@ -363,7 +363,7 @@ class Robot {
    * @param[in] limit_rate True if rate limiting should be activated. False by default.
    * This could distort your motion!
    * @param[in] cutoff_frequency Cutoff frequency for a first order low-pass filter applied on
-   * the user commanded signal. Set to franka::kMaxCutoffFrequency to disable.
+   * the user commanded signal. Set to agimus_franka::kMaxCutoffFrequency to disable.
    *
    * @throw ControlException if an error related to motion generation occurred.
    * @throw InvalidOperationException if a conflicting operation is already running.
@@ -374,7 +374,7 @@ class Robot {
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
   void control(
-      std::function<CartesianPose(const RobotState&, franka::Duration)> motion_generator_callback,
+      std::function<CartesianPose(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
       ControllerMode controller_mode = ControllerMode::kJointImpedance,
       bool limit_rate = false,
       double cutoff_frequency = kDefaultCutoffFrequency);
@@ -391,7 +391,7 @@ class Robot {
    * @param[in] limit_rate True if rate limiting should be activated. False by default.
    * This could distort your motion!
    * @param[in] cutoff_frequency Cutoff frequency for a first order low-pass filter applied on
-   * the user commanded signal. Set to franka::kMaxCutoffFrequency to disable.
+   * the user commanded signal. Set to agimus_franka::kMaxCutoffFrequency to disable.
    *
    * @throw ControlException if an error related to motion generation occurred.
    * @throw InvalidOperationException if a conflicting operation is already running.
@@ -401,7 +401,7 @@ class Robot {
    *
    * @see Robot::Robot to change behavior if realtime priority cannot be set.
    */
-  void control(std::function<CartesianVelocities(const RobotState&, franka::Duration)>
+  void control(std::function<CartesianVelocities(const RobotState&, agimus_franka::Duration)>
                    motion_generator_callback,
                ControllerMode controller_mode = ControllerMode::kJointImpedance,
                bool limit_rate = false,
@@ -418,9 +418,9 @@ class Robot {
    *
    * This minimal example will print the robot state 100 times:
    * @code{.cpp}
-   * franka::Robot robot("robot.franka.de");
+   * agimus_franka::Robot robot("robot.agimus_franka.de");
    * size_t count = 0;
-   * robot.read([&count](const franka::RobotState& robot_state) {
+   * robot.read([&count](const agimus_franka::RobotState& robot_state) {
    *   std::cout << robot_state << std::endl;
    *   return count++ < 100;
    * });
@@ -718,7 +718,7 @@ class Robot {
    * Stops all currently running motions.
    *
    * If a control or motion generator loop is running in another thread, it will be preempted
-   * with a franka::ControlException.
+   * with a agimus_franka::ControlException.
    *
    * @throw CommandException if the Control reports an error.
    * @throw NetworkException if the connection is lost, e.g. after a timeout.
@@ -770,7 +770,7 @@ class Robot {
   /**
    * Starts a new motion generator and controller
    *
-   * @tparam T the franka control type
+   * @tparam T the agimus_franka control type
    * @param control_mode defines the type of motion / control that shall be started
    * @param controller_mode the controller-mode that shall be used
    * @return unique_ptr of ActiveMotionGenerator for the started motion
@@ -789,4 +789,4 @@ class Robot {
   std::mutex control_mutex_;
 };
 
-}  // namespace franka
+}  // namespace agimus_franka

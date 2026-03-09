@@ -1,6 +1,6 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <franka/model.h>
+#include <agimus_franka/model.h>
 
 #include <sstream>
 
@@ -13,7 +13,7 @@
 
 using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
 
-namespace franka {
+namespace agimus_franka {
 
 Frame operator++(Frame& frame, int /* dummy */) noexcept {
   Frame original = frame;
@@ -28,7 +28,7 @@ Model::~Model() noexcept = default;
 Model::Model(Model&&) noexcept = default;
 Model& Model::operator=(Model&&) noexcept = default;
 
-std::array<double, 16> Model::pose(Frame frame, const franka::RobotState& robot_state) const {
+std::array<double, 16> Model::pose(Frame frame, const agimus_franka::RobotState& robot_state) const {
   return pose(frame, robot_state.q, robot_state.F_T_EE, robot_state.EE_T_K);
 }
 
@@ -81,7 +81,7 @@ std::array<double, 16> Model::pose(
 }
 
 std::array<double, 42> Model::bodyJacobian(Frame frame,
-                                           const franka::RobotState& robot_state) const {
+                                           const agimus_franka::RobotState& robot_state) const {
   return bodyJacobian(frame, robot_state.q, robot_state.F_T_EE, robot_state.EE_T_K);
 }
 
@@ -134,7 +134,7 @@ std::array<double, 42> Model::bodyJacobian(
 }
 
 std::array<double, 42> Model::zeroJacobian(Frame frame,
-                                           const franka::RobotState& robot_state) const {
+                                           const agimus_franka::RobotState& robot_state) const {
   return zeroJacobian(frame, robot_state.q, robot_state.F_T_EE, robot_state.EE_T_K);
 };
 
@@ -186,11 +186,11 @@ std::array<double, 42> Model::zeroJacobian(
   return output;
 }
 
-std::array<double, 49> franka::Model::mass(const franka::RobotState& robot_state) const noexcept {
+std::array<double, 49> agimus_franka::Model::mass(const agimus_franka::RobotState& robot_state) const noexcept {
   return mass(robot_state.q, robot_state.I_total, robot_state.m_total, robot_state.F_x_Ctotal);
 }
 
-std::array<double, 49> franka::Model::mass(
+std::array<double, 49> agimus_franka::Model::mass(
     const std::array<double, 7>& q,
     const std::array<double, 9>& I_total,  // NOLINT(readability-identifier-naming)
     double m_total,
@@ -202,13 +202,13 @@ std::array<double, 49> franka::Model::mass(
   return output;
 }
 
-std::array<double, 7> franka::Model::coriolis(const franka::RobotState& robot_state) const
+std::array<double, 7> agimus_franka::Model::coriolis(const agimus_franka::RobotState& robot_state) const
     noexcept {
   return coriolis(robot_state.q, robot_state.dq, robot_state.I_total, robot_state.m_total,
                   robot_state.F_x_Ctotal);
 }
 
-std::array<double, 7> franka::Model::coriolis(
+std::array<double, 7> agimus_franka::Model::coriolis(
     const std::array<double, 7>& q,
     const std::array<double, 7>& dq,
     const std::array<double, 9>& I_total,  // NOLINT(readability-identifier-naming)
@@ -222,17 +222,17 @@ std::array<double, 7> franka::Model::coriolis(
   return output;
 }
 
-std::array<double, 7> franka::Model::gravity(const franka::RobotState& robot_state,
+std::array<double, 7> agimus_franka::Model::gravity(const agimus_franka::RobotState& robot_state,
                                              const std::array<double, 3>& gravity_earth) const
     noexcept {
   return gravity(robot_state.q, robot_state.m_total, robot_state.F_x_Ctotal, gravity_earth);
 };
 
-std::array<double, 7> franka::Model::gravity(const franka::RobotState& robot_state) const noexcept {
+std::array<double, 7> agimus_franka::Model::gravity(const agimus_franka::RobotState& robot_state) const noexcept {
   return gravity(robot_state, robot_state.O_ddP_O);
 };
 
-std::array<double, 7> franka::Model::gravity(
+std::array<double, 7> agimus_franka::Model::gravity(
     const std::array<double, 7>& q,
     double m_total,
     const std::array<double, 3>& F_x_Ctotal,  // NOLINT(readability-identifier-naming)
@@ -243,4 +243,4 @@ std::array<double, 7> franka::Model::gravity(
   return output;
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

@@ -1,14 +1,14 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 
-#include <franka/active_control.h>
-#include <franka/exception.h>
-#include <franka/robot.h>
+#include <agimus_franka/active_control.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/robot.h>
 #include <agimus_research_interface/robot/rbk_types.h>
 
 #include "robot_impl.h"
 
-namespace franka {
+namespace agimus_franka {
 
 ActiveControl::ActiveControl(std::shared_ptr<Robot::Impl> robot_impl,
                              uint32_t motion_id,
@@ -38,4 +38,4 @@ std::pair<RobotState, Duration> ActiveControl::readOnce() {
   return std::make_pair(robot_state, time_since_last_read);
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

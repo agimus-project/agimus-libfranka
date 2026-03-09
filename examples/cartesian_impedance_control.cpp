@@ -7,10 +7,10 @@
 
 #include <Eigen/Dense>
 
-#include <franka/duration.h>
-#include <franka/exception.h>
-#include <franka/model.h>
-#include <franka/robot.h>
+#include <agimus_franka/duration.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/model.h>
+#include <agimus_franka/robot.h>
 
 #include "examples_common.h"
 
@@ -45,12 +45,12 @@ int main(int argc, char** argv) {
 
   try {
     // connect to robot
-    franka::Robot robot(argv[1]);
+    agimus_franka::Robot robot(argv[1]);
     setDefaultBehavior(robot);
     // load the kinematics and dynamics model
-    franka::Model model = robot.loadModel();
+    agimus_franka::Model model = robot.loadModel();
 
-    franka::RobotState initial_state = robot.readOnce();
+    agimus_franka::RobotState initial_state = robot.readOnce();
 
     // equilibrium point is the initial position
     Eigen::Affine3d initial_transform(Eigen::Matrix4d::Map(initial_state.O_T_EE.data()));
@@ -64,13 +64,13 @@ int main(int argc, char** argv) {
                                {{100.0, 100.0, 100.0, 100.0, 100.0, 100.0}});
 
     // define callback for the torque control loop
-    std::function<franka::Torques(const franka::RobotState&, franka::Duration)>
-        impedance_control_callback = [&](const franka::RobotState& robot_state,
-                                         franka::Duration /*duration*/) -> franka::Torques {
+    std::function<agimus_franka::Torques(const agimus_franka::RobotState&, agimus_franka::Duration)>
+        impedance_control_callback = [&](const agimus_franka::RobotState& robot_state,
+                                         agimus_franka::Duration /*duration*/) -> agimus_franka::Torques {
       // get state variables
       std::array<double, 7> coriolis_array = model.coriolis(robot_state);
       std::array<double, 42> jacobian_array =
-          model.zeroJacobian(franka::Frame::kEndEffector, robot_state);
+          model.zeroJacobian(agimus_franka::Frame::kEndEffector, robot_state);
 
       // convert to Eigen
       Eigen::Map<const Eigen::Matrix<double, 7, 1>> coriolis(coriolis_array.data());
@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
     std::cin.ignore();
     robot.control(impedance_control_callback);
 
-  } catch (const franka::Exception& ex) {
+  } catch (const agimus_franka::Exception& ex) {
     // print exception
     std::cout << ex.what() << std::endl;
   }

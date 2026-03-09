@@ -1,6 +1,6 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <franka/control_tools.h>
+#include <agimus_franka/control_tools.h>
 
 #include <cstring>
 #include <exception>
@@ -20,7 +20,7 @@
 // See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65923#c0
 using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
 
-namespace franka {
+namespace agimus_franka {
 
 bool hasRealtimeKernel() {
 #ifdef LIBFRANKA_WINDOWS
@@ -47,7 +47,7 @@ bool setCurrentThreadToHighestSchedulerPriority(std::string* error_message) {
   if (!SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS)) {
     if (error_message != nullptr) {
       *error_message =
-          "libfranka: unable to set priority for the process: "s + get_last_windows_error();
+          "libagimus_franka: unable to set priority for the process: "s + get_last_windows_error();
     }
     return false;
   }
@@ -55,7 +55,7 @@ bool setCurrentThreadToHighestSchedulerPriority(std::string* error_message) {
   if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL)) {
     if (error_message != nullptr) {
       *error_message =
-          "libfranka: unable to set priority for the thread: "s + get_last_windows_error();
+          "libagimus_franka: unable to set priority for the thread: "s + get_last_windows_error();
     }
     return false;
   }
@@ -66,7 +66,7 @@ bool setCurrentThreadToHighestSchedulerPriority(std::string* error_message) {
   if (thread_priority == -1) {
     if (error_message != nullptr) {
       *error_message =
-          "libfranka: unable to get maximum possible thread priority: "s + std::strerror(errno);
+          "libagimus_franka: unable to get maximum possible thread priority: "s + std::strerror(errno);
     }
     return false;
   }
@@ -75,7 +75,7 @@ bool setCurrentThreadToHighestSchedulerPriority(std::string* error_message) {
   thread_param.sched_priority = thread_priority;
   if (pthread_setschedparam(pthread_self(), SCHED_FIFO, &thread_param) != 0) {
     if (error_message != nullptr) {
-      *error_message = "libfranka: unable to set realtime scheduling: "s + std::strerror(errno);
+      *error_message = "libagimus_franka: unable to set realtime scheduling: "s + std::strerror(errno);
     }
     return false;
   }
@@ -83,4 +83,4 @@ bool setCurrentThreadToHighestSchedulerPriority(std::string* error_message) {
 #endif
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

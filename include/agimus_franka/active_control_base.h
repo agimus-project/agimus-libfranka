@@ -2,9 +2,9 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
-#include <franka/control_types.h>
-#include <franka/exception.h>
-#include <franka/robot_state.h>
+#include <agimus_franka/control_types.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/robot_state.h>
 #include <memory>
 #include <optional>
 #include <utility>
@@ -14,14 +14,14 @@
  * Abstract interface class as the base of the active controllers.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 /**
  * Allows the user to read the state of a Robot and to send new control commands after starting a
  * control process of a Robot.
  *
- * hint: To create an ActiveControlBase, see franka::ActiveTorqueControl or
- * franka::ActiveMotionGenerator
+ * hint: To create an ActiveControlBase, see agimus_franka::ActiveTorqueControl or
+ * agimus_franka::ActiveMotionGenerator
  *
  */
 class ActiveControlBase {
@@ -116,4 +116,4 @@ class ActiveControlBase {
   ActiveControlBase() = default;
 };
 
-}  // namespace franka
+}  // namespace agimus_franka

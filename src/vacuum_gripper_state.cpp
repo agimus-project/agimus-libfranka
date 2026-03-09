@@ -1,13 +1,13 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include "franka/vacuum_gripper_state.h"
+#include "agimus_franka/vacuum_gripper_state.h"
 
 #include <cstring>
 
-namespace franka {
+namespace agimus_franka {
 
 std::ostream& operator<<(std::ostream& ostream,
-                         const franka::VacuumGripperState& vacuum_gripper_state) {
+                         const agimus_franka::VacuumGripperState& vacuum_gripper_state) {
   std::string device_status;
   switch (vacuum_gripper_state.device_status) {
     case VacuumGripperDeviceStatus::kGreen:
@@ -34,4 +34,4 @@ std::ostream& operator<<(std::ostream& ostream,
   return ostream;
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

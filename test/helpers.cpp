@@ -24,7 +24,7 @@ std::vector<std::string> splitAt(const std::string& s, char delimiter) {
   return tokens;
 }
 
-void testRobotStateIsZero(const franka::RobotState& actual) {
+void testRobotStateIsZero(const agimus_franka::RobotState& actual) {
   for (double element : actual.O_T_EE) {
     EXPECT_EQ(0.0, element);
   }
@@ -148,7 +148,7 @@ void testRobotStateIsZero(const franka::RobotState& actual) {
   EXPECT_EQ(0.0, actual.control_command_success_rate);
 }
 
-void testRobotStatesAreEqual(const franka::RobotState& expected, const franka::RobotState& actual) {
+void testRobotStatesAreEqual(const agimus_franka::RobotState& expected, const agimus_franka::RobotState& actual) {
   EXPECT_EQ(expected.O_T_EE, actual.O_T_EE);
   EXPECT_EQ(expected.F_T_NE, actual.F_T_NE);
   EXPECT_EQ(expected.NE_T_EE, actual.NE_T_EE);
@@ -198,7 +198,7 @@ void testRobotStatesAreEqual(const franka::RobotState& expected, const franka::R
 }
 
 void testRobotStatesAreEqual(const agimus_research_interface::robot::RobotState& expected,
-                             const franka::RobotState& actual) {
+                             const agimus_franka::RobotState& actual) {
   EXPECT_EQ(expected.O_T_EE, actual.O_T_EE);
   EXPECT_EQ(expected.F_T_NE, actual.F_T_NE);
   EXPECT_EQ(expected.NE_T_EE, actual.NE_T_EE);
@@ -212,10 +212,10 @@ void testRobotStatesAreEqual(const agimus_research_interface::robot::RobotState&
   EXPECT_EQ(expected.F_x_Cload, actual.F_x_Cload);
   EXPECT_EQ(expected.I_load, actual.I_load);
   EXPECT_EQ(expected.m_ee + expected.m_load, actual.m_total);
-  EXPECT_EQ(franka::combineCenterOfMass(expected.m_ee, expected.F_x_Cee, expected.m_load,
+  EXPECT_EQ(agimus_franka::combineCenterOfMass(expected.m_ee, expected.F_x_Cee, expected.m_load,
                                         expected.F_x_Cload),
             actual.F_x_Ctotal);
-  EXPECT_EQ(franka::combineInertiaTensor(expected.m_ee, expected.F_x_Cee, expected.I_ee,
+  EXPECT_EQ(agimus_franka::combineInertiaTensor(expected.m_ee, expected.F_x_Cee, expected.I_ee,
                                          expected.m_load, expected.F_x_Cload, expected.I_load,
                                          actual.m_total, actual.F_x_Ctotal),
             actual.I_total);
@@ -245,33 +245,33 @@ void testRobotStatesAreEqual(const agimus_research_interface::robot::RobotState&
   EXPECT_EQ(expected.O_ddP_EE_c, actual.O_ddP_EE_c);
   EXPECT_EQ(expected.theta, actual.theta);
   EXPECT_EQ(expected.dtheta, actual.dtheta);
-  EXPECT_EQ(franka::Errors(expected.errors), actual.current_errors);
-  EXPECT_EQ(franka::Errors(expected.reflex_reason), actual.last_motion_errors);
+  EXPECT_EQ(agimus_franka::Errors(expected.errors), actual.current_errors);
+  EXPECT_EQ(agimus_franka::Errors(expected.reflex_reason), actual.last_motion_errors);
   EXPECT_EQ(expected.message_id, actual.time.toMSec());
   EXPECT_EQ(expected.control_command_success_rate, actual.control_command_success_rate);
 
-  franka::RobotMode expected_robot_mode = franka::RobotMode::kOther;
+  agimus_franka::RobotMode expected_robot_mode = agimus_franka::RobotMode::kOther;
   switch (expected.robot_mode) {
     case agimus_research_interface::robot::RobotMode::kOther:
-      expected_robot_mode = franka::RobotMode::kOther;
+      expected_robot_mode = agimus_franka::RobotMode::kOther;
       break;
     case agimus_research_interface::robot::RobotMode::kIdle:
-      expected_robot_mode = franka::RobotMode::kIdle;
+      expected_robot_mode = agimus_franka::RobotMode::kIdle;
       break;
     case agimus_research_interface::robot::RobotMode::kMove:
-      expected_robot_mode = franka::RobotMode::kMove;
+      expected_robot_mode = agimus_franka::RobotMode::kMove;
       break;
     case agimus_research_interface::robot::RobotMode::kGuiding:
-      expected_robot_mode = franka::RobotMode::kGuiding;
+      expected_robot_mode = agimus_franka::RobotMode::kGuiding;
       break;
     case agimus_research_interface::robot::RobotMode::kReflex:
-      expected_robot_mode = franka::RobotMode::kReflex;
+      expected_robot_mode = agimus_franka::RobotMode::kReflex;
       break;
     case agimus_research_interface::robot::RobotMode::kUserStopped:
-      expected_robot_mode = franka::RobotMode::kUserStopped;
+      expected_robot_mode = agimus_franka::RobotMode::kUserStopped;
       break;
     case agimus_research_interface::robot::RobotMode::kAutomaticErrorRecovery:
-      expected_robot_mode = franka::RobotMode::kAutomaticErrorRecovery;
+      expected_robot_mode = agimus_franka::RobotMode::kAutomaticErrorRecovery;
       break;
   }
   EXPECT_EQ(expected_robot_mode, actual.robot_mode);
@@ -295,8 +295,8 @@ std::array<double, 16> identityMatrix() {
   return matrix;
 }
 
-franka::RobotState generateValidRobotState() {
-  franka::RobotState robot_state{};
+agimus_franka::RobotState generateValidRobotState() {
+  agimus_franka::RobotState robot_state{};
   robot_state.O_T_EE = identityMatrix();
   robot_state.O_T_EE_d = identityMatrix();
   robot_state.F_T_EE = identityMatrix();
@@ -305,7 +305,7 @@ franka::RobotState generateValidRobotState() {
   return robot_state;
 }
 
-void randomRobotState(franka::RobotState& robot_state) {
+void randomRobotState(agimus_franka::RobotState& robot_state) {
   for (double& element : robot_state.O_T_EE) {
     element = randomDouble();
   }
@@ -427,13 +427,13 @@ void randomRobotState(franka::RobotState& robot_state) {
   for (bool& error : errors) {
     error = randomBool();
   }
-  robot_state.current_errors = franka::Errors(errors);
+  robot_state.current_errors = agimus_franka::Errors(errors);
   for (bool& error : errors) {
     error = randomBool();
   }
-  robot_state.last_motion_errors = franka::Errors(errors);
+  robot_state.last_motion_errors = agimus_franka::Errors(errors);
   robot_state.control_command_success_rate = randomDouble();
-  robot_state.time = franka::Duration(static_cast<uint64_t>(std::rand()));
+  robot_state.time = agimus_franka::Duration(static_cast<uint64_t>(std::rand()));
 }
 
 void randomRobotState(agimus_research_interface::robot::RobotState& robot_state) {
@@ -609,7 +609,7 @@ void testRobotCommandsAreEqual(const agimus_research_interface::robot::RobotComm
 }
 
 void testRobotCommandsAreEqual(const agimus_research_interface::robot::RobotCommand& expected,
-                               const franka::RobotCommand actual) {
+                               const agimus_franka::RobotCommand actual) {
   agimus_research_interface::robot::RobotCommand fci_command = expected;
   fci_command.motion.q_c = actual.joint_positions.q;
   fci_command.motion.dq_c = actual.joint_velocities.dq;
@@ -619,8 +619,8 @@ void testRobotCommandsAreEqual(const agimus_research_interface::robot::RobotComm
   testRobotCommandsAreEqual(expected, fci_command);
 }
 
-void randomGripperState(franka::GripperState& gripper_state) {
-  gripper_state.time = franka::Duration(static_cast<uint64_t>(std::rand()));
+void randomGripperState(agimus_franka::GripperState& gripper_state) {
+  gripper_state.time = agimus_franka::Duration(static_cast<uint64_t>(std::rand()));
   gripper_state.temperature = static_cast<uint16_t>(std::rand());
   gripper_state.is_grasped = randomBool();
   gripper_state.max_width = randomDouble();
@@ -637,8 +637,8 @@ void randomGripperState(agimus_research_interface::gripper::GripperState& grippe
   gripper_state.width = randomDouble();
 }
 
-void testGripperStatesAreEqual(const franka::GripperState& expected,
-                               const franka::GripperState& actual) {
+void testGripperStatesAreEqual(const agimus_franka::GripperState& expected,
+                               const agimus_franka::GripperState& actual) {
   EXPECT_EQ(expected.time, actual.time);
   EXPECT_EQ(expected.width, actual.width);
   EXPECT_EQ(expected.max_width, actual.max_width);
@@ -647,7 +647,7 @@ void testGripperStatesAreEqual(const franka::GripperState& expected,
 }
 
 void testGripperStatesAreEqual(const agimus_research_interface::gripper::GripperState& expected,
-                               const franka::GripperState& actual) {
+                               const agimus_franka::GripperState& actual) {
   EXPECT_EQ(expected.message_id, actual.time.toMSec());
   EXPECT_EQ(expected.width, actual.width);
   EXPECT_EQ(expected.max_width, actual.max_width);
@@ -683,7 +683,7 @@ bool operator==(const Move::Deviation& left, const Move::Deviation& right) {
 }  // namespace robot
 }  // namespace agimus_research_interface
 
-namespace franka {
+namespace agimus_franka {
 
 bool operator==(const Errors& lhs, const Errors& rhs) {
   return lhs.joint_position_limits_violation == rhs.joint_position_limits_violation &&
@@ -776,4 +776,4 @@ bool operator==(const RobotState& lhs, const RobotState& rhs) {
          lhs.robot_mode == rhs.robot_mode && lhs.time == rhs.time;
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

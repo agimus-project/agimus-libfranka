@@ -10,7 +10,7 @@
 #include <string>
 #include <thread>
 
-#include <franka/robot_state.h>
+#include <agimus_franka/robot_state.h>
 #include <agimus_research_interface/gripper/types.h>
 #include <agimus_research_interface/robot/rbk_types.h>
 #include <agimus_research_interface/robot/service_types.h>

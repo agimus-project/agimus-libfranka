@@ -5,10 +5,10 @@
 
 #include <Eigen/Core>
 
-#include <franka/duration.h>
-#include <franka/exception.h>
-#include <franka/model.h>
-#include <franka/robot.h>
+#include <agimus_franka/duration.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/model.h>
+#include <agimus_franka/robot.h>
 
 #include "examples_common.h"
 
@@ -36,10 +36,10 @@ int main(int argc, char** argv) {
 
   try {
     // connect to robot
-    franka::Robot robot(argv[1]);
+    agimus_franka::Robot robot(argv[1]);
     setDefaultBehavior(robot);
     // load the kinematics and dynamics model
-    franka::Model model = robot.loadModel();
+    agimus_franka::Model model = robot.loadModel();
 
     // set collision behavior
     robot.setCollisionBehavior({{100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0}},
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
                                {{100.0, 100.0, 100.0, 100.0, 100.0, 100.0}},
                                {{100.0, 100.0, 100.0, 100.0, 100.0, 100.0}});
 
-    franka::RobotState initial_state = robot.readOnce();
+    agimus_franka::RobotState initial_state = robot.readOnce();
 
     Eigen::VectorXd initial_tau_ext(7), tau_error_integral(7);
     // Bias torque sensor
@@ -62,12 +62,12 @@ int main(int argc, char** argv) {
     // define callback for the torque control loop
     Eigen::Vector3d initial_position;
     double time = 0.0;
-    auto get_position = [](const franka::RobotState& robot_state) {
+    auto get_position = [](const agimus_franka::RobotState& robot_state) {
       return Eigen::Vector3d(robot_state.O_T_EE[12], robot_state.O_T_EE[13],
                              robot_state.O_T_EE[14]);
     };
-    auto force_control_callback = [&](const franka::RobotState& robot_state,
-                                      franka::Duration period) -> franka::Torques {
+    auto force_control_callback = [&](const agimus_franka::RobotState& robot_state,
+                                      agimus_franka::Duration period) -> agimus_franka::Torques {
       time += period.toSec();
 
       if (time == 0.0) {
@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
 
       // get state variables
       std::array<double, 42> jacobian_array =
-          model.zeroJacobian(franka::Frame::kEndEffector, robot_state);
+          model.zeroJacobian(agimus_franka::Frame::kEndEffector, robot_state);
 
       Eigen::Map<const Eigen::Matrix<double, 6, 7>> jacobian(jacobian_array.data());
       Eigen::Map<const Eigen::Matrix<double, 7, 1>> tau_measured(robot_state.tau_J.data());

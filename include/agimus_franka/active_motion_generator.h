@@ -6,16 +6,16 @@
 
 /**
  * @file active_motion_generator.h
- * Contains the `franka::ActiveMotionGenerator` type.
+ * Contains the `agimus_franka::ActiveMotionGenerator` type.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 /**
  * Allows the user to read the state of a Robot and to send new motion generator commands after
  * starting a control process of a Robot.
  *
- * hint: To create an ActiveMotionGenerator, see franka::Robot
+ * hint: To create an ActiveMotionGenerator, see agimus_franka::Robot
  *
  */
 template <typename MotionGeneratorType>
@@ -36,7 +36,7 @@ class ActiveMotionGenerator : public ActiveControl {
   void writeOnce(const MotionGeneratorType& motion_generator_input,
                  const std::optional<const Torques>& control_input) override;
   /**
-   * franka::Robot as friend to allow construction of ActiveMotionGenerator<MotionGeneratorType> in
+   * agimus_franka::Robot as friend to allow construction of ActiveMotionGenerator<MotionGeneratorType> in
    * start<MotionGeneratorType>Control methods
    *
    */
@@ -63,4 +63,4 @@ class ActiveMotionGenerator : public ActiveControl {
 
   agimus_research_interface::robot::Move::ControllerMode controller_type_;
 };
-}  // namespace franka
+}  // namespace agimus_franka

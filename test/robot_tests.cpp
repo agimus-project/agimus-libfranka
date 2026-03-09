@@ -7,12 +7,12 @@
 #include <thread>
 #include <utility>
 
-#include <franka/active_control.h>
-#include <franka/active_torque_control.h>
-#include <franka/control_types.h>
-#include <franka/exception.h>
-#include <franka/lowpass_filter.h>
-#include <franka/robot.h>
+#include <agimus_franka/active_control.h>
+#include <agimus_franka/active_torque_control.h>
+#include <agimus_franka/control_types.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/lowpass_filter.h>
+#include <agimus_franka/robot.h>
 #include <agimus_research_interface/robot/service_types.h>
 #include <robot_impl.h>
 
@@ -29,7 +29,7 @@ using agimus_research_interface::robot::Move;
 using agimus_research_interface::robot::StopMove;
 using namespace agimus_research_interface;
 
-using namespace franka;
+using namespace agimus_franka;
 using namespace std::chrono_literals;
 
 TEST(Robot, CannotConnectIfNoServerRunning) {
@@ -155,7 +155,7 @@ TEST(Robot, CanControlRobot) {
         send.clear();
         return MotionFinished(joint_positions);
       },
-      ControllerMode::kJointImpedance, false, franka::kMaxCutoffFrequency);
+      ControllerMode::kJointImpedance, false, agimus_franka::kMaxCutoffFrequency);
 
   ASSERT_NE(0u, stopped_message_id);
   ASSERT_EQ(5, count);
@@ -241,8 +241,8 @@ TEST(Robot, StopAfterControllerChange) {
   int count = 0;
   JointPositions joint_positions{{0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0}};
   Torques torques{{10, 10, 10, 10, 10, 10, 10}};
-  EXPECT_THROW(robot.control([&](const franka::RobotState&,
-                                 franka::Duration) -> franka::Torques { return torques; },
+  EXPECT_THROW(robot.control([&](const agimus_franka::RobotState&,
+                                 agimus_franka::Duration) -> agimus_franka::Torques { return torques; },
                              [&](const RobotState&, Duration time_step) -> JointPositions {
                                if (count == 0) {
                                  EXPECT_EQ(0u, time_step.toMSec());
@@ -316,8 +316,8 @@ TEST(Robot, StopAfterMotionAndControllerChange) {
   int count = 0;
   JointPositions joint_positions{{0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0}};
   Torques torques{{10, 10, 10, 10, 10, 10, 10}};
-  EXPECT_THROW(robot.control([&](const franka::RobotState&,
-                                 franka::Duration) -> franka::Torques { return torques; },
+  EXPECT_THROW(robot.control([&](const agimus_franka::RobotState&,
+                                 agimus_franka::Duration) -> agimus_franka::Torques { return torques; },
                              [&](const RobotState&, Duration time_step) -> JointPositions {
                                if (count == 0) {
                                  EXPECT_EQ(0u, time_step.toMSec());
@@ -391,8 +391,8 @@ TEST(Robot, StopAfterMotionGeneratorChange) {
   int count = 0;
   JointPositions joint_positions{{0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0}};
   Torques torques{{10, 10, 10, 10, 10, 10, 10}};
-  EXPECT_THROW(robot.control([&](const franka::RobotState&,
-                                 franka::Duration) -> franka::Torques { return torques; },
+  EXPECT_THROW(robot.control([&](const agimus_franka::RobotState&,
+                                 agimus_franka::Duration) -> agimus_franka::Torques { return torques; },
                              [&](const RobotState&, Duration time_step) -> JointPositions {
                                if (count == 0) {
                                  EXPECT_EQ(0u, time_step.toMSec());

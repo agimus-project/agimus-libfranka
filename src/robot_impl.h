@@ -7,8 +7,8 @@
 #include <sstream>
 #include <type_traits>
 
-#include <franka/model.h>
-#include <franka/robot.h>
+#include <agimus_franka/model.h>
+#include <agimus_franka/robot.h>
 #include <agimus_research_interface/robot/rbk_types.h>
 #include <agimus_research_interface/robot/service_traits.h>
 #include <agimus_research_interface/robot/service_types.h>
@@ -17,7 +17,7 @@
 #include "network.h"
 #include "robot_control.h"
 
-namespace franka {
+namespace agimus_franka {
 
 RobotState convertRobotState(const agimus_research_interface::robot::RobotState& robot_state) noexcept;
 
@@ -118,7 +118,7 @@ class Robot::Impl : public RobotControl {
   std::string commandNotPossibleMsg() const {
     std::stringstream ss;
     ss << " command rejected: command not possible in the current mode ("
-       << static_cast<franka::RobotMode>(robot_mode_) << ")!";
+       << static_cast<agimus_franka::RobotMode>(robot_mode_) << ")!";
     if (robot_mode_ == agimus_research_interface::robot::RobotMode::kOther) {
       ss << " Did you open the brakes?";
     }
@@ -138,17 +138,17 @@ class Robot::Impl : public RobotControl {
       case T::Status::kSuccess:
         break;
       case T::Status::kCommandNotPossibleRejected:
-        throw CommandException("libfranka: "s + agimus_research_interface::robot::CommandTraits<T>::kName +
+        throw CommandException("libagimus_franka: "s + agimus_research_interface::robot::CommandTraits<T>::kName +
                                commandNotPossibleMsg());
       case T::Status::kInvalidArgumentRejected:
-        throw CommandException("libfranka: "s + agimus_research_interface::robot::CommandTraits<T>::kName +
+        throw CommandException("libagimus_franka: "s + agimus_research_interface::robot::CommandTraits<T>::kName +
                                " command rejected: invalid argument!");
       // case T::Status::kCommandRejectedDueToActivatedSafetyFunctions:
-      //   throw CommandException("libfranka: "s + agimus_research_interface::robot::CommandTraits<T>::kName +
+      //   throw CommandException("libagimus_franka: "s + agimus_research_interface::robot::CommandTraits<T>::kName +
       //                          " command rejected due to activated safety function! Please disable "
       //                          "all safety functions. ");
       default:
-        throw ProtocolException("libfranka: Unexpected response while handling "s +
+        throw ProtocolException("libagimus_franka: Unexpected response while handling "s +
                                 agimus_research_interface::robot::CommandTraits<T>::kName + " command!");
     }
   }
@@ -162,14 +162,14 @@ class Robot::Impl : public RobotControl {
       case T::Status::kSuccess:
         break;
       case T::Status::kCommandNotPossibleRejected:
-        throw CommandException("libfranka: "s + agimus_research_interface::robot::CommandTraits<T>::kName +
+        throw CommandException("libagimus_franka: "s + agimus_research_interface::robot::CommandTraits<T>::kName +
                                commandNotPossibleMsg());
       // case T::Status::kCommandRejectedDueToActivatedSafetyFunctions:
-      //   throw CommandException("libfranka: "s + agimus_research_interface::robot::CommandTraits<T>::kName +
+      //   throw CommandException("libagimus_franka: "s + agimus_research_interface::robot::CommandTraits<T>::kName +
       //                          " command rejected due to activated safety function! Please disable "
       //                          "all safety functions.");
       default:
-        throw ProtocolException("libfranka: Unexpected response while handling "s +
+        throw ProtocolException("libagimus_franka: Unexpected response while handling "s +
                                 agimus_research_interface::robot::CommandTraits<T>::kName + " command!");
     }
   }
@@ -208,66 +208,66 @@ inline void Robot::Impl::handleCommandResponse<agimus_research_interface::robot:
     case agimus_research_interface::robot::Move::Status::kMotionStarted:
       if (motionGeneratorRunning()) {
         throw ProtocolException(
-            "libfranka: "s +
+            "libagimus_franka: "s +
             agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::Move>::kName +
             " received unexpected motion started message.");
       }
       break;
     case agimus_research_interface::robot::Move::Status::kEmergencyAborted:
       throw CommandException(
-          "libfranka: "s +
+          "libagimus_franka: "s +
           agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::Move>::kName +
           " command aborted: User Stop pressed!");
     case agimus_research_interface::robot::Move::Status::kReflexAborted:
       throw CommandException(
-          "libfranka: "s +
+          "libagimus_franka: "s +
           agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::Move>::kName +
           " command aborted: motion aborted by reflex!");
     case agimus_research_interface::robot::Move::Status::kInputErrorAborted:
       throw CommandException(
-          "libfranka: "s +
+          "libagimus_franka: "s +
           agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::Move>::kName +
           " command aborted: invalid input provided!");
     case agimus_research_interface::robot::Move::Status::kCommandNotPossibleRejected:
       throw CommandException(
-          "libfranka: "s +
+          "libagimus_franka: "s +
           agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::Move>::kName +
           commandNotPossibleMsg());
     case agimus_research_interface::robot::Move::Status::kStartAtSingularPoseRejected:
       throw CommandException(
-          "libfranka: "s +
+          "libagimus_franka: "s +
           agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::Move>::kName +
           " command rejected: cannot start at singular pose!");
     case agimus_research_interface::robot::Move::Status::kInvalidArgumentRejected:
       throw CommandException(
-          "libfranka: "s +
+          "libagimus_franka: "s +
           agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::Move>::kName +
           " command rejected: maximum path deviation out of range!");
     case agimus_research_interface::robot::Move::Status::kPreempted:
       throw CommandException(
-          "libfranka: "s +
+          "libagimus_franka: "s +
           agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::Move>::kName +
           " command preempted!");
     case agimus_research_interface::robot::Move::Status::kAborted:
       throw CommandException(
-          "libfranka: "s +
+          "libagimus_franka: "s +
           agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::Move>::kName +
           " command aborted!");
     // case agimus_research_interface::robot::Move::Status::kPreemptedDueToActivatedSafetyFunctions:
     //  throw CommandException(
-    //      "libfranka: "s +
+    //      "libagimus_franka: "s +
     //      agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::Move>::kName +
     //      " command preempted due to activated safety function! Please disable all safety "
     //      "functions.");
     // case agimus_research_interface::robot::Move::Status::kCommandRejectedDueToActivatedSafetyFunctions:
     //   throw CommandException(
-    //       "libfranka: "s +
+    //       "libagimus_franka: "s +
     //       agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::Move>::kName +
     //       " command rejected due to activated safety function! Please disable all safety "
     //       "functions.");
     default:
       throw ProtocolException(
-          "libfranka: Unexpected response while handling "s +
+          "libagimus_franka: Unexpected response while handling "s +
           agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::Move>::kName +
           " command!");
   }
@@ -283,33 +283,33 @@ inline void Robot::Impl::handleCommandResponse<agimus_research_interface::robot:
       break;
     case agimus_research_interface::robot::StopMove::Status::kCommandNotPossibleRejected:
       throw CommandException(
-          "libfranka: "s +
+          "libagimus_franka: "s +
           agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::StopMove>::kName +
           commandNotPossibleMsg());
     case agimus_research_interface::robot::StopMove::Status::kAborted:
       throw CommandException(
-          "libfranka: "s +
+          "libagimus_franka: "s +
           agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::StopMove>::kName +
           commandNotPossibleMsg());
     case agimus_research_interface::robot::StopMove::Status::kEmergencyAborted:
       throw CommandException(
-          "libfranka: "s +
+          "libagimus_franka: "s +
           agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::StopMove>::kName +
           " command aborted: User Stop pressed!");
     case agimus_research_interface::robot::StopMove::Status::kReflexAborted:
       throw CommandException(
-          "libfranka: "s +
+          "libagimus_franka: "s +
           agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::StopMove>::kName +
           " command aborted: motion aborted by reflex!");
     // case agimus_research_interface::robot::StopMove::Status::kCommandRejectedDueToActivatedSafetyFunctions:
     //   throw CommandException(
-    //       "libfranka: "s +
+    //       "libagimus_franka: "s +
     //       agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::Move>::kName +
     //       " command rejected due to activated safety function! Please disable all safety "
     //       "functions.");
     default:
       throw ProtocolException(
-          "libfranka: Unexpected response while handling "s +
+          "libagimus_franka: Unexpected response while handling "s +
           agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::StopMove>::kName +
           " command!");
   }
@@ -324,40 +324,40 @@ inline void Robot::Impl::handleCommandResponse<agimus_research_interface::robot:
     case agimus_research_interface::robot::AutomaticErrorRecovery::Status::kSuccess:
       break;
     case agimus_research_interface::robot::AutomaticErrorRecovery::Status::kEmergencyAborted:
-      throw CommandException("libfranka: "s +
+      throw CommandException("libagimus_franka: "s +
                              agimus_research_interface::robot::CommandTraits<
                                  agimus_research_interface::robot::AutomaticErrorRecovery>::kName +
                              " command aborted: User Stop pressed!");
     case agimus_research_interface::robot::AutomaticErrorRecovery::Status::kReflexAborted:
-      throw CommandException("libfranka: "s +
+      throw CommandException("libagimus_franka: "s +
                              agimus_research_interface::robot::CommandTraits<
                                  agimus_research_interface::robot::AutomaticErrorRecovery>::kName +
                              " command aborted: motion aborted by reflex!");
     case agimus_research_interface::robot::AutomaticErrorRecovery::Status::kCommandNotPossibleRejected:
-      throw CommandException("libfranka: "s +
+      throw CommandException("libagimus_franka: "s +
                              agimus_research_interface::robot::CommandTraits<
                                  agimus_research_interface::robot::AutomaticErrorRecovery>::kName +
                              commandNotPossibleMsg());
     case agimus_research_interface::robot::AutomaticErrorRecovery::Status::
         kManualErrorRecoveryRequiredRejected:
-      throw CommandException("libfranka: "s +
+      throw CommandException("libagimus_franka: "s +
                              agimus_research_interface::robot::CommandTraits<
                                  agimus_research_interface::robot::AutomaticErrorRecovery>::kName +
                              " command rejected: manual error recovery required!");
     case agimus_research_interface::robot::AutomaticErrorRecovery::Status::kAborted:
-      throw CommandException("libfranka: "s +
+      throw CommandException("libagimus_franka: "s +
                              agimus_research_interface::robot::CommandTraits<
                                  agimus_research_interface::robot::AutomaticErrorRecovery>::kName +
                              " command aborted!");
     // case agimus_research_interface::robot::AutomaticErrorRecovery::Status::
     //     kCommandRejectedDueToActivatedSafetyFunctions:
     //   throw CommandException(
-    //       "libfranka: "s +
+    //       "libagimus_franka: "s +
     //       agimus_research_interface::robot::CommandTraits<agimus_research_interface::robot::Move>::kName +
     //       " command rejected due to activated safety function! Please disable all safety "
     //       "functions.");
     default:
-      throw ProtocolException("libfranka: Unexpected response while handling "s +
+      throw ProtocolException("libagimus_franka: Unexpected response while handling "s +
                               agimus_research_interface::robot::CommandTraits<
                                   agimus_research_interface::robot::AutomaticErrorRecovery>::kName +
                               " command!");
@@ -372,4 +372,4 @@ uint32_t Robot::Impl::executeCommand(TArgs... args) {
   return command_id;
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

@@ -4,9 +4,9 @@
 
 #include "library_downloader.h"
 
-namespace franka {
+namespace agimus_franka {
 
-ModelLibrary::ModelLibrary(franka::Network& network)
+ModelLibrary::ModelLibrary(agimus_franka::Network& network)
     : loader_(LibraryDownloader(network).path()),
       body_jacobian_joint1{reinterpret_cast<decltype(&Ji_J_J1)>(loader_.getSymbol("Ji_J_J1"))},
       body_jacobian_joint2{reinterpret_cast<decltype(&Ji_J_J2)>(loader_.getSymbol("Ji_J_J2"))},
@@ -39,4 +39,4 @@ ModelLibrary::ModelLibrary(franka::Network& network)
       coriolis{reinterpret_cast<decltype(&c_NE)>(loader_.getSymbol("c_NE"))},
       gravity{reinterpret_cast<decltype(&g_NE)>(loader_.getSymbol("g_NE"))} {}
 
-}  // namespace franka
+}  // namespace agimus_franka

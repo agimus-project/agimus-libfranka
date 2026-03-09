@@ -1,12 +1,12 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include "franka/gripper_state.h"
+#include "agimus_franka/gripper_state.h"
 
 #include <cstring>
 
-namespace franka {
+namespace agimus_franka {
 
-std::ostream& operator<<(std::ostream& ostream, const franka::GripperState& gripper_state) {
+std::ostream& operator<<(std::ostream& ostream, const agimus_franka::GripperState& gripper_state) {
   ostream << "{\"width\": " << gripper_state.width << ", \"max_width\": " << gripper_state.max_width
           << ", \"is_grasped\": " << gripper_state.is_grasped
           << ", \"temperature\": " << gripper_state.temperature
@@ -14,4 +14,4 @@ std::ostream& operator<<(std::ostream& ostream, const franka::GripperState& grip
   return ostream;
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

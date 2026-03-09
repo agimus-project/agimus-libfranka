@@ -6,14 +6,14 @@
 #include <ostream>
 #include <string>
 
-#include <franka/duration.h>
+#include <agimus_franka/duration.h>
 
 /**
  * @file vacuum_gripper_state.h
- * Contains the franka::VacuumGripperState type.
+ * Contains the agimus_franka::VacuumGripperState type.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 /**
  * Vacuum gripper device status.
@@ -75,6 +75,6 @@ struct VacuumGripperState {
  * @return Ostream instance
  */
 std::ostream& operator<<(std::ostream& ostream,
-                         const franka::VacuumGripperState& vacuum_gripper_state);
+                         const agimus_franka::VacuumGripperState& vacuum_gripper_state);
 
-}  // namespace franka
+}  // namespace agimus_franka

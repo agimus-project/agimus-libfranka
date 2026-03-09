@@ -2,19 +2,19 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #include <gmock/gmock.h>
 
-#include <franka/exception.h>
-#include <franka/vacuum_gripper.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/vacuum_gripper.h>
 
 #include <chrono>
 
 #include "helpers.h"
 #include "mock_server.h"
 
-using franka::CommandException;
-using franka::IncompatibleVersionException;
-using franka::Network;
-using franka::VacuumGripper;
-using franka::VacuumGripperState;
+using agimus_franka::CommandException;
+using agimus_franka::IncompatibleVersionException;
+using agimus_franka::Network;
+using agimus_franka::VacuumGripper;
+using agimus_franka::VacuumGripperState;
 
 using namespace agimus_research_interface::vacuum_gripper;
 
@@ -76,8 +76,8 @@ DropOff::Request VacuumGripperCommand<DropOff>::getExpected() {
 template <>
 bool VacuumGripperCommand<Vacuum>::executeCommand(VacuumGripper& vacuum_gripper) {
   uint8_t vacuum = 100;
-  franka::VacuumGripper::ProductionSetupProfile profile =
-      franka::VacuumGripper::ProductionSetupProfile::kP0;
+  agimus_franka::VacuumGripper::ProductionSetupProfile profile =
+      agimus_franka::VacuumGripper::ProductionSetupProfile::kP0;
   std::chrono::milliseconds timeout = std::chrono::milliseconds(1000);
   return vacuum_gripper.vacuum(vacuum, timeout, profile);
 }
@@ -137,7 +137,7 @@ TYPED_TEST(VacuumGripperCommand, CanSendAndReceiveFail) {
 
 TYPED_TEST(VacuumGripperCommand, CanSendAndReceiveUnsucessful) {
   VacuumGripperMockServer server;
-  franka::VacuumGripper vacuum_gripper("127.0.0.1");
+  agimus_franka::VacuumGripper vacuum_gripper("127.0.0.1");
 
   server
       .waitForCommand<typename TestFixture::TCommand>(

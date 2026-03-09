@@ -4,12 +4,12 @@
 
 #include <gtest/gtest.h>
 
-#include <franka/robot_state.h>
+#include <agimus_franka/robot_state.h>
 
 #include "helpers.h"
 #include "robot_impl.h"
 
-using namespace franka;
+using namespace agimus_franka;
 
 TEST(RobotState, IsInitializedToZero) {
   RobotState robot_state;

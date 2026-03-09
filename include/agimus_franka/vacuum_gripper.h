@@ -7,14 +7,14 @@
 #include <memory>
 #include <string>
 
-#include <franka/vacuum_gripper_state.h>
+#include <agimus_franka/vacuum_gripper_state.h>
 
 /**
  * @file vacuum_gripper.h
- * Contains the franka::VacuumGripper type.
+ * Contains the agimus_franka::VacuumGripper type.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 class Network;
 
@@ -40,12 +40,12 @@ class VacuumGripper {
   /**
    * Establishes a connection with a vacuum gripper connected to a robot.
    *
-   * @param[in] franka_address IP/hostname of the robot the vacuum gripper is connected to.
+   * @param[in] agimus_franka_address IP/hostname of the robot the vacuum gripper is connected to.
    *
    * @throw NetworkException if the connection is unsuccessful.
-   * @throw IncompatibleVersionException if this version of `libfranka` is not supported.
+   * @throw IncompatibleVersionException if this version of `libagimus_franka` is not supported.
    */
-  explicit VacuumGripper(const std::string& franka_address);
+  explicit VacuumGripper(const std::string& agimus_franka_address);
 
   /**
    * Move-constructs a new VacuumGripper instance.
@@ -134,4 +134,4 @@ class VacuumGripper {
   uint16_t ri_version_;
 };
 
-}  // namespace franka
+}  // namespace agimus_franka

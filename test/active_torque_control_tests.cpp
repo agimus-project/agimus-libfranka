@@ -2,10 +2,10 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #include <gmock/gmock.h>
 
-#include <franka/active_control.h>
-#include <franka/active_torque_control.h>
-#include <franka/control_types.h>
-#include <franka/exception.h>
+#include <agimus_franka/active_control.h>
+#include <agimus_franka/active_torque_control.h>
+#include <agimus_franka/control_types.h>
+#include <agimus_franka/exception.h>
 #include <robot_impl.h>
 
 #include "helpers.h"
@@ -17,7 +17,7 @@ using ::testing::Matcher;
 
 using namespace agimus_research_interface;
 
-using namespace franka;
+using namespace agimus_franka;
 
 class ActiveTorqueControlTest : public ::testing::Test {
  public:

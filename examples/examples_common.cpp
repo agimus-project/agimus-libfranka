@@ -6,10 +6,10 @@
 #include <array>
 #include <cmath>
 
-#include <franka/exception.h>
-#include <franka/robot.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/robot.h>
 
-void setDefaultBehavior(franka::Robot& robot) {
+void setDefaultBehavior(agimus_franka::Robot& robot) {
   robot.setCollisionBehavior(
       {{20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0}}, {{20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0}},
       {{10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0}}, {{10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0}},
@@ -111,8 +111,8 @@ void MotionGenerator::calculateSynchronizedValues() {
   }
 }
 
-franka::JointPositions MotionGenerator::operator()(const franka::RobotState& robot_state,
-                                                   franka::Duration period) {
+agimus_franka::JointPositions MotionGenerator::operator()(const agimus_franka::RobotState& robot_state,
+                                                   agimus_franka::Duration period) {
   time_ += period.toSec();
 
   if (time_ == 0.0) {
@@ -126,7 +126,7 @@ franka::JointPositions MotionGenerator::operator()(const franka::RobotState& rob
 
   std::array<double, 7> joint_positions;
   Eigen::VectorXd::Map(&joint_positions[0], 7) = (q_start_ + delta_q_d);
-  franka::JointPositions output(joint_positions);
+  agimus_franka::JointPositions output(joint_positions);
   output.motion_finished = motion_finished;
   return output;
 }

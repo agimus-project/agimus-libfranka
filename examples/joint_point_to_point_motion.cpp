@@ -3,8 +3,8 @@
 #include <cmath>
 #include <iostream>
 
-#include <franka/exception.h>
-#include <franka/robot.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/robot.h>
 
 #include "examples_common.h"
 
@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     return -1;
   }
   try {
-    franka::Robot robot(argv[1]);
+    agimus_franka::Robot robot(argv[1]);
     setDefaultBehavior(robot);
 
     std::array<double, 7> q_goal;
@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
     std::cin.ignore();
     robot.control(motion_generator);
     std::cout << "Motion finished" << std::endl;
-  } catch (const franka::Exception& e) {
+  } catch (const agimus_franka::Exception& e) {
     std::cout << e.what() << std::endl;
     return -1;
   }

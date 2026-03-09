@@ -1,15 +1,15 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <franka/gripper.h>
+#include <agimus_franka/gripper.h>
 
 #include <sstream>
 
-#include <franka/exception.h>
+#include <agimus_franka/exception.h>
 #include <agimus_research_interface/gripper/types.h>
 
 #include "network.h"
 
-namespace franka {
+namespace agimus_franka {
 
 namespace {
 
@@ -22,13 +22,13 @@ bool executeCommand(Network& network, TArgs&&... args) {
     case T::Status::kSuccess:
       return true;
     case T::Status::kFail:
-      throw CommandException("libfranka gripper: Command failed!");
+      throw CommandException("libagimus_franka gripper: Command failed!");
     case T::Status::kUnsuccessful:
       return false;
     case T::Status::kAborted:
-      throw CommandException("libfranka gripper: Command aborted!");
+      throw CommandException("libagimus_franka gripper: Command aborted!");
     default:
-      throw ProtocolException("libfranka gripper: Unexpected response while handling command!");
+      throw ProtocolException("libagimus_franka gripper: Unexpected response while handling command!");
   }
 }
 
@@ -45,9 +45,9 @@ GripperState convertGripperState(
 
 }  // anonymous namespace
 
-Gripper::Gripper(const std::string& franka_address)
+Gripper::Gripper(const std::string& agimus_franka_address)
     : network_{
-          std::make_unique<Network>(franka_address, agimus_research_interface::gripper::kCommandPort)} {
+          std::make_unique<Network>(agimus_franka_address, agimus_research_interface::gripper::kCommandPort)} {
   connect<agimus_research_interface::gripper::Connect, agimus_research_interface::gripper::kVersion>(
       *network_, &ri_version_);
 }
@@ -92,4 +92,4 @@ GripperState Gripper::readOnce() const {
   return convertGripperState(gripper_state);
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

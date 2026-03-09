@@ -15,20 +15,20 @@
 using namespace std::chrono_literals;
 using namespace agimus_research_interface::robot;
 
-using franka::ControlException;
-using franka::NetworkException;
+using agimus_franka::ControlException;
+using agimus_franka::NetworkException;
 
-struct Robot : public ::franka::Robot {
-  struct Impl : public ::franka::Robot::Impl {
-    using ::franka::Robot::Impl::controllerRunning;
-    using ::franka::Robot::Impl::Impl;
-    using ::franka::Robot::Impl::motionGeneratorRunning;
+struct Robot : public ::agimus_franka::Robot {
+  struct Impl : public ::agimus_franka::Robot::Impl {
+    using ::agimus_franka::Robot::Impl::controllerRunning;
+    using ::agimus_franka::Robot::Impl::Impl;
+    using ::agimus_franka::Robot::Impl::motionGeneratorRunning;
   };
 };
 
 TEST(RobotImpl, CanReceiveRobotState) {
   RobotMockServer server;
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   RobotState sent_robot_state;
   server.sendRandomState<RobotState>([](auto s) { randomRobotState(s); }, &sent_robot_state)
@@ -40,7 +40,7 @@ TEST(RobotImpl, CanReceiveRobotState) {
 
 TEST(RobotImpl, CanReceiveReorderedRobotStatesCorrectly) {
   RobotMockServer server;
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   server.onSendUDP<RobotState>([](RobotState& robot_state) { robot_state.message_id = 2; })
       .spinOnce();
@@ -60,7 +60,7 @@ TEST(RobotImpl, CanReceiveReorderedRobotStatesCorrectly) {
 
 TEST(RobotImpl, ThrowsTimeoutIfNoRobotStateArrives) {
   RobotMockServer server;
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort, 200ms), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort, 200ms), 0);
 
   EXPECT_THROW(robot.update(nullptr, nullptr), NetworkException);
 }
@@ -71,18 +71,18 @@ TEST(RobotImpl, StopsIfControlConnectionClosed) {
     RobotMockServer server;
 
     robot.reset(
-        new Robot::Impl(std::make_unique<franka::Network>("127.0.0.1", kCommandPort, 200ms), 0));
+        new Robot::Impl(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort, 200ms), 0));
 
     RobotState robot_state;
     server.sendRandomState<RobotState>([](auto s) { randomRobotState(s); }, &robot_state)
         .spinOnce();
 
-    testRobotStatesAreEqual(franka::convertRobotState(robot_state),
+    testRobotStatesAreEqual(agimus_franka::convertRobotState(robot_state),
                             robot->update(nullptr, nullptr));
   }
 
   EXPECT_THROW(robot->update(nullptr, nullptr), NetworkException);
-  EXPECT_THROW(robot->writeOnce(franka::Torques{{1, 2, 3, 4, 5, 6, 7}}), NetworkException);
+  EXPECT_THROW(robot->writeOnce(agimus_franka::Torques{{1, 2, 3, 4, 5, 6, 7}}), NetworkException);
 }
 
 TEST(RobotImpl, CanStartMotion) {
@@ -90,7 +90,7 @@ TEST(RobotImpl, CanStartMotion) {
   Move::Deviation maximum_path_deviation{0, 1, 2};
   Move::Deviation maximum_goal_pose_deviation{3, 4, 5};
 
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   server
       .onSendUDP<RobotState>([](RobotState& robot_state) {
@@ -141,7 +141,7 @@ TEST(RobotImpl, CanStartMotion) {
   EXPECT_NO_THROW(robot.update(&motion_command, nullptr));
 
   // Test exceptions if wrong writeOnce is called
-  const franka::Torques control_output{{1, 2, 3, 4, 5, 6, 7}};
+  const agimus_franka::Torques control_output{{1, 2, 3, 4, 5, 6, 7}};
   EXPECT_THROW(robot.writeOnce(control_output), ControlException);
 
   // Test exceptions if wrong finishMotion is called
@@ -154,7 +154,7 @@ TEST(RobotImpl, CanStartMotionWithController) {
   Move::Deviation maximum_path_deviation{0, 1, 2};
   Move::Deviation maximum_goal_pose_deviation{3, 4, 5};
 
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   server
       .onSendUDP<RobotState>([](RobotState& robot_state) {
@@ -199,7 +199,7 @@ TEST(RobotImpl, CanStartExternalControllerMotion) {
   Move::Deviation maximum_goal_pose_deviation{3, 4, 5};
   RobotMockServer server;
 
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   server
       .onSendUDP<RobotState>([](RobotState& robot_state) {
@@ -240,7 +240,7 @@ TEST(RobotImpl, CanStartExternalControllerMotion) {
   EXPECT_THROW(robot.update(nullptr, &control_command), ControlException);
 
   // Test no exception if writeOnce is called
-  franka::Torques control_output{{1, 2, 3, 4, 5, 6, 7}};
+  agimus_franka::Torques control_output{{1, 2, 3, 4, 5, 6, 7}};
   motion_command.dq_c = {0, 0, 0, 0, 0, 0, 0};
   control_command.tau_J_d = control_output.tau_J;
   const uint64_t kMessageID = 3;
@@ -258,10 +258,10 @@ TEST(RobotImpl, CanStartExternalControllerMotion) {
   EXPECT_NO_THROW(robot.writeOnce(control_output));
 
   // Test exception if writeOnce with invalid input is called
-  EXPECT_THROW(robot.writeOnce(franka::Torques{}), std::invalid_argument);
+  EXPECT_THROW(robot.writeOnce(agimus_franka::Torques{}), std::invalid_argument);
 
   // Test exception if finishMotion with invalid input is called
-  EXPECT_THROW(robot.finishMotion(kMessageID, franka::Torques{}), std::invalid_argument);
+  EXPECT_THROW(robot.finishMotion(kMessageID, agimus_franka::Torques{}), std::invalid_argument);
 }
 
 TEST(RobotImpl, CanNotStartMultipleMotions) {
@@ -269,7 +269,7 @@ TEST(RobotImpl, CanNotStartMultipleMotions) {
   Move::Deviation maximum_path_deviation{0, 1, 2};
   Move::Deviation maximum_goal_pose_deviation{3, 4, 5};
 
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   server
       .onSendUDP<RobotState>([](RobotState& robot_state) {
@@ -305,7 +305,7 @@ TEST(RobotImpl, CanSendMotionGeneratorCommand) {
   sent_command.motion.motion_generation_finished = false;
 
   RobotMockServer server;
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   server
       .onSendUDP<RobotState>([=](RobotState& robot_state) {
@@ -351,7 +351,7 @@ TEST(RobotImpl, CanSendControllerCommand) {
   Move::Deviation maximum_path_deviation{0, 1, 2};
   Move::Deviation maximum_goal_pose_deviation{3, 4, 5};
 
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   server
       .onSendUDP<RobotState>([=](RobotState& robot_state) {
@@ -404,7 +404,7 @@ TEST(RobotImpl, CanSendMotionGeneratorAndControlCommand) {
   sent_command.motion.motion_generation_finished = false;
 
   RobotMockServer server;
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   server
       .onSendUDP<RobotState>([=](RobotState& robot_state) {
@@ -455,7 +455,7 @@ TEST(RobotImpl, CanReceiveMotionRejected) {
 
   {
     RobotMockServer server;
-    Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+    Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
     server
         .onSendUDP<RobotState>([=](RobotState& robot_state) {
@@ -504,7 +504,7 @@ TEST(RobotImpl, CanStopMotion) {
   uint32_t move_id;
 
   RobotMockServer server;
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   server
       .onSendUDP<RobotState>([](RobotState& robot_state) {
@@ -563,7 +563,7 @@ TEST(RobotImpl, StopMotionErrorThrowsControlException) {
   uint32_t move_id;
 
   RobotMockServer server;
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   server
       .onSendUDP<RobotState>([](RobotState& robot_state) {
@@ -622,7 +622,7 @@ TEST(RobotImpl, CanCancelMotion) {
   uint32_t move_id;
 
   RobotMockServer server;
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   server
       .onSendUDP<RobotState>([](RobotState& robot_state) {
@@ -670,7 +670,7 @@ TEST(RobotImpl, CancelMotionErrorThrowsControlException) {
   uint32_t move_id;
 
   RobotMockServer server;
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   server
       .onSendUDP<RobotState>([](RobotState& robot_state) {
@@ -711,7 +711,7 @@ TEST(RobotImpl, CanStopMotionWithController) {
   uint32_t move_id;
 
   RobotMockServer server;
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
   server
       .onSendUDP<RobotState>([](RobotState& robot_state) {
         robot_state.motion_generator_mode = MotionGeneratorMode::kCartesianVelocity;
@@ -768,7 +768,7 @@ TEST(RobotImpl, ThrowsDuringMotionIfErrorReceived) {
   Move::Deviation maximum_path_deviation{0, 1, 2};
   Move::Deviation maximum_goal_pose_deviation{3, 4, 5};
 
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   uint32_t move_id;
   server
@@ -817,7 +817,7 @@ TEST(RobotImpl, LogMadeIfErrorReceived) {
   std::vector<RobotCommand> commands;
   std::vector<RobotState> states;
 
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), log_size);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), log_size);
 
   uint32_t move_id;
   server
@@ -891,12 +891,12 @@ TEST(RobotImpl, LogMadeIfErrorReceived) {
     for (size_t i = 0; i < log_size - 1; i++) {
       // robot.startMotion calls update(), so there's one state more than there are commands
       size_t start_index = commands_sent_in_loop - log_size + 1;
-      testRobotStatesAreEqual(franka::convertRobotState(states[start_index + 1 + i]),
+      testRobotStatesAreEqual(agimus_franka::convertRobotState(states[start_index + 1 + i]),
                               exception.log[i].state);
       testRobotCommandsAreEqual(commands[start_index + i], exception.log[i].command);
     }
-    franka::Record last = exception.log.back();
-    testRobotStatesAreEqual(franka::convertRobotState(states.back()), last.state);
+    agimus_franka::Record last = exception.log.back();
+    testRobotStatesAreEqual(agimus_franka::convertRobotState(states.back()), last.state);
     testRobotCommandsAreEqual(last_command, last.command);
   } catch (...) {
     FAIL() << "Expected ControlException";
@@ -915,7 +915,7 @@ TEST(RobotImpl, LogShowsOnlyTheLastMotion) {
   std::vector<RobotCommand> commands;
   std::vector<RobotState> states;
 
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), log_size);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), log_size);
 
   uint32_t move_id;
   server
@@ -1040,11 +1040,11 @@ TEST(RobotImpl, LogShowsOnlyTheLastMotion) {
     EXPECT_EQ(commands_sent_second_loop + 1, exception.log.size());
     for (size_t i = 0; i < commands_sent_second_loop; i++) {
       // robot.startMotion calls update(), so there's one state more than there are commands
-      testRobotStatesAreEqual(franka::convertRobotState(states[i + 1]), exception.log[i].state);
+      testRobotStatesAreEqual(agimus_franka::convertRobotState(states[i + 1]), exception.log[i].state);
       testRobotCommandsAreEqual(commands[i], exception.log[i].command);
     }
-    franka::Record last = exception.log.back();
-    testRobotStatesAreEqual(franka::convertRobotState(states.back()), last.state);
+    agimus_franka::Record last = exception.log.back();
+    testRobotStatesAreEqual(agimus_franka::convertRobotState(states.back()), last.state);
     testRobotCommandsAreEqual(last_command, last.command);
   } catch (...) {
     FAIL() << "Expected ControlException";
@@ -1062,7 +1062,7 @@ TEST(RobotImpl, ThrowsDuringControlIfErrorReceived) {
   Move::Deviation maximum_path_deviation{0, 1, 2};
   Move::Deviation maximum_goal_pose_deviation{3, 4, 5};
 
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   uint32_t move_id;
   server
@@ -1118,7 +1118,7 @@ TEST(RobotImpl, CanStartConsecutiveMotion) {
   sent_command.motion.motion_generation_finished = false;
 
   RobotMockServer server;
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   for (int i = 0; i < 3; i++) {
     uint32_t move_id;
@@ -1176,7 +1176,7 @@ TEST(RobotImpl, CanStartConsecutiveMotionAfterError) {
   Move::Deviation maximum_path_deviation{0, 1, 2};
   Move::Deviation maximum_goal_pose_deviation{3, 4, 5};
 
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   uint32_t move_id;
   server
@@ -1239,7 +1239,7 @@ TEST(RobotImpl, CanStartConsecutiveControlAfterError) {
   sent_command.motion.motion_generation_finished = false;
 
   RobotMockServer server;
-  Robot::Impl robot(std::make_unique<franka::Network>("127.0.0.1", kCommandPort), 0);
+  Robot::Impl robot(std::make_unique<agimus_franka::Network>("127.0.0.1", kCommandPort), 0);
 
   uint32_t move_id;
   server

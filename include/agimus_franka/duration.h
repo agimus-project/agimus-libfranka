@@ -8,10 +8,10 @@
 
 /**
  * @file duration.h
- * Contains the franka::Duration type.
+ * Contains the agimus_franka::Duration type.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 /**
  * Represents a duration with millisecond resolution.
@@ -262,4 +262,4 @@ class Duration {
  */
 Duration operator*(uint64_t lhs, const Duration& rhs) noexcept;
 
-}  // namespace franka
+}  // namespace agimus_franka

@@ -6,11 +6,11 @@
 #include <string>
 #include <vector>
 
-#include <franka/log.h>
-#include <franka/robot_state.h>
+#include <agimus_franka/log.h>
+#include <agimus_franka/robot_state.h>
 #include <agimus_research_interface/robot/rbk_types.h>
 
-namespace franka {
+namespace agimus_franka {
 
 class Logger {
  public:
@@ -18,7 +18,7 @@ class Logger {
 
   void log(const RobotState& state, const agimus_research_interface::robot::RobotCommand& command);
 
-  std::vector<franka::Record> flush();
+  std::vector<agimus_franka::Record> flush();
 
  private:
   std::vector<RobotState> states_;
@@ -29,4 +29,4 @@ class Logger {
   const size_t log_size_;  // NOLINT(readability-identifier-naming)
 };
 
-}  // namespace franka
+}  // namespace agimus_franka

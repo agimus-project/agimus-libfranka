@@ -1,6 +1,6 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <franka/exception.h>
+#include <agimus_franka/exception.h>
 
 #include <string>
 #include <utility>
@@ -10,22 +10,22 @@
 // See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65923#c0
 using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
 
-namespace franka {
+namespace agimus_franka {
 
 ControlException::ControlException(const std::string& what,
-                                   std::vector<franka::Record> log) noexcept
+                                   std::vector<agimus_franka::Record> log) noexcept
     : Exception(what), log(std::move(log)) {}
 
 IncompatibleVersionException::IncompatibleVersionException(uint16_t server_version,
                                                            uint16_t library_version) noexcept
-    : Exception("libfranka: Incompatible library version (server version: "s +
+    : Exception("libagimus_franka: Incompatible library version (server version: "s +
                 std::to_string(server_version) + ", library version: "s +
                 std::to_string(library_version) +
-                "). Please check https://frankaemika.github.io for Panda system updates "
-                "or choose a libfranka version that uses the server version " +
+                "). Please check https://agimus_frankaemika.github.io for Panda system updates "
+                "or choose a libagimus_franka version that uses the server version " +
                 std::to_string(server_version) +
-                " from the table at https://frankaemika.github.io/docs/compatibility.html ."s),
+                " from the table at https://agimus_frankaemika.github.io/docs/compatibility.html ."s),
       server_version(server_version),
       library_version(library_version) {}
 
-}  // namespace franka
+}  // namespace agimus_franka

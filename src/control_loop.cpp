@@ -8,11 +8,11 @@
 #include <exception>
 #include <fstream>
 
-#include <franka/control_tools.h>
-#include <franka/control_types.h>
-#include <franka/exception.h>
-#include <franka/lowpass_filter.h>
-#include <franka/rate_limiting.h>
+#include <agimus_franka/control_tools.h>
+#include <agimus_franka/control_types.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/lowpass_filter.h>
+#include <agimus_franka/rate_limiting.h>
 
 #include "motion_generator_traits.h"
 
@@ -21,7 +21,7 @@
 // See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65923#c0
 using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
 
-namespace franka {
+namespace agimus_franka {
 
 template <typename T>
 ControlLoop<T>::ControlLoop(RobotControl& robot,
@@ -40,7 +40,7 @@ ControlLoop<T>::ControlLoop(RobotControl& robot,
     throw RealtimeException(error_message);
   }
   if (throw_on_error && !hasRealtimeKernel()) {
-    throw RealtimeException("libfranka: Running kernel does not have realtime capabilities.");
+    throw RealtimeException("libagimus_franka: Running kernel does not have realtime capabilities.");
   }
 }
 
@@ -56,10 +56,10 @@ ControlLoop<T>::ControlLoop(RobotControl& robot,
                   limit_rate,
                   cutoff_frequency) {
   if (!control_callback_) {
-    throw std::invalid_argument("libfranka: Invalid control callback given.");
+    throw std::invalid_argument("libagimus_franka: Invalid control callback given.");
   }
   if (!motion_callback_) {
-    throw std::invalid_argument("libfranka: Invalid motion callback given.");
+    throw std::invalid_argument("libagimus_franka: Invalid motion callback given.");
   }
 
   motion_id_ = robot.startMotion(
@@ -75,7 +75,7 @@ ControlLoop<T>::ControlLoop(RobotControl& robot,
                             double cutoff_frequency)
     : ControlLoop(robot, std::move(motion_callback), {}, limit_rate, cutoff_frequency) {
   if (!motion_callback_) {
-    throw std::invalid_argument("libfranka: Invalid motion callback given.");
+    throw std::invalid_argument("libagimus_franka: Invalid motion callback given.");
   }
   agimus_research_interface::robot::Move::ControllerMode mode;
   switch (controller_mode) {
@@ -86,7 +86,7 @@ ControlLoop<T>::ControlLoop(RobotControl& robot,
       mode = decltype(mode)::kCartesianImpedance;
       break;
     default:
-      throw std::invalid_argument("libfranka: Invalid controller mode given.");
+      throw std::invalid_argument("libagimus_franka: Invalid controller mode given.");
   }
   motion_id_ = robot.startMotion(mode, MotionGeneratorTraits<T>::kMotionGeneratorMode,
                                  kDefaultDeviation, kDefaultDeviation);
@@ -127,7 +127,7 @@ void ControlLoop<T>::operator()() try {
 
 template <typename T>
 bool ControlLoop<T>::spinControl(const RobotState& robot_state,
-                                 franka::Duration time_step,
+                                 agimus_franka::Duration time_step,
                                  agimus_research_interface::robot::ControllerCommand* command) {
   Torques control_output = control_callback_(robot_state, time_step);
   if (cutoff_frequency_ < kMaxCutoffFrequency) {
@@ -146,7 +146,7 @@ bool ControlLoop<T>::spinControl(const RobotState& robot_state,
 
 template <typename T>
 bool ControlLoop<T>::spinMotion(const RobotState& robot_state,
-                                franka::Duration time_step,
+                                agimus_franka::Duration time_step,
                                 agimus_research_interface::robot::MotionGeneratorCommand* command) {
   T motion_output = motion_callback_(robot_state, time_step);
   convertMotion(motion_output, robot_state, command);
@@ -277,4 +277,4 @@ template class ControlLoop<JointVelocities>;
 template class ControlLoop<CartesianPose>;
 template class ControlLoop<CartesianVelocities>;
 
-}  // namespace franka
+}  // namespace agimus_franka

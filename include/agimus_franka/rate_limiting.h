@@ -13,7 +13,7 @@
  * joint position and joint velocity.
  */
 
-namespace franka {
+namespace agimus_franka {
 /**
  * Sample time constant
  */
@@ -111,7 +111,7 @@ constexpr double kMaxElbowVelocity =
  * Computes the maximum joint velocity based on joint position
  *
  * @note The implementation is based on
- * https://frankaemika.github.io/docs/control_parameters.html#limits-for-franka-research-3.
+ * https://agimus_frankaemika.github.io/docs/control_parameters.html#limits-for-agimus_franka-research-3.
  *
  * @param[in] q joint position.
  *
@@ -140,7 +140,7 @@ inline std::array<double, 7> computeUpperLimitsJointVelocity(const std::array<do
  * Computes the minimum joint velocity based on joint position
  *
  * @note The implementation is based on
- * https://frankaemika.github.io/docs/control_parameters.html#limits-for-franka-research-3.
+ * https://agimus_frankaemika.github.io/docs/control_parameters.html#limits-for-agimus_franka-research-3.
  *
  * @param[in] q joint position.
  *
@@ -356,4 +356,4 @@ std::array<double, 16> limitRate(
     const std::array<double, 6>& last_O_dP_EE_c,    // NOLINT(readability-identifier-naming)
     const std::array<double, 6>& last_O_ddP_EE_c);  // NOLINT(readability-identifier-naming)
 
-}  // namespace franka
+}  // namespace agimus_franka

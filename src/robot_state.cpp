@@ -1,12 +1,12 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include "franka/robot_state.h"
+#include "agimus_franka/robot_state.h"
 
 #include <algorithm>
 #include <cstring>
 #include <iterator>
 
-namespace franka {
+namespace agimus_franka {
 
 namespace {
 
@@ -50,7 +50,7 @@ std::ostream& operator<<(std::ostream& ostream, const RobotMode robot_mode) {
   return ostream;
 }
 
-std::ostream& operator<<(std::ostream& ostream, const franka::RobotState& robot_state) {
+std::ostream& operator<<(std::ostream& ostream, const agimus_franka::RobotState& robot_state) {
   ostream << "{\"O_T_EE\": " << robot_state.O_T_EE << ", \"O_T_EE_d\": " << robot_state.O_T_EE_d
           << ", \"F_T_NE\": " << robot_state.F_T_NE << ", \"NE_T_EE\": " << robot_state.NE_T_EE
           << ", \"F_T_EE\": " << robot_state.F_T_EE << ", \"EE_T_K\": " << robot_state.EE_T_K
@@ -87,4 +87,4 @@ std::ostream& operator<<(std::ostream& ostream, const franka::RobotState& robot_
   return ostream;
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

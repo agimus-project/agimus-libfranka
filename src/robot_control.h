@@ -4,12 +4,12 @@
 
 #include <cstdint>
 
-#include <franka/control_types.h>
-#include <franka/robot_state.h>
+#include <agimus_franka/control_types.h>
+#include <agimus_franka/robot_state.h>
 #include <agimus_research_interface/robot/rbk_types.h>
 #include <agimus_research_interface/robot/service_types.h>
 
-namespace franka {
+namespace agimus_franka {
 
 class RobotControl {
  public:
@@ -35,4 +35,4 @@ class RobotControl {
   virtual RealtimeConfig realtimeConfig() const noexcept = 0;
 };
 
-}  // namespace franka
+}  // namespace agimus_franka

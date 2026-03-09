@@ -6,9 +6,9 @@
 #include <gmock/gmock.h>
 #include <Eigen/Core>
 
-#include <franka/exception.h>
-#include <franka/model.h>
-#include <franka/robot.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/model.h>
+#include <agimus_franka/robot.h>
 #include <agimus_research_interface/robot/service_types.h>
 
 #include "helpers.h"
@@ -89,12 +89,12 @@ struct Model : public ::testing::Test {
   }
 
   RobotMockServer server{};
-  franka::Robot robot{"127.0.0.1"};
+  agimus_franka::Robot robot{"127.0.0.1"};
 };
 
 TEST(InvalidModel, ThrowsIfNoModelReceived) {
   RobotMockServer server;
-  franka::Robot robot("127.0.0.1");
+  agimus_franka::Robot robot("127.0.0.1");
 
   server
       .waitForCommand<LoadModelLibrary>([&](const LoadModelLibrary::Request&) {
@@ -102,12 +102,12 @@ TEST(InvalidModel, ThrowsIfNoModelReceived) {
       })
       .spinOnce();
 
-  EXPECT_THROW(robot.loadModel(), franka::ModelException);
+  EXPECT_THROW(robot.loadModel(), agimus_franka::ModelException);
 }
 
 TEST(InvalidModel, ThrowsIfInvalidModelReceived) {
   RobotMockServer server;
-  franka::Robot robot("127.0.0.1");
+  agimus_franka::Robot robot("127.0.0.1");
 
   std::array<char, 10> buffer{};
   server
@@ -123,7 +123,7 @@ TEST(InvalidModel, ThrowsIfInvalidModelReceived) {
       })
       .spinOnce();
 
-  EXPECT_THROW(robot.loadModel(), franka::ModelException);
+  EXPECT_THROW(robot.loadModel(), agimus_franka::ModelException);
 }
 
 TEST_F(Model, CanCreateModel) {
@@ -131,7 +131,7 @@ TEST_F(Model, CanCreateModel) {
 }
 
 TEST_F(Model, CanGetMassMatrix) {
-  franka::RobotState robot_state;
+  agimus_franka::RobotState robot_state;
   randomRobotState(robot_state);
 
   MockModel mock;
@@ -145,7 +145,7 @@ TEST_F(Model, CanGetMassMatrix) {
 
   model_library_interface = &mock;
 
-  franka::Model model(robot.loadModel());
+  agimus_franka::Model model(robot.loadModel());
   auto matrix = model.mass(robot_state);
   for (size_t i = 0; i < matrix.size(); i++) {
     EXPECT_EQ(i, matrix[i]);
@@ -153,7 +153,7 @@ TEST_F(Model, CanGetMassMatrix) {
 }
 
 TEST_F(Model, CanGetCoriolisVector) {
-  franka::RobotState robot_state;
+  agimus_franka::RobotState robot_state;
   randomRobotState(robot_state);
   std::array<double, 7> expected_vector{12, 13, 14, 15, 16, 17, 18};
 
@@ -166,13 +166,13 @@ TEST_F(Model, CanGetCoriolisVector) {
 
   model_library_interface = &mock;
 
-  franka::Model model(robot.loadModel());
+  agimus_franka::Model model(robot.loadModel());
   auto vector = model.coriolis(robot_state);
   EXPECT_EQ(expected_vector, vector);
 }
 
 TEST_F(Model, CanGetGravity) {
-  franka::RobotState robot_state;
+  agimus_franka::RobotState robot_state;
   randomRobotState(robot_state);
   std::array<double, 3> gravity_earth{4, 5, 6};
 
@@ -187,7 +187,7 @@ TEST_F(Model, CanGetGravity) {
 
   model_library_interface = &mock;
 
-  franka::Model model(robot.loadModel());
+  agimus_franka::Model model(robot.loadModel());
   auto matrix = model.gravity(robot_state, gravity_earth);
   for (size_t i = 0; i < matrix.size(); i++) {
     EXPECT_EQ(i, matrix[i]);
@@ -195,7 +195,7 @@ TEST_F(Model, CanGetGravity) {
 }
 
 TEST_F(Model, CanGetJointPoses) {
-  franka::RobotState robot_state;
+  agimus_franka::RobotState robot_state;
   randomRobotState(robot_state);
 
   std::array<double, 16> expected_pose{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}};
@@ -251,15 +251,15 @@ TEST_F(Model, CanGetJointPoses) {
 
   model_library_interface = &mock;
 
-  franka::Model model(robot.loadModel());
-  for (franka::Frame joint = franka::Frame::kJoint1; joint <= franka::Frame::kStiffness; joint++) {
+  agimus_franka::Model model(robot.loadModel());
+  for (agimus_franka::Frame joint = agimus_franka::Frame::kJoint1; joint <= agimus_franka::Frame::kStiffness; joint++) {
     auto pose = model.pose(joint, robot_state);
     EXPECT_EQ(expected_pose, pose);
   }
 }
 
 TEST_F(Model, CanGetBodyJacobian) {
-  franka::RobotState robot_state;
+  agimus_franka::RobotState robot_state;
   randomRobotState(robot_state);
 
   std::array<double, 42> expected_jacobian;
@@ -317,15 +317,15 @@ TEST_F(Model, CanGetBodyJacobian) {
 
   model_library_interface = &mock;
 
-  franka::Model model(robot.loadModel());
-  for (franka::Frame joint = franka::Frame::kJoint1; joint <= franka::Frame::kStiffness; joint++) {
+  agimus_franka::Model model(robot.loadModel());
+  for (agimus_franka::Frame joint = agimus_franka::Frame::kJoint1; joint <= agimus_franka::Frame::kStiffness; joint++) {
     auto jacobian = model.bodyJacobian(joint, robot_state);
     EXPECT_EQ(expected_jacobian, jacobian);
   }
 }
 
 TEST_F(Model, CanGetZeroJacobian) {
-  franka::RobotState robot_state;
+  agimus_franka::RobotState robot_state;
   randomRobotState(robot_state);
 
   std::array<double, 42> expected_jacobian;
@@ -383,15 +383,15 @@ TEST_F(Model, CanGetZeroJacobian) {
 
   model_library_interface = &mock;
 
-  franka::Model model(robot.loadModel());
-  for (franka::Frame joint = franka::Frame::kJoint1; joint <= franka::Frame::kStiffness; joint++) {
+  agimus_franka::Model model(robot.loadModel());
+  for (agimus_franka::Frame joint = agimus_franka::Frame::kJoint1; joint <= agimus_franka::Frame::kStiffness; joint++) {
     auto jacobian = model.zeroJacobian(joint, robot_state);
     EXPECT_EQ(expected_jacobian, jacobian);
   }
 }
 
 TEST(Frame, CanIncrement) {
-  franka::Frame frame = franka::Frame::kJoint3;
-  EXPECT_EQ(franka::Frame::kJoint3, frame++);
-  EXPECT_EQ(franka::Frame::kJoint4, frame);
+  agimus_franka::Frame frame = agimus_franka::Frame::kJoint3;
+  EXPECT_EQ(agimus_franka::Frame::kJoint3, frame++);
+  EXPECT_EQ(agimus_franka::Frame::kJoint4, frame);
 }

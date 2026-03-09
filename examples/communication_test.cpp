@@ -4,11 +4,11 @@
 #include <iostream>
 #include <thread>
 
-#include <franka/active_control.h>
-#include <franka/active_torque_control.h>
-#include <franka/duration.h>
-#include <franka/exception.h>
-#include <franka/robot.h>
+#include <agimus_franka/active_control.h>
+#include <agimus_franka/active_torque_control.h>
+#include <agimus_franka/duration.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/robot.h>
 
 #include "examples_common.h"
 
@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
   std::cout << std::fixed;
 
   try {
-    franka::Robot robot(argv[1]);
+    agimus_franka::Robot robot(argv[1]);
     setDefaultBehavior(robot);
 
     // First move the robot to a suitable joint configuration
@@ -54,11 +54,11 @@ int main(int argc, char** argv) {
         {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}}, {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}},
         {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}}, {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}});
 
-    franka::Torques zero_torques{{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
+    agimus_franka::Torques zero_torques{{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
     auto rw_interface = robot.startTorqueControl();
 
-    franka::RobotState robot_state;
-    franka::Duration period;
+    agimus_franka::RobotState robot_state;
+    agimus_franka::Duration period;
 
     while (!zero_torques.motion_finished) {
       std::tie(robot_state, period) = rw_interface->readOnce();
@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
       // Sending zero torques - if EE is configured correctly, robot should not move
       rw_interface->writeOnce(zero_torques);
     }
-  } catch (const franka::Exception& e) {
+  } catch (const agimus_franka::Exception& e) {
     std::cout << e.what() << std::endl;
     return -1;
   }
@@ -123,7 +123,7 @@ int main(int argc, char** argv) {
   } else if (avg_success_rate < 0.95) {
     std::cout << std::endl << "WARNING: MANY PACKETS GOT LOST!" << std::endl;
     std::cout << "PLEASE INSPECT YOUR SETUP AND FOLLOW ADVICE ON" << std::endl
-              << "https://frankaemika.github.io/docs/troubleshooting.html" << std::endl;
+              << "https://agimus_frankaemika.github.io/docs/troubleshooting.html" << std::endl;
   }
   std::cout << "#######################################################" << std::endl << std::endl;
 

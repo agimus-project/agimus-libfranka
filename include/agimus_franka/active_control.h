@@ -2,18 +2,18 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
-#include <franka/active_control_base.h>
-#include <franka/exception.h>
+#include <agimus_franka/active_control_base.h>
+#include <agimus_franka/exception.h>
 
 #include "robot.h"
 
 /**
  * @file active_control.h
- * Implements the ActiveControlBase abstract class. Contains the `franka::ActiveControl`,
- * `franka::ActiveTorqueControl` and `franka::ActiveMotionGenerator` type.
+ * Implements the ActiveControlBase abstract class. Contains the `agimus_franka::ActiveControl`,
+ * `agimus_franka::ActiveTorqueControl` and `agimus_franka::ActiveMotionGenerator` type.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 /**
  * Documented in ActiveControlBase
@@ -25,27 +25,27 @@ class ActiveControl : public ActiveControlBase {
   std::pair<RobotState, Duration> readOnce() override;
 
   void writeOnce(const Torques& /* control_input */) override {
-    throw franka::ControlException(wrong_write_once_method_called);
+    throw agimus_franka::ControlException(wrong_write_once_method_called);
   };
 
   void writeOnce(const JointPositions& /* motion_generator_input */,
                  const std::optional<const Torques>& /*control_input*/) override {
-    throw franka::ControlException(wrong_write_once_method_called);
+    throw agimus_franka::ControlException(wrong_write_once_method_called);
   };
 
   void writeOnce(const JointVelocities& /* motion_generator_input */,
                  const std::optional<const Torques>& /* control_input */) override {
-    throw franka::ControlException(wrong_write_once_method_called);
+    throw agimus_franka::ControlException(wrong_write_once_method_called);
   };
 
   void writeOnce(const CartesianPose& /* motion_generator_input */,
                  const std::optional<const Torques>& /* control_input */) override {
-    throw franka::ControlException(wrong_write_once_method_called);
+    throw agimus_franka::ControlException(wrong_write_once_method_called);
   };
 
   void writeOnce(const CartesianVelocities& /* motion_generator_input */,
                  const std::optional<const Torques>& /* control_input */) override {
-    throw franka::ControlException(wrong_write_once_method_called);
+    throw agimus_franka::ControlException(wrong_write_once_method_called);
   };
 
   void writeOnce(const JointPositions& motion_generator_input) override {
@@ -97,4 +97,4 @@ class ActiveControl : public ActiveControlBase {
       "Wrong writeOnce method called for currently active control!"};
 };
 
-}  // namespace franka
+}  // namespace agimus_franka

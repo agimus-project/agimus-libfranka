@@ -7,10 +7,10 @@
 #include <string>
 #include <vector>
 
-#include <franka/gripper_state.h>
-#include <franka/log.h>
-#include <franka/robot_state.h>
-#include <franka/vacuum_gripper_state.h>
+#include <agimus_franka/gripper_state.h>
+#include <agimus_franka/log.h>
+#include <agimus_franka/robot_state.h>
+#include <agimus_franka/vacuum_gripper_state.h>
 #include <agimus_research_interface/gripper/types.h>
 #include <agimus_research_interface/robot/rbk_types.h>
 #include <agimus_research_interface/robot/service_types.h>
@@ -38,12 +38,12 @@ std::vector<T> findDuplicates(const std::vector<T>& xs) {
   return dups;
 }
 
-void randomRobotState(franka::RobotState& robot_state);
+void randomRobotState(agimus_franka::RobotState& robot_state);
 void randomRobotState(agimus_research_interface::robot::RobotState& robot_state);
-void testRobotStateIsZero(const franka::RobotState& actual);
+void testRobotStateIsZero(const agimus_franka::RobotState& actual);
 void testRobotStatesAreEqual(const agimus_research_interface::robot::RobotState& expected,
-                             const franka::RobotState& actual);
-void testRobotStatesAreEqual(const franka::RobotState& expected, const franka::RobotState& actual);
+                             const agimus_franka::RobotState& actual);
+void testRobotStatesAreEqual(const agimus_franka::RobotState& expected, const agimus_franka::RobotState& actual);
 
 void randomRobotCommand(agimus_research_interface::robot::RobotCommand& command);
 void testMotionGeneratorCommandsAreEqual(
@@ -54,9 +54,9 @@ void testControllerCommandsAreEqual(const agimus_research_interface::robot::Cont
 void testRobotCommandsAreEqual(const agimus_research_interface::robot::RobotCommand& expected,
                                const agimus_research_interface::robot::RobotCommand& actual);
 void testRobotCommandsAreEqual(const agimus_research_interface::robot::RobotCommand& expected,
-                               const franka::RobotCommand actual);
+                               const agimus_franka::RobotCommand actual);
 std::array<double, 16> identityMatrix();
-franka::RobotState generateValidRobotState();
+agimus_franka::RobotState generateValidRobotState();
 std::array<double, 6> differentiateOneSample(std::array<double, 16> value,
                                              std::array<double, 16> last_value,
                                              double delta_t);
@@ -69,9 +69,9 @@ bool operator==(const Move::Deviation& left, const Move::Deviation& right);
 }  // namespace robot
 }  // namespace agimus_research_interface
 
-namespace franka {
+namespace agimus_franka {
 
 bool operator==(const Errors& lhs, const Errors& rhs);
 bool operator==(const RobotState& lhs, const RobotState& rhs);
 
-}  // namespace franka
+}  // namespace agimus_franka

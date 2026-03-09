@@ -2,9 +2,9 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
-#include <franka/robot.h>
+#include <agimus_franka/robot.h>
 
-using namespace franka;
+using namespace agimus_franka;
 
 class RobotMock : public Robot {
  public:

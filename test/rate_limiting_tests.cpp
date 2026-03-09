@@ -4,11 +4,11 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 
-#include <franka/rate_limiting.h>
+#include <agimus_franka/rate_limiting.h>
 
 #include "helpers.h"
 
-using namespace franka;
+using namespace agimus_franka;
 
 const double kNoLimit{std::numeric_limits<double>::max()};
 const double kNoLowerLimit{std::numeric_limits<double>::lowest()};

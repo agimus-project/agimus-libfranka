@@ -5,14 +5,14 @@
 #include <cstdint>
 #include <ostream>
 
-#include <franka/duration.h>
+#include <agimus_franka/duration.h>
 
 /**
  * @file gripper_state.h
- * Contains the franka::GripperState type.
+ * Contains the agimus_franka::GripperState type.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 /**
  * Describes the gripper state.
@@ -56,6 +56,6 @@ struct GripperState {
  *
  * @return Ostream instance
  */
-std::ostream& operator<<(std::ostream& ostream, const franka::GripperState& gripper_state);
+std::ostream& operator<<(std::ostream& ostream, const agimus_franka::GripperState& gripper_state);
 
-}  // namespace franka
+}  // namespace agimus_franka

@@ -3,8 +3,8 @@
 #include <cmath>
 #include <iostream>
 
-#include <franka/exception.h>
-#include <franka/robot.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/robot.h>
 
 #include "examples_common.h"
 
@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
     return -1;
   }
   try {
-    franka::Robot robot(argv[1]);
+    agimus_franka::Robot robot(argv[1]);
     setDefaultBehavior(robot);
 
     // First move the robot to a suitable joint configuration
@@ -46,8 +46,8 @@ int main(int argc, char** argv) {
     std::array<double, 2> initial_elbow;
     double time = 0.0;
     robot.control(
-        [&time, &initial_pose, &initial_elbow](const franka::RobotState& robot_state,
-                                               franka::Duration period) -> franka::CartesianPose {
+        [&time, &initial_pose, &initial_elbow](const agimus_franka::RobotState& robot_state,
+                                               agimus_franka::Duration period) -> agimus_franka::CartesianPose {
           time += period.toSec();
 
           if (time == 0.0) {
@@ -62,12 +62,12 @@ int main(int argc, char** argv) {
 
           if (time >= 10.0) {
             std::cout << std::endl << "Finished motion, shutting down example" << std::endl;
-            return franka::MotionFinished({initial_pose, elbow});
+            return agimus_franka::MotionFinished({initial_pose, elbow});
           }
 
           return {initial_pose, elbow};
         });
-  } catch (const franka::Exception& e) {
+  } catch (const agimus_franka::Exception& e) {
     std::cout << e.what() << std::endl;
     return -1;
   }

@@ -7,13 +7,13 @@
 
 /**
  * @file errors.h
- * Contains the franka::Errors type.
+ * Contains the agimus_franka::Errors type.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 /**
- * Enumerates errors that can occur while controlling a franka::Robot.
+ * Enumerates errors that can occur while controlling a agimus_franka::Robot.
  */
 struct Errors {
  private:
@@ -255,4 +255,4 @@ struct Errors {
  */
 std::ostream& operator<<(std::ostream& ostream, const Errors& errors);
 
-}  // namespace franka
+}  // namespace agimus_franka

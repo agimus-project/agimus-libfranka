@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
-#include <franka/duration.h>
+#include <agimus_franka/duration.h>
 
-using franka::Duration;
+using agimus_franka::Duration;
 
 TEST(Duration, CanDefaultConstruct) {
   Duration d;

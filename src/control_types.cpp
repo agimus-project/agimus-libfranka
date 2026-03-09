@@ -3,9 +3,9 @@
 #include <stdexcept>
 #include <type_traits>
 
-#include <franka/control_types.h>
+#include <agimus_franka/control_types.h>
 
-namespace franka {
+namespace agimus_franka {
 
 // NOLINTNEXTLINE(modernize-pass-by-value)
 Torques::Torques(const std::array<double, 7>& torques) noexcept : tau_J(torques) {}
@@ -107,4 +107,4 @@ bool CartesianVelocities::hasElbow() const noexcept {
   return elbow != decltype(elbow)();
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

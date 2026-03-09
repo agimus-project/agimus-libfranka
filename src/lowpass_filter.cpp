@@ -4,9 +4,9 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
-#include <franka/lowpass_filter.h>
+#include <agimus_franka/lowpass_filter.h>
 
-namespace franka {
+namespace agimus_franka {
 
 double lowpassFilter(double sample_time, double y, double y_last, double cutoff_frequency) {
   if (sample_time < 0 || !std::isfinite(sample_time)) {
@@ -60,4 +60,4 @@ std::array<double, 16> cartesianLowpassFilter(double sample_time,
 
   return filtered_values;
 }
-}  // namespace franka
+}  // namespace agimus_franka

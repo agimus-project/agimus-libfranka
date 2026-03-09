@@ -4,15 +4,15 @@
 
 #include <vector>
 
-#include <franka/control_types.h>
-#include <franka/robot_state.h>
+#include <agimus_franka/control_types.h>
+#include <agimus_franka/robot_state.h>
 
 /**
  * @file log.h
  * Contains helper types for logging sent commands and received robot states.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 /**
  * Command sent to the robot. Structure used only for logging purposes.
@@ -67,4 +67,4 @@ struct Record {
  * @return a string in CSV format, or empty string.
  */
 std::string logToCSV(const std::vector<Record>& log);
-}  // namespace franka
+}  // namespace agimus_franka

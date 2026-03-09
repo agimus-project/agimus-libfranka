@@ -6,16 +6,16 @@
 
 /**
  * @file active_torque_control.h
- * Contains the `franka::ActiveTorqueControl` type.
+ * Contains the `agimus_franka::ActiveTorqueControl` type.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 /**
  * Allows the user to read the state of a Robot and to send new torque control commands after
  * starting a control process of a Robot.
  *
- * hint: To create an ActiveTorqueControl, see franka::Robot
+ * hint: To create an ActiveTorqueControl, see agimus_franka::Robot
  *
  */
 class ActiveTorqueControl : public ActiveControl {
@@ -32,7 +32,7 @@ class ActiveTorqueControl : public ActiveControl {
   void writeOnce(const Torques& control_input) override;
 
   /**
-   * franka::Robot as friend to allow construction of ActiveTorqueControl in
+   * agimus_franka::Robot as friend to allow construction of ActiveTorqueControl in
    * startTorqueControl methods
    *
    */
@@ -53,4 +53,4 @@ class ActiveTorqueControl : public ActiveControl {
       : ActiveControl(std::move(robot_impl), motion_id, std::move(control_lock)){};
 };
 
-}  // namespace franka
+}  // namespace agimus_franka

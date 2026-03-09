@@ -2,10 +2,10 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
-#include <franka/control_types.h>
+#include <agimus_franka/control_types.h>
 #include <agimus_research_interface/robot/service_types.h>
 
-namespace franka {
+namespace agimus_franka {
 
 template <typename T>
 struct MotionGeneratorTraits {};
@@ -34,4 +34,4 @@ struct MotionGeneratorTraits<CartesianVelocities> {
       agimus_research_interface::robot::Move::MotionGeneratorMode::kCartesianVelocity;
 };
 
-}  // namespace franka
+}  // namespace agimus_franka

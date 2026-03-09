@@ -1,12 +1,12 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <franka/rate_limiting.h>
+#include <agimus_franka/rate_limiting.h>
 
 #include <Eigen/Dense>
 
-#include <franka/control_tools.h>
+#include <agimus_franka/control_tools.h>
 
-namespace franka {
+namespace agimus_franka {
 
 namespace {
 
@@ -255,4 +255,4 @@ std::array<double, 16> limitRate(
   return limited_values;
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

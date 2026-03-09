@@ -9,11 +9,11 @@
 #include <mutex>
 #include <thread>
 
-#include <franka/duration.h>
-#include <franka/exception.h>
-#include <franka/model.h>
-#include <franka/rate_limiting.h>
-#include <franka/robot.h>
+#include <agimus_franka/duration.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/model.h>
+#include <agimus_franka/rate_limiting.h>
+#include <agimus_franka/robot.h>
 
 #include "examples_common.h"
 
@@ -33,7 +33,7 @@ std::ostream& operator<<(std::ostream& ostream, const std::array<T, N>& array) {
  * An example showing a joint impedance type control that executes a Cartesian motion in the shape
  * of a circle. The example illustrates how to use the internal inverse kinematics to map a
  * Cartesian trajectory to joint space. The joint space target is tracked by an impedance control
- * that additionally compensates coriolis terms using the libfranka model library. This example
+ * that additionally compensates coriolis terms using the libagimus_franka model library. This example
  * also serves to compare commanded vs. measured torques. The results are printed from a separate
  * thread to avoid blocking print functions in the real-time loop.
  */
@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
     std::mutex mutex;
     bool has_data;
     std::array<double, 7> tau_d_last;
-    franka::RobotState robot_state;
+    agimus_franka::RobotState robot_state;
     std::array<double, 7> gravity;
   } print_data{};
   std::atomic_bool running{true};
@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
 
   try {
     // Connect to robot.
-    franka::Robot robot(argv[1]);
+    agimus_franka::Robot robot(argv[1]);
     setDefaultBehavior(robot);
 
     // First move the robot to a suitable joint configuration
@@ -123,14 +123,14 @@ int main(int argc, char** argv) {
         {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}}, {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}});
 
     // Load the kinematics and dynamics model.
-    franka::Model model = robot.loadModel();
+    agimus_franka::Model model = robot.loadModel();
 
     std::array<double, 16> initial_pose;
 
     // Define callback function to send Cartesian pose goals to get inverse kinematics solved.
     auto cartesian_pose_callback = [=, &time, &vel_current, &running, &angle, &initial_pose](
-                                       const franka::RobotState& robot_state,
-                                       franka::Duration period) -> franka::CartesianPose {
+                                       const agimus_franka::RobotState& robot_state,
+                                       agimus_franka::Duration period) -> agimus_franka::CartesianPose {
       // Update time.
       time += period.toSec();
 
@@ -158,14 +158,14 @@ int main(int argc, char** argv) {
       // Compute relative y and z positions of desired pose.
       double delta_y = radius * (1 - std::cos(angle));
       double delta_z = radius * std::sin(angle);
-      franka::CartesianPose pose_desired = initial_pose;
+      agimus_franka::CartesianPose pose_desired = initial_pose;
       pose_desired.O_T_EE[13] += delta_y;
       pose_desired.O_T_EE[14] += delta_z;
 
       // Send desired pose.
       if (time >= run_time + acceleration_time) {
         running = false;
-        return franka::MotionFinished(pose_desired);
+        return agimus_franka::MotionFinished(pose_desired);
       }
 
       return pose_desired;
@@ -178,10 +178,10 @@ int main(int argc, char** argv) {
     const std::array<double, 7> d_gains = {{50.0, 50.0, 50.0, 50.0, 30.0, 25.0, 15.0}};
 
     // Define callback for the joint torque control loop.
-    std::function<franka::Torques(const franka::RobotState&, franka::Duration)>
+    std::function<agimus_franka::Torques(const agimus_franka::RobotState&, agimus_franka::Duration)>
         impedance_control_callback =
             [&print_data, &model, k_gains, d_gains](
-                const franka::RobotState& state, franka::Duration /*period*/) -> franka::Torques {
+                const agimus_franka::RobotState& state, agimus_franka::Duration /*period*/) -> agimus_franka::Torques {
       // Read current coriolis terms from model.
       std::array<double, 7> coriolis = model.coriolis(state);
 
@@ -198,7 +198,7 @@ int main(int argc, char** argv) {
       // rate limiting for the control loop (activated by default), the torque would anyway be
       // adjusted!
       std::array<double, 7> tau_d_rate_limited =
-          franka::limitRate(franka::kMaxTorqueRate, tau_d_calculated, state.tau_J_d);
+          agimus_franka::limitRate(agimus_franka::kMaxTorqueRate, tau_d_calculated, state.tau_J_d);
 
       // Update data to print.
       if (print_data.mutex.try_lock()) {
@@ -216,7 +216,7 @@ int main(int argc, char** argv) {
     // Start real-time control loop.
     robot.control(impedance_control_callback, cartesian_pose_callback);
 
-  } catch (const franka::Exception& ex) {
+  } catch (const agimus_franka::Exception& ex) {
     running = false;
     std::cerr << ex.what() << std::endl;
   }

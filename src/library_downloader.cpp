@@ -8,12 +8,12 @@
 
 #include <Poco/SharedLibrary.h>
 
-#include <franka/exception.h>
+#include <agimus_franka/exception.h>
 #include <agimus_research_interface/robot/service_types.h>
 
 #include "platform.h"
 
-namespace franka {
+namespace agimus_franka {
 
 LibraryDownloader::LibraryDownloader(Network& network)
     : model_library_file_{Poco::TemporaryFile::tempName() + Poco::SharedLibrary::suffix()} {
@@ -30,7 +30,7 @@ LibraryDownloader::LibraryDownloader(Network& network)
 #elif defined(LIBFRANKA_ARM)
   architecture = LoadModelLibrary::Architecture::kARM;
 #else
-  throw ModelException("libfranka: Unsupported architecture!");
+  throw ModelException("libagimus_franka: Unsupported architecture!");
 #endif
 
 #if defined(LIBFRANKA_WINDOWS)
@@ -38,7 +38,7 @@ LibraryDownloader::LibraryDownloader(Network& network)
 #elif defined(LIBFRANKA_LINUX)
   operating_system = LoadModelLibrary::System::kLinux;
 #else
-  throw ModelException("libfranka: Unsupported operating system!");
+  throw ModelException("libagimus_franka: Unsupported operating system!");
 #endif
 
   uint32_t command_id = network.tcpSendRequest<LoadModelLibrary>(architecture, operating_system);
@@ -46,14 +46,14 @@ LibraryDownloader::LibraryDownloader(Network& network)
   LoadModelLibrary::Response response =
       network.tcpBlockingReceiveResponse<LoadModelLibrary>(command_id, &buffer);
   if (response.status != LoadModelLibrary::Status::kSuccess) {
-    throw ModelException("libfranka: Server reports error when loading model library.");
+    throw ModelException("libagimus_franka: Server reports error when loading model library.");
   }
 
   try {
     std::ofstream model_library_stream(path().c_str(), std::ios_base::out | std::ios_base::binary);
     model_library_stream.write(reinterpret_cast<char*>(buffer.data()), buffer.size());
   } catch (const std::exception& ex) {
-    throw ModelException("libfranka: Cannot save model library.");
+    throw ModelException("libagimus_franka: Cannot save model library.");
   }
 }
 
@@ -71,4 +71,4 @@ const std::string& LibraryDownloader::path() const noexcept {
   return model_library_file_.path();
 }
 
-};  // namespace franka
+};  // namespace agimus_franka

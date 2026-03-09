@@ -2,11 +2,11 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
-#include <franka/robot_state.h>
+#include <agimus_franka/robot_state.h>
 
 #include "robot_control.h"
 
-class MockRobotControl : public franka::RobotControl {
+class MockRobotControl : public agimus_franka::RobotControl {
  public:
   MOCK_METHOD4(
       startMotion,
@@ -22,12 +22,12 @@ class MockRobotControl : public franka::RobotControl {
 
   MOCK_METHOD2(
       update,
-      franka::RobotState(const agimus_research_interface::robot::MotionGeneratorCommand* motion_command,
+      agimus_franka::RobotState(const agimus_research_interface::robot::MotionGeneratorCommand* motion_command,
                          const agimus_research_interface::robot::ControllerCommand* control_command));
 
-  MOCK_METHOD2(throwOnMotionError, void(const franka::RobotState& robot_state, uint32_t motion_id));
+  MOCK_METHOD2(throwOnMotionError, void(const agimus_franka::RobotState& robot_state, uint32_t motion_id));
 
-  franka::RealtimeConfig realtimeConfig() const noexcept override {
-    return franka::RealtimeConfig::kIgnore;
+  agimus_franka::RealtimeConfig realtimeConfig() const noexcept override {
+    return agimus_franka::RealtimeConfig::kIgnore;
   }
 };

@@ -1,9 +1,9 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <franka/active_control.h>
-#include <franka/active_motion_generator.h>
-#include <franka/active_torque_control.h>
-#include <franka/robot.h>
+#include <agimus_franka/active_control.h>
+#include <agimus_franka/active_motion_generator.h>
+#include <agimus_franka/active_torque_control.h>
+#include <agimus_franka/robot.h>
 
 #include <utility>
 
@@ -12,19 +12,19 @@
 #include "network.h"
 #include "robot_impl.h"
 
-namespace franka {
+namespace agimus_franka {
 
 void assertOwningLock(const std::unique_lock<std::mutex>& lock) {
   if (!lock.owns_lock()) {
     throw InvalidOperationException(
-        "libfranka robot: Cannot perform this operation while another control or read operation "
+        "libagimus_franka robot: Cannot perform this operation while another control or read operation "
         "is running.");
   }
 }
 
-Robot::Robot(const std::string& franka_address, RealtimeConfig realtime_config, size_t log_size)
+Robot::Robot(const std::string& agimus_franka_address, RealtimeConfig realtime_config, size_t log_size)
     : impl_{new Robot::Impl(
-          std::make_unique<Network>(franka_address, agimus_research_interface::robot::kCommandPort),
+          std::make_unique<Network>(agimus_franka_address, agimus_research_interface::robot::kCommandPort),
           log_size,
           realtime_config)} {}
 
@@ -50,7 +50,7 @@ Robot::ServerVersion Robot::serverVersion() const noexcept {
   return impl_->serverVersion();
 }
 
-void Robot::control(std::function<Torques(const RobotState&, franka::Duration)> control_callback,
+void Robot::control(std::function<Torques(const RobotState&, agimus_franka::Duration)> control_callback,
                     bool limit_rate,
                     double cutoff_frequency) {
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
@@ -65,8 +65,8 @@ void Robot::control(std::function<Torques(const RobotState&, franka::Duration)> 
 }
 
 void Robot::control(
-    std::function<Torques(const RobotState&, franka::Duration)> control_callback,
-    std::function<JointPositions(const RobotState&, franka::Duration)> motion_generator_callback,
+    std::function<Torques(const RobotState&, agimus_franka::Duration)> control_callback,
+    std::function<JointPositions(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
     bool limit_rate,
     double cutoff_frequency) {
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
@@ -79,8 +79,8 @@ void Robot::control(
 }
 
 void Robot::control(
-    std::function<Torques(const RobotState&, franka::Duration)> control_callback,
-    std::function<JointVelocities(const RobotState&, franka::Duration)> motion_generator_callback,
+    std::function<Torques(const RobotState&, agimus_franka::Duration)> control_callback,
+    std::function<JointVelocities(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
     bool limit_rate,
     double cutoff_frequency) {
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
@@ -93,8 +93,8 @@ void Robot::control(
 }
 
 void Robot::control(
-    std::function<Torques(const RobotState&, franka::Duration)> control_callback,
-    std::function<CartesianPose(const RobotState&, franka::Duration)> motion_generator_callback,
+    std::function<Torques(const RobotState&, agimus_franka::Duration)> control_callback,
+    std::function<CartesianPose(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
     bool limit_rate,
     double cutoff_frequency) {
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
@@ -106,8 +106,8 @@ void Robot::control(
   loop();
 }
 
-void Robot::control(std::function<Torques(const RobotState&, franka::Duration)> control_callback,
-                    std::function<CartesianVelocities(const RobotState&, franka::Duration)>
+void Robot::control(std::function<Torques(const RobotState&, agimus_franka::Duration)> control_callback,
+                    std::function<CartesianVelocities(const RobotState&, agimus_franka::Duration)>
                         motion_generator_callback,
                     bool limit_rate,
                     double cutoff_frequency) {
@@ -121,7 +121,7 @@ void Robot::control(std::function<Torques(const RobotState&, franka::Duration)> 
 }
 
 void Robot::control(
-    std::function<JointPositions(const RobotState&, franka::Duration)> motion_generator_callback,
+    std::function<JointPositions(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
     ControllerMode controller_mode,
     bool limit_rate,
     double cutoff_frequency) {
@@ -134,7 +134,7 @@ void Robot::control(
 }
 
 void Robot::control(
-    std::function<JointVelocities(const RobotState&, franka::Duration)> motion_generator_callback,
+    std::function<JointVelocities(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
     ControllerMode controller_mode,
     bool limit_rate,
     double cutoff_frequency) {
@@ -147,7 +147,7 @@ void Robot::control(
 }
 
 void Robot::control(
-    std::function<CartesianPose(const RobotState&, franka::Duration)> motion_generator_callback,
+    std::function<CartesianPose(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
     ControllerMode controller_mode,
     bool limit_rate,
     double cutoff_frequency) {
@@ -159,7 +159,7 @@ void Robot::control(
   loop();
 }
 
-void Robot::control(std::function<CartesianVelocities(const RobotState&, franka::Duration)>
+void Robot::control(std::function<CartesianVelocities(const RobotState&, agimus_franka::Duration)>
                         motion_generator_callback,
                     ControllerMode controller_mode,
                     bool limit_rate,
@@ -320,4 +320,4 @@ template std::unique_ptr<ActiveControlBase> Robot::startControl<CartesianPose>(
 template std::unique_ptr<ActiveControlBase> Robot::startControl<CartesianVelocities>(
     const agimus_research_interface::robot::Move::ControllerMode& controller_type);
 
-}  // namespace franka
+}  // namespace agimus_franka

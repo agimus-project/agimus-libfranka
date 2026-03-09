@@ -7,16 +7,16 @@
 
 using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
 
-namespace franka {
+namespace agimus_franka {
 
-Network::Network(const std::string& franka_address,
-                 uint16_t franka_port,
+Network::Network(const std::string& agimus_franka_address,
+                 uint16_t agimus_franka_port,
                  std::chrono::milliseconds tcp_timeout,
                  std::chrono::milliseconds udp_timeout,
                  std::tuple<bool, int, int, int> tcp_keepalive) {
   try {
     Poco::Timespan poco_timeout(1000l * tcp_timeout.count());
-    Poco::Net::SocketAddress address(franka_address, franka_port);
+    Poco::Net::SocketAddress address(agimus_franka_address, agimus_franka_port);
 
     tcp_socket_.connect(address, poco_timeout);
     tcp_socket_.setBlocking(true);
@@ -38,14 +38,14 @@ Network::Network(const std::string& franka_address,
     udp_port_ = udp_socket_.address().port();
   } catch (const Poco::Net::ConnectionRefusedException& e) {
     throw NetworkException(
-        "libfranka: Connection to FCI refused. Please install FCI feature or enable FCI mode in Desk."s);
+        "libagimus_franka: Connection to FCI refused. Please install FCI feature or enable FCI mode in Desk."s);
   } catch (const Poco::Net::NetException& e) {
-    throw NetworkException("libfranka: Connection error: "s + e.what());
+    throw NetworkException("libagimus_franka: Connection error: "s + e.what());
   } catch (const Poco::TimeoutException& e) {
     throw NetworkException(
-        "libfranka: Connection timeout. Please check your network connection or settings."s);
+        "libagimus_franka: Connection timeout. Please check your network connection or settings."s);
   } catch (const Poco::Exception& e) {
-    throw NetworkException("libfranka: "s + e.what());
+    throw NetworkException("libagimus_franka: "s + e.what());
   }
 }
 
@@ -70,11 +70,11 @@ void Network::tcpThrowIfConnectionClosed() try {
     int rv = tcp_socket_.receiveBytes(buffer.data(), static_cast<int>(buffer.size()), MSG_PEEK);
 
     if (rv == 0) {
-      throw NetworkException("libfranka: server closed connection");
+      throw NetworkException("libagimus_franka: server closed connection");
     }
   }
 } catch (const Poco::Exception& e) {
-  throw NetworkException("libfranka: "s + e.what());
+  throw NetworkException("libagimus_franka: "s + e.what());
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

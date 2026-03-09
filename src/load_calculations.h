@@ -6,7 +6,7 @@
 
 #include <Eigen/Core>
 
-namespace franka {
+namespace agimus_franka {
 
 std::array<double, 3> combineCenterOfMass(
     double m_ee,
@@ -26,4 +26,4 @@ std::array<double, 9> combineInertiaTensor(
     double m_total,
     const std::array<double, 3>& F_x_Ctotal);  // NOLINT(readability-identifier-naming)
 
-}  // namespace franka
+}  // namespace agimus_franka

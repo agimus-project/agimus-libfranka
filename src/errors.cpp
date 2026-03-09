@@ -1,6 +1,6 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <franka/errors.h>
+#include <agimus_franka/errors.h>
 
 #include <algorithm>
 #include <iterator>
@@ -10,7 +10,7 @@
 
 using Error = agimus_research_interface::robot::Error;
 
-namespace franka {
+namespace agimus_franka {
 
 Errors::Errors() : Errors(std::array<bool, 41>{}) {}
 
@@ -129,4 +129,4 @@ std::ostream& operator<<(std::ostream& ostream, const Errors& errors) {
   return ostream;
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

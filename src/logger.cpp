@@ -2,7 +2,7 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #include "logger.h"
 
-namespace franka {
+namespace agimus_franka {
 
 Logger::Logger(size_t log_size) : log_size_(log_size) {
   states_.resize(log_size);
@@ -45,4 +45,4 @@ std::vector<Record> Logger::flush() {
   return log;
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

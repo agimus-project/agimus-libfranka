@@ -10,8 +10,8 @@
 #include <Poco/File.h>
 #include <Poco/Path.h>
 
-#include <franka/exception.h>
-#include <franka/robot.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/robot.h>
 
 #include "examples_common.h"
 
@@ -38,7 +38,7 @@ class Controller {
     std::fill(&dq_buffer_.get()[0], &dq_buffer_.get()[dq_filter_size_ * 7], 0);
   }
 
-  inline franka::Torques step(const franka::RobotState& state) {
+  inline agimus_franka::Torques step(const agimus_franka::RobotState& state) {
     updateDQFilter(state);
 
     std::array<double, 7> tau_J_d;  // NOLINT(readability-identifier-naming)
@@ -48,7 +48,7 @@ class Controller {
     return tau_J_d;
   }
 
-  void updateDQFilter(const franka::RobotState& state) {
+  void updateDQFilter(const agimus_franka::RobotState& state) {
     for (size_t i = 0; i < 7; i++) {
       dq_buffer_.get()[dq_current_filter_position_ * 7 + i] = state.dq[i];
     }
@@ -105,7 +105,7 @@ std::vector<double> generateTrajectory(double a_max) {
 
 }  // anonymous namespace
 
-void writeLogToFile(const std::vector<franka::Record>& log);
+void writeLogToFile(const std::vector<agimus_franka::Record>& log);
 
 int main(int argc, char** argv) {
   if (argc != 2) {
@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
   Controller controller(filter_size, K_P, K_D);
 
   try {
-    franka::Robot robot(argv[1]);
+    agimus_franka::Robot robot(argv[1]);
     setDefaultBehavior(robot);
 
     // First move the robot to a suitable joint configuration
@@ -151,29 +151,29 @@ int main(int argc, char** argv) {
     std::vector<double> trajectory = generateTrajectory(max_acceleration);
 
     robot.control(
-        [&](const franka::RobotState& robot_state, franka::Duration) -> franka::Torques {
+        [&](const agimus_franka::RobotState& robot_state, agimus_franka::Duration) -> agimus_franka::Torques {
           return controller.step(robot_state);
         },
-        [&](const franka::RobotState&, franka::Duration period) -> franka::JointVelocities {
+        [&](const agimus_franka::RobotState&, agimus_franka::Duration period) -> agimus_franka::JointVelocities {
           index += period.toMSec();
 
           if (index >= trajectory.size()) {
             index = trajectory.size() - 1;
           }
 
-          franka::JointVelocities velocities{{0, 0, 0, 0, 0, 0, 0}};
+          agimus_franka::JointVelocities velocities{{0, 0, 0, 0, 0, 0, 0}};
           velocities.dq[joint_number] = trajectory[index];
 
           if (index >= trajectory.size() - 1) {
-            return franka::MotionFinished(velocities);
+            return agimus_franka::MotionFinished(velocities);
           }
           return velocities;
         });
-  } catch (const franka::ControlException& e) {
+  } catch (const agimus_franka::ControlException& e) {
     std::cout << e.what() << std::endl;
     writeLogToFile(e.log);
     return -1;
-  } catch (const franka::Exception& e) {
+  } catch (const agimus_franka::Exception& e) {
     std::cout << e.what() << std::endl;
     return -1;
   }
@@ -181,13 +181,13 @@ int main(int argc, char** argv) {
   return 0;
 }
 
-void writeLogToFile(const std::vector<franka::Record>& log) {
+void writeLogToFile(const std::vector<agimus_franka::Record>& log) {
   if (log.empty()) {
     return;
   }
   try {
     Poco::Path temp_dir_path(Poco::Path::temp());
-    temp_dir_path.pushDirectory("libfranka-logs");
+    temp_dir_path.pushDirectory("libagimus_franka-logs");
 
     Poco::File temp_dir(temp_dir_path);
     temp_dir.createDirectories();
@@ -201,7 +201,7 @@ void writeLogToFile(const std::vector<franka::Record>& log) {
       return;
     }
     std::ofstream log_stream(log_file.path().c_str());
-    log_stream << franka::logToCSV(log);
+    log_stream << agimus_franka::logToCSV(log);
 
     std::cout << "Log file written to: " << log_file.path() << std::endl;
   } catch (...) {

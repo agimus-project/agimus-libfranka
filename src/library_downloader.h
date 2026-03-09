@@ -8,7 +8,7 @@
 
 #include "network.h"
 
-namespace franka {
+namespace agimus_franka {
 
 class LibraryDownloader {
  public:
@@ -21,4 +21,4 @@ class LibraryDownloader {
   Poco::File model_library_file_;
 };
 
-};  // namespace franka
+};  // namespace agimus_franka

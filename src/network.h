@@ -16,14 +16,14 @@
 #include <Poco/Net/NetException.h>
 #include <Poco/Net/StreamSocket.h>
 
-#include <franka/exception.h>
+#include <agimus_franka/exception.h>
 
-namespace franka {
+namespace agimus_franka {
 
 class Network {
  public:
-  Network(const std::string& franka_address,
-          uint16_t franka_port,
+  Network(const std::string& agimus_franka_address,
+          uint16_t agimus_franka_port,
           std::chrono::milliseconds tcp_timeout = std::chrono::seconds(60),
           std::chrono::milliseconds udp_timeout = std::chrono::seconds(1),
           std::tuple<bool, int, int, int> tcp_keepalive = std::make_tuple(true, 1, 3, 1));
@@ -124,13 +124,13 @@ T Network::udpBlockingReceiveUnsafe() try {
       udp_socket_.receiveFrom(buffer.data(), static_cast<int>(buffer.size()), udp_server_address_);
 
   if (bytes_received != static_cast<int>(buffer.size())) {
-    throw ProtocolException("libfranka: incorrect object size");
+    throw ProtocolException("libagimus_franka: incorrect object size");
   }
 
   return *reinterpret_cast<T*>(buffer.data());
 } catch (const Poco::Exception& e) {
   using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
-  throw NetworkException("libfranka: UDP receive: "s + e.what());
+  throw NetworkException("libagimus_franka: UDP receive: "s + e.what());
 }
 
 template <typename T>
@@ -139,17 +139,17 @@ void Network::udpSend(const T& data) try {
 
   int bytes_sent = udp_socket_.sendTo(&data, sizeof(data), udp_server_address_);
   if (bytes_sent != sizeof(data)) {
-    throw NetworkException("libfranka: could not send UDP data");
+    throw NetworkException("libagimus_franka: could not send UDP data");
   }
 } catch (const Poco::Exception& e) {
   using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
-  throw NetworkException("libfranka: UDP send: "s + e.what());
+  throw NetworkException("libagimus_franka: UDP send: "s + e.what());
 }
 
 template <typename T>
 void Network::tcpReadFromBuffer(std::chrono::microseconds timeout) try {
   if (tcp_socket_.poll(0, Poco::Net::Socket::SELECT_ERROR)) {
-    throw NetworkException("libfranka: TCP connection got interrupted.");
+    throw NetworkException("libagimus_franka: TCP connection got interrupted.");
   }
 
   if (!tcp_socket_.poll(timeout.count(), Poco::Net::Socket::SELECT_READ)) {
@@ -162,7 +162,7 @@ void Network::tcpReadFromBuffer(std::chrono::microseconds timeout) try {
     typename T::Header header;
     tcp_socket_.receiveBytes(&header, sizeof(header));
     if (header.size < sizeof(header)) {
-      throw ProtocolException("libfranka: Incorrect TCP message size.");
+      throw ProtocolException("libagimus_franka: Incorrect TCP message size.");
     }
     pending_response_.resize(header.size);
     std::memcpy(pending_response_.data(), &header, sizeof(header));
@@ -183,7 +183,7 @@ void Network::tcpReadFromBuffer(std::chrono::microseconds timeout) try {
   }
 } catch (const Poco::Exception& e) {
   using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
-  throw NetworkException("libfranka: TCP receive: "s + e.what());
+  throw NetworkException("libagimus_franka: TCP receive: "s + e.what());
 }
 
 template <typename T, typename... TArgs>
@@ -200,7 +200,7 @@ uint32_t Network::tcpSendRequest(TArgs&&... args) try {
   return message.header.command_id;
 } catch (const Poco::Exception& e) {
   using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
-  throw NetworkException("libfranka: TCP send bytes: "s + e.what());
+  throw NetworkException("libagimus_franka: TCP send bytes: "s + e.what());
 }
 
 template <typename T>
@@ -218,7 +218,7 @@ bool Network::tcpReceiveResponse(uint32_t command_id,
     auto message = reinterpret_cast<const typename T::template Message<typename T::Response>*>(
         it->second.data());
     if (message->header.size < sizeof(message)) {
-      throw ProtocolException("libfranka: Incorrect TCP message size.");
+      throw ProtocolException("libagimus_franka: Incorrect TCP message size.");
     }
     handler(message->getInstance());
     received_responses_.erase(it);
@@ -244,7 +244,7 @@ typename T::Response Network::tcpBlockingReceiveResponse(uint32_t command_id,
   auto message = *reinterpret_cast<const typename T::template Message<typename T::Response>*>(
       it->second.data());
   if (message.header.size < sizeof(message)) {
-    throw ProtocolException("libfranka: Incorrect TCP message size.");
+    throw ProtocolException("libagimus_franka: Incorrect TCP message size.");
   }
 
   if (vl_buffer != nullptr && message.header.size != sizeof(message)) {
@@ -269,8 +269,8 @@ void connect(Network& network, uint16_t* ri_version) {
       *ri_version = connect_response.version;
       break;
     default:
-      throw ProtocolException("libfranka: Protocol error during connection attempt");
+      throw ProtocolException("libagimus_franka: Protocol error during connection attempt");
   }
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

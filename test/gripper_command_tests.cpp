@@ -2,17 +2,17 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #include <gmock/gmock.h>
 
-#include <franka/exception.h>
-#include <franka/gripper.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/gripper.h>
 
 #include "helpers.h"
 #include "mock_server.h"
 
-using franka::CommandException;
-using franka::Gripper;
-using franka::GripperState;
-using franka::IncompatibleVersionException;
-using franka::Network;
+using agimus_franka::CommandException;
+using agimus_franka::Gripper;
+using agimus_franka::GripperState;
+using agimus_franka::IncompatibleVersionException;
+using agimus_franka::Network;
 
 using namespace agimus_research_interface::gripper;
 

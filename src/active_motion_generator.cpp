@@ -1,14 +1,14 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 
-#include <franka/active_motion_generator.h>
-#include <franka/exception.h>
-#include <franka/robot.h>
+#include <agimus_franka/active_motion_generator.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/robot.h>
 #include <agimus_research_interface/robot/rbk_types.h>
 
 #include "robot_impl.h"
 
-namespace franka {
+namespace agimus_franka {
 
 template <typename MotionGeneratorType>
 bool ActiveMotionGenerator<MotionGeneratorType>::isTorqueControlFinished(
@@ -24,17 +24,17 @@ void ActiveMotionGenerator<MotionGeneratorType>::writeOnce(
     const MotionGeneratorType& motion_generator_input,
     const std::optional<const Torques>& control_input) {
   if (control_finished) {
-    throw franka::ControlException("writeOnce must not be called after the motion has finished.");
+    throw agimus_franka::ControlException("writeOnce must not be called after the motion has finished.");
   }
 
   if (control_input.has_value() &&
       controller_type_ != agimus_research_interface::robot::Move::ControllerMode::kExternalController) {
-    throw franka::ControlException("Torques can only be commanded in kExternalController mode.");
+    throw agimus_franka::ControlException("Torques can only be commanded in kExternalController mode.");
   }
 
   if (!control_input.has_value() &&
       controller_type_ == agimus_research_interface::robot::Move::ControllerMode::kExternalController) {
-    throw franka::ControlException(
+    throw agimus_franka::ControlException(
         "Torque command missing, please use writeOnce(const MotionGeneratorType& "
         "motion_generator_input, const Torques& control_input) for external controllers.");
   }
@@ -66,4 +66,4 @@ template class ActiveMotionGenerator<JointVelocities>;
 template class ActiveMotionGenerator<CartesianPose>;
 template class ActiveMotionGenerator<CartesianVelocities>;
 
-}  // namespace franka
+}  // namespace agimus_franka

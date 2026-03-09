@@ -13,7 +13,7 @@
  * Contains helper functions for writing control loops.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 /**
  * Determines whether the given elbow configuration is valid or not.
@@ -100,7 +100,7 @@ inline void checkMatrix(const std::array<double, 16>& transform) {
   checkFinite(transform);
   if (!isHomogeneousTransformation(transform)) {
     throw std::invalid_argument(
-        "libfranka: Attempt to set invalid transformation in motion generator. Has to be column "
+        "libagimus_franka: Attempt to set invalid transformation in motion generator. Has to be column "
         "major!");
   }
 }
@@ -119,4 +119,4 @@ inline void checkElbow(const std::array<double, 2>& elbow) {
   }
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

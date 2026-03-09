@@ -5,15 +5,15 @@
 #include <array>
 #include <ostream>
 
-#include <franka/duration.h>
-#include <franka/errors.h>
+#include <agimus_franka/duration.h>
+#include <agimus_franka/errors.h>
 
 /**
  * @file robot_state.h
- * Contains the franka::RobotState types.
+ * Contains the agimus_franka::RobotState types.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 /**
  * Describes the robot's current mode.
@@ -410,7 +410,7 @@ struct RobotState {
  *
  * @return Ostream instance
  */
-std::ostream& operator<<(std::ostream& ostream, const franka::RobotState& robot_state);
+std::ostream& operator<<(std::ostream& ostream, const agimus_franka::RobotState& robot_state);
 
 /**
  * Streams RobotMode in human-readable form
@@ -422,4 +422,4 @@ std::ostream& operator<<(std::ostream& ostream, const franka::RobotState& robot_
  */
 std::ostream& operator<<(std::ostream& ostream, RobotMode robot_mode);
 
-}  // namespace franka
+}  // namespace agimus_franka

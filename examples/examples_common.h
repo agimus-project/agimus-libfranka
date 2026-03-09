@@ -6,10 +6,10 @@
 
 #include <Eigen/Core>
 
-#include <franka/control_types.h>
-#include <franka/duration.h>
-#include <franka/robot.h>
-#include <franka/robot_state.h>
+#include <agimus_franka/control_types.h>
+#include <agimus_franka/duration.h>
+#include <agimus_franka/robot.h>
+#include <agimus_franka/robot_state.h>
 
 /**
  * @file examples_common.h
@@ -21,7 +21,7 @@
  *
  * @param[in] robot Robot instance to set behavior on.
  */
-void setDefaultBehavior(franka::Robot& robot);
+void setDefaultBehavior(agimus_franka::Robot& robot);
 
 /**
  * An example showing how to generate a joint pose motion to a goal position. Adapted from:
@@ -46,7 +46,7 @@ class MotionGenerator {
    *
    * @return Joint positions for use inside a control loop.
    */
-  franka::JointPositions operator()(const franka::RobotState& robot_state, franka::Duration period);
+  agimus_franka::JointPositions operator()(const agimus_franka::RobotState& robot_state, agimus_franka::Duration period);
 
  private:
   using Vector7d = Eigen::Matrix<double, 7, 1, Eigen::ColMajor>;

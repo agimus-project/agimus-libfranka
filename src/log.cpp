@@ -1,13 +1,13 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <franka/log.h>
+#include <agimus_franka/log.h>
 
 #include <iterator>
 #include <sstream>
 
 using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
 
-namespace franka {
+namespace agimus_franka {
 
 namespace {
 
@@ -39,7 +39,7 @@ std::string csvRobotStateHeader() {
 }
 
 std::string csvRobotCommandHeader() {
-  franka::RobotCommand command;
+  agimus_franka::RobotCommand command;
   std::ostringstream os;
   os << csvName(command.joint_positions.q, "cmd.q_d") << ","
      << csvName(command.joint_velocities.dq, "cmd.dq_d") << ","
@@ -49,7 +49,7 @@ std::string csvRobotCommandHeader() {
   return os.str();
 }
 
-std::string csvLine(const franka::RobotState& robot_state) {
+std::string csvLine(const agimus_franka::RobotState& robot_state) {
   std::ostringstream os;
   os << robot_state.time.toMSec() << "," << robot_state.control_command_success_rate << ","
      << robot_state.q << "," << robot_state.q_d << "," << robot_state.dq << "," << robot_state.dq_d
@@ -57,7 +57,7 @@ std::string csvLine(const franka::RobotState& robot_state) {
   return os.str();
 }
 
-std::string csvLine(const franka::RobotCommand& command) {
+std::string csvLine(const agimus_franka::RobotCommand& command) {
   std::ostringstream os;
   os << command.joint_positions.q << "," << command.joint_velocities.dq << ","
      << command.cartesian_pose.O_T_EE << "," << command.cartesian_velocities.O_dP_EE << ","
@@ -81,4 +81,4 @@ std::string logToCSV(const std::vector<Record>& log) {
   return os.str();
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

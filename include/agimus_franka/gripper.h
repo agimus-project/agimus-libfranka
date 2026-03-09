@@ -6,14 +6,14 @@
 #include <memory>
 #include <string>
 
-#include <franka/gripper_state.h>
+#include <agimus_franka/gripper_state.h>
 
 /**
  * @file gripper.h
- * Contains the franka::Gripper type.
+ * Contains the agimus_franka::Gripper type.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 class Network;
 
@@ -34,12 +34,12 @@ class Gripper {
   /**
    * Establishes a connection with a gripper connected to a robot.
    *
-   * @param[in] franka_address IP/hostname of the robot the gripper is connected to.
+   * @param[in] agimus_franka_address IP/hostname of the robot the gripper is connected to.
    *
    * @throw NetworkException if the connection is unsuccessful.
-   * @throw IncompatibleVersionException if this version of `libfranka` is not supported.
+   * @throw IncompatibleVersionException if this version of `libagimus_franka` is not supported.
    */
-  explicit Gripper(const std::string& franka_address);
+  explicit Gripper(const std::string& agimus_franka_address);
 
   /**
    * Move-constructs a new Gripper instance.
@@ -153,4 +153,4 @@ class Gripper {
   uint16_t ri_version_;
 };
 
-}  // namespace franka
+}  // namespace agimus_franka

@@ -8,7 +8,7 @@
 #include "library_loader.h"
 #include "network.h"
 
-namespace franka {
+namespace agimus_franka {
 
 class ModelLibrary {
  public:
@@ -54,4 +54,4 @@ class ModelLibrary {
   const std::function<decltype(g_NE)> gravity;
 };
 
-}  // namespace franka
+}  // namespace agimus_franka

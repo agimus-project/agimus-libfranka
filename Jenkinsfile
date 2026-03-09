@@ -167,7 +167,7 @@ pipeline {
           }
           stage('Check Github Sync') {
             steps {
-              sh '.ci/checkgithistory.sh https://github.com/frankaemika/libfranka.git develop'
+              sh '.ci/checkgithistory.sh https://github.com/agimus_frankaemika/libagimus_franka.git develop'
             }
           }
           stage('Publish') {
@@ -177,7 +177,7 @@ pipeline {
                   sh 'cpack'
                   fePublishDebian('*.deb', 'futuretech-common', "deb.distribution=${env.DISTRO};deb.component=main;deb.architecture=amd64")
                   dir('doc') {
-                    sh 'tar cfz ../libfranka-docs.tar.gz html'
+                    sh 'tar cfz ../libagimus_franka-docs.tar.gz html'
                   }
                   sh "rename -e 's/(.tar.gz|.deb)\$/-${env.DISTRO}\$1/' *.deb *.tar.gz"
                   publishHTML([allowMissing: false,

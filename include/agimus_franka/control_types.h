@@ -11,10 +11,10 @@
  * Contains helper types for returning motion generation and joint-level torque commands.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 /**
- * Available controller modes for a franka::Robot.
+ * Available controller modes for a agimus_franka::Robot.
  */
 enum class ControllerMode { kJointImpedance, kCartesianImpedance };
 
@@ -356,4 +356,4 @@ inline CartesianVelocities MotionFinished(  // NOLINT(readability-identifier-nam
   return command;
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

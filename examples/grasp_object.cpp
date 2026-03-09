@@ -5,8 +5,8 @@
 #include <string>
 #include <thread>
 
-#include <franka/exception.h>
-#include <franka/gripper.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/gripper.h>
 
 /**
  * @example grasp_object.cpp
@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
   }
 
   try {
-    franka::Gripper gripper(argv[1]);
+    agimus_franka::Gripper gripper(argv[1]);
     double grasping_width = std::stod(argv[3]);
 
     std::stringstream ss(argv[2]);
@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
     }
 
     // Check for the maximum grasping width.
-    franka::GripperState gripper_state = gripper.readOnce();
+    agimus_franka::GripperState gripper_state = gripper.readOnce();
     if (gripper_state.max_width < grasping_width) {
       std::cout << "Object is too large for the current fingers on the gripper." << std::endl;
       return -1;
@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
 
     std::cout << "Grasped object, will release it now." << std::endl;
     gripper.stop();
-  } catch (franka::Exception const& e) {
+  } catch (agimus_franka::Exception const& e) {
     std::cout << e.what() << std::endl;
     return -1;
   }

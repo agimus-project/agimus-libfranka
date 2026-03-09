@@ -5,17 +5,17 @@
 #include <stdexcept>
 #include <string>
 
-#include <franka/log.h>
+#include <agimus_franka/log.h>
 
 /**
  * @file exception.h
  * Contains exception definitions.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 /**
- * Base class for all exceptions used by `libfranka`.
+ * Base class for all exceptions used by `libagimus_franka`.
  */
 struct Exception : public std::runtime_error {
   using std::runtime_error::runtime_error;
@@ -44,13 +44,13 @@ struct ProtocolException : public Exception {
 };
 
 /**
- * IncompatibleVersionException is thrown if the robot does not support this version of libfranka.
+ * IncompatibleVersionException is thrown if the robot does not support this version of libagimus_franka.
  */
 struct IncompatibleVersionException : public Exception {
   /**
    * Creates the exception using the two different protocol versions.
    * @param[in] server_version Protocol version on the Control side.
-   * @param[in] library_version Protocol version of libfranka.
+   * @param[in] library_version Protocol version of libagimus_franka.
    */
   IncompatibleVersionException(uint16_t server_version, uint16_t library_version) noexcept;
 
@@ -59,7 +59,7 @@ struct IncompatibleVersionException : public Exception {
    */
   const uint16_t server_version;
   /**
-   * libfranka protocol version.
+   * libagimus_franka protocol version.
    */
   const uint16_t library_version;
 };
@@ -77,12 +77,12 @@ struct ControlException : public Exception {
    * @param[in] what Explanatory string.
    * @param[in] log Vector of last received states and commands.
    */
-  explicit ControlException(const std::string& what, std::vector<franka::Record> log = {}) noexcept;
+  explicit ControlException(const std::string& what, std::vector<agimus_franka::Record> log = {}) noexcept;
 
   /**
    * Vector of states and commands logged just before the exception occurred.
    */
-  const std::vector<franka::Record> log;
+  const std::vector<agimus_franka::Record> log;
 };
 
 /**
@@ -106,4 +106,4 @@ struct InvalidOperationException : public Exception {
   using Exception::Exception;
 };
 
-}  // namespace franka
+}  // namespace agimus_franka

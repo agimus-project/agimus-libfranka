@@ -2,14 +2,14 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #include <gtest/gtest.h>
 
-#include <franka/errors.h>
+#include <agimus_franka/errors.h>
 #include <agimus_research_interface/robot/error.h>
 #include <agimus_research_interface/robot/rbk_types.h>
 
 #include "helpers.h"
 
 TEST(Errors, IsInitializedToNoErrors) {
-  franka::Errors errors;
+  agimus_franka::Errors errors;
 
   EXPECT_FALSE(errors);
 }
@@ -18,7 +18,7 @@ TEST(Errors, EvaluatedToTrueOnError) {
   std::array<bool, sizeof(agimus_research_interface::robot::RobotState::errors)> error_flags{};
   error_flags[rand() % error_flags.size()] = true;
 
-  franka::Errors errors(error_flags);
+  agimus_franka::Errors errors(error_flags);
 
   EXPECT_TRUE(errors);
 }
@@ -31,7 +31,7 @@ TEST(Errors, CanGetNamesOfErrors) {
   error_flags[static_cast<size_t>(
       agimus_research_interface::robot::Error::kSelfcollisionAvoidanceViolation)] = true;
 
-  franka::Errors errors(error_flags);
+  agimus_franka::Errors errors(error_flags);
 
   std::string expected =
       R"(["joint_position_limits_violation", "self_collision_avoidance_violation"])";
@@ -39,7 +39,7 @@ TEST(Errors, CanGetNamesOfErrors) {
 }
 
 TEST(Errors, CanBeStreamed) {
-  franka::Errors errors;
+  agimus_franka::Errors errors;
 
   std::stringstream ss;
   ss << errors;

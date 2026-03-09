@@ -3,8 +3,8 @@
 #include <cmath>
 #include <iostream>
 
-#include <franka/exception.h>
-#include <franka/robot.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/robot.h>
 
 #include "examples_common.h"
 
@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
     return -1;
   }
   try {
-    franka::Robot robot(argv[1]);
+    agimus_franka::Robot robot(argv[1]);
     setDefaultBehavior(robot);
 
     // First move the robot to a suitable joint configuration
@@ -44,8 +44,8 @@ int main(int argc, char** argv) {
 
     std::array<double, 7> initial_position;
     double time = 0.0;
-    robot.control([&initial_position, &time](const franka::RobotState& robot_state,
-                                             franka::Duration period) -> franka::JointPositions {
+    robot.control([&initial_position, &time](const agimus_franka::RobotState& robot_state,
+                                             agimus_franka::Duration period) -> agimus_franka::JointPositions {
       time += period.toSec();
 
       if (time == 0.0) {
@@ -54,18 +54,18 @@ int main(int argc, char** argv) {
 
       double delta_angle = M_PI / 8.0 * (1 - std::cos(M_PI / 2.5 * time));
 
-      franka::JointPositions output = {{initial_position[0], initial_position[1],
+      agimus_franka::JointPositions output = {{initial_position[0], initial_position[1],
                                         initial_position[2], initial_position[3] + delta_angle,
                                         initial_position[4] + delta_angle, initial_position[5],
                                         initial_position[6] + delta_angle}};
 
       if (time >= 5.0) {
         std::cout << std::endl << "Finished motion, shutting down example" << std::endl;
-        return franka::MotionFinished(output);
+        return agimus_franka::MotionFinished(output);
       }
       return output;
     });
-  } catch (const franka::Exception& e) {
+  } catch (const agimus_franka::Exception& e) {
     std::cout << e.what() << std::endl;
     return -1;
   }

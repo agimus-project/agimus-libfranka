@@ -5,7 +5,7 @@
 
 #include <gmock/gmock.h>
 
-#include <franka/lowpass_filter.h>
+#include <agimus_franka/lowpass_filter.h>
 #include "control_loop.h"
 #include "motion_generator_traits.h"
 
@@ -14,14 +14,14 @@
 
 using namespace ::testing;
 
-using franka::CartesianPose;
-using franka::CartesianVelocities;
-using franka::ControllerMode;
-using franka::Duration;
-using franka::JointPositions;
-using franka::JointVelocities;
-using franka::RobotState;
-using franka::Torques;
+using agimus_franka::CartesianPose;
+using agimus_franka::CartesianVelocities;
+using agimus_franka::ControllerMode;
+using agimus_franka::Duration;
+using agimus_franka::JointPositions;
+using agimus_franka::JointVelocities;
+using agimus_franka::RobotState;
+using agimus_franka::Torques;
 
 using agimus_research_interface::robot::ControllerCommand;
 using agimus_research_interface::robot::MotionGeneratorCommand;
@@ -37,11 +37,11 @@ class MockControlCallback {
 };
 
 template <typename T>
-class ControlLoop : public franka::ControlLoop<T> {
+class ControlLoop : public agimus_franka::ControlLoop<T> {
  public:
-  using franka::ControlLoop<T>::ControlLoop;
-  using franka::ControlLoop<T>::spinMotion;
-  using franka::ControlLoop<T>::spinControl;
+  using agimus_franka::ControlLoop<T>::ControlLoop;
+  using agimus_franka::ControlLoop<T>::spinMotion;
+  using agimus_franka::ControlLoop<T>::spinControl;
 };
 
 template <typename T>
@@ -50,7 +50,7 @@ struct MockMotionCallback {
 };
 
 double getCutoffFreq(bool filter) {
-  return (filter) ? franka::kDefaultCutoffFrequency : franka::kMaxCutoffFrequency;
+  return (filter) ? agimus_franka::kDefaultCutoffFrequency : agimus_franka::kMaxCutoffFrequency;
 }
 
 template <bool LimitRate, bool Filter>
@@ -99,7 +99,7 @@ class ControlLoops : public ::testing::Test {
   using ControlCallback = typename Loop::ControlCallback;
 
   const agimus_research_interface::robot::Move::MotionGeneratorMode kMotionGeneratorMode =
-      franka::MotionGeneratorTraits<TMotion>::kMotionGeneratorMode;
+      agimus_franka::MotionGeneratorTraits<TMotion>::kMotionGeneratorMode;
 
   static constexpr bool kLimitRate = T::kLimitRate;
   static constexpr bool kFilter = T::kFilter;
@@ -117,7 +117,7 @@ class ControlLoopWithTransformationMatrix : public ::testing::Test {
   using ControlCallback = typename Loop::ControlCallback;
 
   const agimus_research_interface::robot::Move::MotionGeneratorMode kMotionGeneratorMode =
-      franka::MotionGeneratorTraits<TMotion>::kMotionGeneratorMode;
+      agimus_franka::MotionGeneratorTraits<TMotion>::kMotionGeneratorMode;
 
   static constexpr bool kLimitRate = T::kLimitRate;
   static constexpr bool kFilter = T::kFilter;
@@ -133,7 +133,7 @@ class ControlLoopWithElbow : public ::testing::Test {
   using ControlCallback = typename Loop::ControlCallback;
 
   const agimus_research_interface::robot::Move::MotionGeneratorMode kMotionGeneratorMode =
-      franka::MotionGeneratorTraits<TMotion>::kMotionGeneratorMode;
+      agimus_franka::MotionGeneratorTraits<TMotion>::kMotionGeneratorMode;
 
   static constexpr bool kLimitRate = T::kLimitRate;
   static constexpr bool kFilter = T::kFilter;

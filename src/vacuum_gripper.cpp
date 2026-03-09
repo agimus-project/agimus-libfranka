@@ -1,15 +1,15 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <franka/vacuum_gripper.h>
+#include <agimus_franka/vacuum_gripper.h>
 
 #include <sstream>
 
-#include <franka/exception.h>
+#include <agimus_franka/exception.h>
 #include <agimus_research_interface/vacuum_gripper/types.h>
 
 #include "network.h"
 
-namespace franka {
+namespace agimus_franka {
 
 namespace {
 
@@ -22,14 +22,14 @@ bool executeCommand(Network& network, TArgs&&... args) {
     case T::Status::kSuccess:
       return true;
     case T::Status::kFail:
-      throw CommandException("libfranka vacuum gripper: Command failed!");
+      throw CommandException("libagimus_franka vacuum gripper: Command failed!");
     case T::Status::kUnsuccessful:
       return false;
     case T::Status::kAborted:
-      throw CommandException("libfranka vacuum gripper: Command aborted!");
+      throw CommandException("libagimus_franka vacuum gripper: Command aborted!");
     default:
       throw ProtocolException(
-          "libfranka vacuum gripper: Unexpected response while handling command!");
+          "libagimus_franka vacuum gripper: Unexpected response while handling command!");
   }
 }
 
@@ -61,8 +61,8 @@ VacuumGripperState convertVacuumGripperState(
 
 }  // anonymous namespace
 
-VacuumGripper::VacuumGripper(const std::string& franka_address)
-    : network_{std::make_unique<Network>(franka_address,
+VacuumGripper::VacuumGripper(const std::string& agimus_franka_address)
+    : network_{std::make_unique<Network>(agimus_franka_address,
                                          agimus_research_interface::vacuum_gripper::kCommandPort)} {
   connect<agimus_research_interface::vacuum_gripper::Connect,
           agimus_research_interface::vacuum_gripper::kVersion>(*network_, &ri_version_);
@@ -119,4 +119,4 @@ VacuumGripperState VacuumGripper::readOnce() const {
   return convertVacuumGripperState(vacuum_gripper_state);
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

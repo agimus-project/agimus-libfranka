@@ -6,7 +6,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <franka/log.h>
+#include <agimus_franka/log.h>
 
 #include "helpers.h"
 #include "logger.h"
@@ -16,13 +16,13 @@ using namespace ::testing;
 
 TEST(Logger, LogIsFIFO) {
   size_t log_count = 5;
-  franka::Logger logger(log_count);
+  agimus_franka::Logger logger(log_count);
 
-  std::vector<franka::RobotState> states;
+  std::vector<agimus_franka::RobotState> states;
   std::vector<agimus_research_interface::robot::RobotCommand> commands;
 
   for (size_t i = 0; i < log_count; i++) {
-    franka::RobotState state;
+    agimus_franka::RobotState state;
     randomRobotState(state);
     states.push_back(state);
 
@@ -33,7 +33,7 @@ TEST(Logger, LogIsFIFO) {
     logger.log(state, command);
   }
 
-  std::vector<franka::Record> log = logger.flush();
+  std::vector<agimus_franka::Record> log = logger.flush();
   for (size_t i = 0; i < log_count; i++) {
     testRobotStatesAreEqual(states[i], log[i].state);
     testRobotCommandsAreEqual(commands[i], log[i].command);
@@ -42,14 +42,14 @@ TEST(Logger, LogIsFIFO) {
 
 TEST(Logger, LogIsAFixedSizeRing) {
   size_t ring = 5;
-  franka::Logger logger(ring);
+  agimus_franka::Logger logger(ring);
 
-  std::vector<franka::RobotState> states;
+  std::vector<agimus_franka::RobotState> states;
   std::vector<agimus_research_interface::robot::RobotCommand> commands;
 
   size_t logs = ring * 2;
   for (size_t i = 0; i < logs; i++) {
-    franka::RobotState state;
+    agimus_franka::RobotState state;
     randomRobotState(state);
     states.push_back(state);
 
@@ -61,7 +61,7 @@ TEST(Logger, LogIsAFixedSizeRing) {
   }
 
   size_t expected_offset = logs - ring;
-  std::vector<franka::Record> log = logger.flush();
+  std::vector<agimus_franka::Record> log = logger.flush();
   for (size_t i = 0; i < ring; i++) {
     testRobotStatesAreEqual(states[i + expected_offset], log[i].state);
     testRobotCommandsAreEqual(commands[i + expected_offset], log[i].command);
@@ -71,13 +71,13 @@ TEST(Logger, LogIsAFixedSizeRing) {
 
 TEST(Logger, LoggerEmptyAfterFlush) {
   size_t log_count = 5;
-  franka::Logger logger(log_count);
+  agimus_franka::Logger logger(log_count);
 
   for (size_t i = 0; i < log_count; i++) {
-    logger.log(franka::RobotState{}, agimus_research_interface::robot::RobotCommand{});
+    logger.log(agimus_franka::RobotState{}, agimus_research_interface::robot::RobotCommand{});
   }
 
-  std::vector<franka::Record> log = logger.flush();
+  std::vector<agimus_franka::Record> log = logger.flush();
   EXPECT_EQ(log_count, log.size());
 
   log = logger.flush();
@@ -86,26 +86,26 @@ TEST(Logger, LoggerEmptyAfterFlush) {
 }
 
 TEST(Logger, NoLogWhenLogSizeZero) {
-  franka::Logger logger(0);
+  agimus_franka::Logger logger(0);
 
   size_t log_count = 50;
   for (size_t i = 0; i < log_count; i++) {
-    logger.log(franka::RobotState{}, agimus_research_interface::robot::RobotCommand{});
+    logger.log(agimus_franka::RobotState{}, agimus_research_interface::robot::RobotCommand{});
   }
 
-  std::vector<franka::Record> log = logger.flush();
+  std::vector<agimus_franka::Record> log = logger.flush();
   EXPECT_EQ(0u, log.size());
 }
 
 TEST(Logger, WellFormattedString) {
   size_t log_count = 5;
-  franka::Logger logger(log_count);
+  agimus_franka::Logger logger(log_count);
 
   for (size_t i = 0; i < log_count; i++) {
-    logger.log(franka::RobotState{}, agimus_research_interface::robot::RobotCommand{});
+    logger.log(agimus_franka::RobotState{}, agimus_research_interface::robot::RobotCommand{});
   }
 
-  std::string log = franka::logToCSV(logger.flush());
+  std::string log = agimus_franka::logToCSV(logger.flush());
 
   EXPECT_PRED2(stringContains, log, "time");
   EXPECT_PRED2(stringContains, log, "success_rate");
@@ -126,10 +126,10 @@ TEST(Logger, WellFormattedString) {
 }
 
 TEST(Logger, NoDuplicateColumns) {
-  franka::Logger logger(1);
-  logger.log(franka::RobotState{}, agimus_research_interface::robot::RobotCommand{});
+  agimus_franka::Logger logger(1);
+  logger.log(agimus_franka::RobotState{}, agimus_research_interface::robot::RobotCommand{});
 
-  std::string log = franka::logToCSV(logger.flush());
+  std::string log = agimus_franka::logToCSV(logger.flush());
 
   std::string header = splitAt(log, '\n').at(0);
   std::vector<std::string> titles = splitAt(header, ',');
@@ -138,9 +138,9 @@ TEST(Logger, NoDuplicateColumns) {
 
 TEST(Logger, EmptyLogEmptyString) {
   size_t log_count = 5;
-  franka::Logger logger(log_count);
+  agimus_franka::Logger logger(log_count);
 
-  std::string csv_string = franka::logToCSV(logger.flush());
+  std::string csv_string = agimus_franka::logToCSV(logger.flush());
 
   EXPECT_STREQ("", csv_string.c_str());
 }

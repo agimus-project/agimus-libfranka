@@ -4,11 +4,11 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 
-#include <franka/lowpass_filter.h>
+#include <agimus_franka/lowpass_filter.h>
 
 #include "helpers.h"
 
-using namespace franka;
+using namespace agimus_franka;
 
 const double kNoLimit{std::numeric_limits<double>::max()};
 

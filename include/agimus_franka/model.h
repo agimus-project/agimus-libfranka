@@ -5,15 +5,15 @@
 #include <array>
 #include <memory>
 
-#include <franka/robot.h>
-#include <franka/robot_state.h>
+#include <agimus_franka/robot.h>
+#include <agimus_franka/robot_state.h>
 
 /**
  * @file model.h
  * Contains model library types.
  */
 
-namespace franka {
+namespace agimus_franka {
 
 /**
  * Enumerates the seven joints, the flange, and the end effector of a robot.
@@ -61,7 +61,7 @@ class Model {
    *
    * @throw ModelException if the model library cannot be loaded.
    */
-  explicit Model(franka::Network& network);
+  explicit Model(agimus_franka::Network& network);
 
   /**
    * Move-constructs a new Model instance.
@@ -94,7 +94,7 @@ class Model {
    *
    * @return Vectorized 4x4 pose matrix, column-major.
    */
-  std::array<double, 16> pose(Frame frame, const franka::RobotState& robot_state) const;
+  std::array<double, 16> pose(Frame frame, const agimus_franka::RobotState& robot_state) const;
 
   /**
    * Gets the 4x4 pose matrix for the given frame in base frame.
@@ -125,7 +125,7 @@ class Model {
    *
    * @return Vectorized 6x7 Jacobian, column-major.
    */
-  std::array<double, 42> bodyJacobian(Frame frame, const franka::RobotState& robot_state) const;
+  std::array<double, 42> bodyJacobian(Frame frame, const agimus_franka::RobotState& robot_state) const;
 
   /**
    * Gets the 6x7 Jacobian for the given frame, relative to that frame.
@@ -156,7 +156,7 @@ class Model {
    *
    * @return Vectorized 6x7 Jacobian, column-major.
    */
-  std::array<double, 42> zeroJacobian(Frame frame, const franka::RobotState& robot_state) const;
+  std::array<double, 42> zeroJacobian(Frame frame, const agimus_franka::RobotState& robot_state) const;
 
   /**
    * Gets the 6x7 Jacobian for the given joint relative to the base frame.
@@ -184,7 +184,7 @@ class Model {
    *
    * @return Vectorized 7x7 mass matrix, column-major.
    */
-  std::array<double, 49> mass(const franka::RobotState& robot_state) const noexcept;
+  std::array<double, 49> mass(const agimus_franka::RobotState& robot_state) const noexcept;
 
   /**
    * Calculates the 7x7 mass matrix. Unit: \f$[kg \times m^2]\f$.
@@ -214,7 +214,7 @@ class Model {
    *
    * @return Coriolis force vector.
    */
-  std::array<double, 7> coriolis(const franka::RobotState& robot_state) const noexcept;
+  std::array<double, 7> coriolis(const agimus_franka::RobotState& robot_state) const noexcept;
 
   /**
    * Calculates the Coriolis force vector (state-space equation): \f$ c= C \times
@@ -266,7 +266,7 @@ class Model {
    *
    * @return Gravity vector.
    */
-  std::array<double, 7> gravity(const franka::RobotState& robot_state,
+  std::array<double, 7> gravity(const agimus_franka::RobotState& robot_state,
                                 const std::array<double, 3>& gravity_earth) const noexcept;
 
   /**
@@ -276,7 +276,7 @@ class Model {
    *
    * @return Gravity vector.
    */
-  std::array<double, 7> gravity(const franka::RobotState& robot_state) const noexcept;
+  std::array<double, 7> gravity(const agimus_franka::RobotState& robot_state) const noexcept;
 
   /// @cond DO_NOT_DOCUMENT
   Model(const Model&) = delete;
@@ -287,4 +287,4 @@ class Model {
   std::unique_ptr<ModelLibrary> library_;
 };
 
-}  // namespace franka
+}  // namespace agimus_franka

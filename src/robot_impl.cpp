@@ -4,11 +4,11 @@
 
 #include <sstream>
 
-#include <franka/control_tools.h>
+#include <agimus_franka/control_tools.h>
 
 #include "load_calculations.h"
 
-namespace franka {
+namespace agimus_franka {
 
 namespace {
 
@@ -45,7 +45,7 @@ inline ControlException createControlException(const char* message,
 Robot::Impl::Impl(std::unique_ptr<Network> network, size_t log_size, RealtimeConfig realtime_config)
     : network_{std::move(network)}, logger_{log_size}, realtime_config_{realtime_config} {
   if (!network_) {
-    throw std::invalid_argument("libfranka robot: Invalid argument");
+    throw std::invalid_argument("libagimus_franka robot: Invalid argument");
   }
 
   connect<agimus_research_interface::robot::Connect, agimus_research_interface::robot::kVersion>(*network_,
@@ -131,7 +131,7 @@ agimus_research_interface::robot::RobotCommand Robot::Impl::sendRobotCommand(
       if (current_move_motion_generator_mode_ ==
           agimus_research_interface::robot::MotionGeneratorMode::kIdle) {
         throw ControlException(
-            "libfranka robot: Trying to send motion command, but no motion generator running!");
+            "libagimus_franka robot: Trying to send motion command, but no motion generator running!");
       }
       robot_command.motion = *motion_command;
     }
@@ -139,7 +139,7 @@ agimus_research_interface::robot::RobotCommand Robot::Impl::sendRobotCommand(
       if (current_move_controller_mode_ !=
           agimus_research_interface::robot::ControllerMode::kExternalController) {
         throw ControlException(
-            "libfranka robot: Trying to send control command, but no controller running!");
+            "libagimus_franka robot: Trying to send control command, but no controller running!");
       }
       robot_command.control = *control_command;
     }
@@ -149,7 +149,7 @@ agimus_research_interface::robot::RobotCommand Robot::Impl::sendRobotCommand(
         current_move_controller_mode_ ==
             agimus_research_interface::robot::ControllerMode::kExternalController &&
         (motion_command == nullptr || control_command == nullptr)) {
-      throw ControlException("libfranka robot: Trying to send partial robot command!");
+      throw ControlException("libagimus_franka robot: Trying to send partial robot command!");
     }
 
     network_->udpSend<agimus_research_interface::robot::RobotCommand>(robot_command);
@@ -211,7 +211,7 @@ uint32_t Robot::Impl::startMotion(
     const agimus_research_interface::robot::Move::Deviation& maximum_path_deviation,
     const agimus_research_interface::robot::Move::Deviation& maximum_goal_pose_deviation) {
   if (motionGeneratorRunning() || controllerRunning()) {
-    throw ControlException("libfranka robot: Attempted to start multiple motions!");
+    throw ControlException("libagimus_franka robot: Attempted to start multiple motions!");
   }
 
   switch (motion_generator_mode) {
@@ -232,7 +232,7 @@ uint32_t Robot::Impl::startMotion(
           decltype(current_move_motion_generator_mode_)::kCartesianVelocity;
       break;
     default:
-      throw std::invalid_argument("libfranka: Invalid motion generator mode given.");
+      throw std::invalid_argument("libagimus_franka: Invalid motion generator mode given.");
   }
 
   switch (controller_mode) {
@@ -246,7 +246,7 @@ uint32_t Robot::Impl::startMotion(
       current_move_controller_mode_ = decltype(current_move_controller_mode_)::kExternalController;
       break;
     default:
-      throw std::invalid_argument("libfranka robot: Invalid controller mode given.");
+      throw std::invalid_argument("libagimus_franka robot: Invalid controller mode given.");
   }
 
   const uint32_t move_command_id = executeCommand<agimus_research_interface::robot::Move>(
@@ -285,7 +285,7 @@ void Robot::Impl::finishMotion(
   }
 
   if (motion_command == nullptr) {
-    throw ControlException("libfranka robot: No motion generator command given!");
+    throw ControlException("libagimus_franka robot: No motion generator command given!");
   }
   agimus_research_interface::robot::MotionGeneratorCommand motion_finished_command = *motion_command;
   motion_finished_command.motion_generation_finished = true;
@@ -549,4 +549,4 @@ void Robot::Impl::writeOnce(const CartesianVelocities& motion_generator_input,
   writeOnce<CartesianVelocities>(motion_generator_input, control_input);
 }
 
-}  // namespace franka
+}  // namespace agimus_franka

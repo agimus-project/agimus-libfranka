@@ -3,10 +3,10 @@
 #include <cmath>
 #include <iostream>
 
-#include <franka/active_control.h>
-#include <franka/active_motion_generator.h>
-#include <franka/exception.h>
-#include <franka/robot.h>
+#include <agimus_franka/active_control.h>
+#include <agimus_franka/active_motion_generator.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/robot.h>
 
 #include "examples_common.h"
 
@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
   }
 
   try {
-    franka::Robot robot(argv[1]);
+    agimus_franka::Robot robot(argv[1]);
     setDefaultBehavior(robot);
 
     // First move the robot to a suitable joint configuration
@@ -50,18 +50,18 @@ int main(int argc, char** argv) {
     double omega_max = 1.0;
     double time = 0.0;
 
-    auto callback_control = [=, &time](const franka::RobotState&,
-                                       franka::Duration period) -> franka::JointVelocities {
+    auto callback_control = [=, &time](const agimus_franka::RobotState&,
+                                       agimus_franka::Duration period) -> agimus_franka::JointVelocities {
       time += period.toSec();
 
       double cycle = std::floor(std::pow(-1.0, (time - std::fmod(time, time_max)) / time_max));
       double omega = cycle * omega_max / 2.0 * (1.0 - std::cos(2.0 * M_PI / time_max * time));
 
-      franka::JointVelocities velocities = {{0.0, 0.0, 0.0, omega, omega, omega, omega}};
+      agimus_franka::JointVelocities velocities = {{0.0, 0.0, 0.0, omega, omega, omega, omega}};
 
       if (time >= 2 * time_max) {
         std::cout << std::endl << "Finished motion, shutting down example" << std::endl;
-        return franka::MotionFinished(velocities);
+        return agimus_franka::MotionFinished(velocities);
       }
       return velocities;
     };
@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
       active_control->writeOnce(joint_velocities);
     }
 
-  } catch (const franka::Exception& e) {
+  } catch (const agimus_franka::Exception& e) {
     std::cout << e.what() << std::endl;
     return -1;
   }

@@ -1,8 +1,8 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <franka/duration.h>
+#include <agimus_franka/duration.h>
 
-namespace franka {
+namespace agimus_franka {
 
 Duration::Duration() noexcept : duration_{0u} {}
 
@@ -109,4 +109,4 @@ Duration operator*(uint64_t lhs, const Duration& rhs) noexcept {
   return rhs * lhs;
 }
 
-}  // namespace franka
+}  // namespace agimus_franka
