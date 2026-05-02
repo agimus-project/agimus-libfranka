@@ -2,12 +2,12 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #include "mock_server.h"
 
-#include <sstream>
-
 #include <Poco/Net/DatagramSocket.h>
 #include <Poco/Net/ServerSocket.h>
 #include <Poco/Net/StreamSocket.h>
 #include <gtest/gtest.h>
+
+#include <sstream>
 
 template <typename C>
 MockServer<C>::MockServer(ConnectCallbackT on_connect, uint32_t sequence_number)
@@ -33,7 +33,8 @@ MockServer<C>::~MockServer() {
 
   if (!commands_.empty()) {
     std::stringstream ss;
-    ss << "Mock server did not process all commands. Unprocessed commands:" << std::endl;
+    ss << "Mock server did not process all commands. Unprocessed commands:"
+       << std::endl;
     while (!commands_.empty()) {
       ss << commands_.front().first << std::endl;
       commands_.pop_front();
@@ -46,13 +47,14 @@ template <typename C>
 MockServer<C>& MockServer<C>::onReceiveRobotCommand(
     ReceiveRobotCommandCallbackT on_receive_robot_command) {
   std::lock_guard<std::mutex> _(command_mutex_);
-  commands_.emplace_back("onReceiveRobotCommand", [=](Socket&, Socket& udp_socket) {
-    agimus_research_interface::robot::RobotCommand robot_command;
-    udp_socket.receiveBytes(&robot_command, sizeof(robot_command));
-    if (on_receive_robot_command) {
-      on_receive_robot_command(robot_command);
-    }
-  });
+  commands_.emplace_back(
+      "onReceiveRobotCommand", [=](Socket&, Socket& udp_socket) {
+        agimus_research_interface::robot::RobotCommand robot_command;
+        udp_socket.receiveBytes(&robot_command, sizeof(robot_command));
+        if (on_receive_robot_command) {
+          on_receive_robot_command(robot_command);
+        }
+      });
   return *this;
 }
 
@@ -110,10 +112,12 @@ void MockServer<C>::serverThread() {
 
   uint16_t udp_port;
   handleCommand<typename C::Connect>(
-      tcp_socket_wrapper, [&, this](const typename C::Connect::Request& request) {
+      tcp_socket_wrapper,
+      [&, this](const typename C::Connect::Request& request) {
         udp_port = request.udp_port;
         return on_connect_ ? on_connect_(request)
-                           : typename C::Connect::Response(C::Connect::Status::kSuccess);
+                           : typename C::Connect::Response(
+                                 C::Connect::Status::kSuccess);
       });
 
   Poco::Net::SocketAddress addr(kHostname, 0);
@@ -148,11 +152,13 @@ void MockServer<C>::serverThread() {
   }
 
   if (!ignore_udp_buffer_) {
-    EXPECT_FALSE(udp_socket.poll(Poco::Timespan(), Poco::Net::Socket::SelectMode::SELECT_READ))
+    EXPECT_FALSE(udp_socket.poll(Poco::Timespan(),
+                                 Poco::Net::Socket::SelectMode::SELECT_READ))
         << "UDP socket still has data";
   }
 
-  if (tcp_socket.poll(Poco::Timespan(), Poco::Net::Socket::SelectMode::SELECT_READ)) {
+  if (tcp_socket.poll(Poco::Timespan(),
+                      Poco::Net::Socket::SelectMode::SELECT_READ)) {
     // Received something on the TCP socket.
     // Test that the Server closed the connection.
     std::array<uint8_t, 16> buffer;
@@ -164,7 +170,8 @@ void MockServer<C>::serverThread() {
 
 template <typename C>
 MockServer<C>& MockServer<C>::generic(
-    std::function<void(MockServer<C>::Socket&, MockServer<C>::Socket&)> generic_command) {
+    std::function<void(MockServer<C>::Socket&, MockServer<C>::Socket&)>
+        generic_command) {
   std::lock_guard<std::mutex> _(command_mutex_);
   commands_.emplace_back("generic", generic_command);
   return *this;
@@ -187,8 +194,9 @@ MockServer<C>& MockServer<C>::doForever(std::function<bool()> callback) {
 }
 
 template <typename C>
-MockServer<C>& MockServer<C>::doForever(std::function<bool()> callback,
-                                        typename decltype(MockServer::commands_)::iterator it) {
+MockServer<C>& MockServer<C>::doForever(
+    std::function<bool()> callback,
+    typename decltype(MockServer::commands_)::iterator it) {
   auto callback_wrapper = [=](Socket&, Socket&) {
     std::unique_lock<std::mutex> lock(command_mutex_);
     if (shutdown_) {
@@ -201,8 +209,10 @@ MockServer<C>& MockServer<C>::doForever(std::function<bool()> callback,
       size_t new_commands = commands_.size() - old_commands;
 
       // Reorder the commands added by callback to the front.
-      decltype(commands_) commands(commands_.cbegin() + old_commands, commands_.cend());
-      commands.insert(commands.end(), commands_.cbegin(), commands_.cbegin() + old_commands);
+      decltype(commands_) commands(commands_.cbegin() + old_commands,
+                                   commands_.cend());
+      commands.insert(commands.end(), commands_.cbegin(),
+                      commands_.cbegin() + old_commands);
       commands_ = commands;
 
       // Insert after the new commands added by callback.

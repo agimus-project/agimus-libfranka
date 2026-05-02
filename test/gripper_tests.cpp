@@ -1,13 +1,12 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <atomic>
-#include <functional>
-
-#include <gmock/gmock.h>
-
 #include <agimus_franka/exception.h>
 #include <agimus_franka/gripper.h>
 #include <agimus_research_interface/gripper/types.h>
+#include <gmock/gmock.h>
+
+#include <atomic>
+#include <functional>
 
 #include "helpers.h"
 #include "mock_server.h"
@@ -31,7 +30,8 @@ TEST(Gripper, CanPerformHandshake) {
   GripperMockServer server;
 
   Gripper gripper("127.0.0.1");
-  EXPECT_EQ(agimus_research_interface::gripper::kVersion, gripper.serverVersion());
+  EXPECT_EQ(agimus_research_interface::gripper::kVersion,
+            gripper.serverVersion());
 }
 
 TEST(Gripper, ThrowsOnIncompatibleLibraryVersion) {

@@ -1,10 +1,10 @@
 // Copyright (c) 2019 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <iostream>
-#include <thread>
-
 #include <agimus_franka/exception.h>
 #include <agimus_franka/vacuum_gripper.h>
+
+#include <iostream>
+#include <thread>
 
 /**
  * @example vacuum_object.cpp
@@ -13,15 +13,18 @@
 
 int main(int argc, char** argv) {
   if (argc != 2) {
-    std::cerr << "Usage: ./vacuum_object <vacuum-gripper-hostname>" << std::endl;
+    std::cerr << "Usage: ./vacuum_object <vacuum-gripper-hostname>"
+              << std::endl;
     return -1;
   }
 
   agimus_franka::VacuumGripper vacuum_gripper(argv[1]);
   try {
     // Print a vacuum gripper state.
-    agimus_franka::VacuumGripperState vacuum_gripper_state = vacuum_gripper.readOnce();
-    std::cout << "Initial vacuum gripper state: " << vacuum_gripper_state << std::endl;
+    agimus_franka::VacuumGripperState vacuum_gripper_state =
+        vacuum_gripper.readOnce();
+    std::cout << "Initial vacuum gripper state: " << vacuum_gripper_state
+              << std::endl;
 
     // Vacuum the object.
     if (!vacuum_gripper.vacuum(100, std::chrono::milliseconds(1000))) {
@@ -30,11 +33,12 @@ int main(int argc, char** argv) {
     }
 
     vacuum_gripper_state = vacuum_gripper.readOnce();
-    std::cout << "Vacuum gripper state after applying vacuum: " << vacuum_gripper_state
-              << std::endl;
+    std::cout << "Vacuum gripper state after applying vacuum: "
+              << vacuum_gripper_state << std::endl;
 
     // Wait 3s and check afterwards, if the object is still grasped.
-    std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(3000));
+    std::this_thread::sleep_for(
+        std::chrono::duration<double, std::milli>(3000));
 
     vacuum_gripper_state = vacuum_gripper.readOnce();
     if (!vacuum_gripper_state.in_control_range) {

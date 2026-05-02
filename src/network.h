@@ -2,6 +2,11 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
+#include <Poco/Net/DatagramSocket.h>
+#include <Poco/Net/NetException.h>
+#include <Poco/Net/StreamSocket.h>
+#include <agimus_franka/exception.h>
+
 #include <chrono>
 #include <cmath>
 #include <cstdint>
@@ -12,21 +17,16 @@
 #include <unordered_map>
 #include <vector>
 
-#include <Poco/Net/DatagramSocket.h>
-#include <Poco/Net/NetException.h>
-#include <Poco/Net/StreamSocket.h>
-
-#include <agimus_franka/exception.h>
-
 namespace agimus_franka {
 
 class Network {
  public:
-  Network(const std::string& agimus_franka_address,
-          uint16_t agimus_franka_port,
+  Network(const std::string& agimus_franka_address, uint16_t agimus_franka_port,
           std::chrono::milliseconds tcp_timeout = std::chrono::seconds(60),
           std::chrono::milliseconds udp_timeout = std::chrono::seconds(1),
-          std::tuple<bool, int, int, int> tcp_keepalive = std::make_tuple(true, 1, 3, 1));
+          std::tuple<bool, int, int, int> tcp_keepalive = std::make_tuple(true,
+                                                                          1, 3,
+                                                                          1));
   ~Network();
 
   uint16_t udpPort() const noexcept;
@@ -43,35 +43,41 @@ class Network {
   void tcpThrowIfConnectionClosed();
 
   /**
-   * Blocks until a T::Response message with the given command ID has been received.
+   * Blocks until a T::Response message with the given command ID has been
+   * received.
    *
-   * Additional variable-length data for the expected response (if any) is written into the given
-   * vl_buffer. If vl_buffer is not given, this data is discarded.
+   * Additional variable-length data for the expected response (if any) is
+   * written into the given vl_buffer. If vl_buffer is not given, this data is
+   * discarded.
    *
    * @param[in] command_id Expected command ID of the T::Response.
-   * @param[out] vl_buffer If given, variable-length data for the expected T::Response message (if
-   * any has been received) is copied into it.
+   * @param[out] vl_buffer If given, variable-length data for the expected
+   * T::Response message (if any has been received) is copied into it.
    *
    * @return Received T::Response instance.
    */
   template <typename T>
-  typename T::Response tcpBlockingReceiveResponse(uint32_t command_id,
-                                                  std::vector<uint8_t>* vl_buffer = nullptr);
+  typename T::Response tcpBlockingReceiveResponse(
+      uint32_t command_id, std::vector<uint8_t>* vl_buffer = nullptr);
 
   /**
-   * Tries to receive a T::Response message with the given command ID (non-blocking).
+   * Tries to receive a T::Response message with the given command ID
+   * (non-blocking).
    *
-   * Additional variable-length data for the expected response (if any) is discarded.
+   * Additional variable-length data for the expected response (if any) is
+   * discarded.
    *
    * @param[in] command_id Expected command ID of the T::Response.
-   * @param[in] handler Callback to be invoked if the expected response has been received.
+   * @param[in] handler Callback to be invoked if the expected response has been
+   * received.
    *
-   * @return True if a T::Response message with the given command_id has been received, false
-   * otherwise.
+   * @return True if a T::Response message with the given command_id has been
+   * received, false otherwise.
    */
   template <typename T>
-  bool tcpReceiveResponse(uint32_t command_id,
-                          std::function<void(const typename T::Response&)> handler);
+  bool tcpReceiveResponse(
+      uint32_t command_id,
+      std::function<void(const typename T::Response&)> handler);
 
   template <typename T, typename... TArgs>
   uint32_t tcpSendRequest(TArgs&&... args);
@@ -120,8 +126,8 @@ template <typename T>
 T Network::udpBlockingReceiveUnsafe() try {
   std::array<uint8_t, sizeof(T)> buffer;
 
-  int bytes_received =
-      udp_socket_.receiveFrom(buffer.data(), static_cast<int>(buffer.size()), udp_server_address_);
+  int bytes_received = udp_socket_.receiveFrom(
+      buffer.data(), static_cast<int>(buffer.size()), udp_server_address_);
 
   if (bytes_received != static_cast<int>(buffer.size())) {
     throw ProtocolException("libagimus_franka: incorrect object size");
@@ -173,7 +179,8 @@ void Network::tcpReadFromBuffer(std::chrono::microseconds timeout) try {
     pending_response_offset_ += tcp_socket_.receiveBytes(
         &pending_response_[pending_response_offset_],
         std::min(tcp_socket_.available(),
-                 static_cast<int>(pending_response_.size() - pending_response_offset_)));
+                 static_cast<int>(pending_response_.size() -
+                                  pending_response_offset_)));
     if (pending_response_offset_ == pending_response_.size()) {
       received_responses_.emplace(pending_command_id_, pending_response_);
       pending_response_.clear();
@@ -191,8 +198,9 @@ uint32_t Network::tcpSendRequest(TArgs&&... args) try {
   std::lock_guard<std::mutex> _(tcp_mutex_);
 
   typename T::template Message<typename T::Request> message(
-      typename T::Header(T::kCommand, command_id_++,
-                         sizeof(typename T::template Message<typename T::Request>)),
+      typename T::Header(
+          T::kCommand, command_id_++,
+          sizeof(typename T::template Message<typename T::Request>)),
       typename T::Request(std::forward<TArgs>(args)...));
 
   tcp_socket_.sendBytes(&message, sizeof(message));
@@ -204,9 +212,11 @@ uint32_t Network::tcpSendRequest(TArgs&&... args) try {
 }
 
 template <typename T>
-bool Network::tcpReceiveResponse(uint32_t command_id,
-                                 std::function<void(const typename T::Response&)> handler) {
-  using namespace std::literals::chrono_literals;  // NOLINT(google-build-using-namespace)
+bool Network::tcpReceiveResponse(
+    uint32_t command_id,
+    std::function<void(const typename T::Response&)> handler) {
+  using namespace std::literals::
+      chrono_literals;  // NOLINT(google-build-using-namespace)
   std::unique_lock<std::mutex> lock(tcp_mutex_, std::try_to_lock);
   if (!lock.owns_lock()) {
     return false;
@@ -215,7 +225,8 @@ bool Network::tcpReceiveResponse(uint32_t command_id,
   tcpReadFromBuffer<T>(0us);
   auto it = received_responses_.find(command_id);
   if (it != received_responses_.end()) {
-    auto message = reinterpret_cast<const typename T::template Message<typename T::Response>*>(
+    auto message = reinterpret_cast<
+        const typename T::template Message<typename T::Response>*>(
         it->second.data());
     if (message->header.size < sizeof(message)) {
       throw ProtocolException("libagimus_franka: Incorrect TCP message size.");
@@ -228,9 +239,10 @@ bool Network::tcpReceiveResponse(uint32_t command_id,
 }
 
 template <typename T>
-typename T::Response Network::tcpBlockingReceiveResponse(uint32_t command_id,
-                                                         std::vector<uint8_t>* vl_buffer) {
-  using namespace std::literals::chrono_literals;  // NOLINT(google-build-using-namespace)
+typename T::Response Network::tcpBlockingReceiveResponse(
+    uint32_t command_id, std::vector<uint8_t>* vl_buffer) {
+  using namespace std::literals::
+      chrono_literals;  // NOLINT(google-build-using-namespace)
   std::unique_lock<std::mutex> lock(tcp_mutex_, std::defer_lock);
   decltype(received_responses_)::const_iterator it;
   do {
@@ -241,7 +253,8 @@ typename T::Response Network::tcpBlockingReceiveResponse(uint32_t command_id,
     std::this_thread::yield();
   } while (it == received_responses_.end());
 
-  auto message = *reinterpret_cast<const typename T::template Message<typename T::Response>*>(
+  auto message = *reinterpret_cast<
+      const typename T::template Message<typename T::Response>*>(
       it->second.data());
   if (message.header.size < sizeof(message)) {
     throw ProtocolException("libagimus_franka: Incorrect TCP message size.");
@@ -261,15 +274,18 @@ typename T::Response Network::tcpBlockingReceiveResponse(uint32_t command_id,
 template <typename T, uint16_t kLibraryVersion>
 void connect(Network& network, uint16_t* ri_version) {
   uint32_t command_id = network.tcpSendRequest<T>(network.udpPort());
-  typename T::Response connect_response = network.tcpBlockingReceiveResponse<T>(command_id);
+  typename T::Response connect_response =
+      network.tcpBlockingReceiveResponse<T>(command_id);
   switch (connect_response.status) {
     case (T::Status::kIncompatibleLibraryVersion):
-      throw IncompatibleVersionException(connect_response.version, kLibraryVersion);
+      throw IncompatibleVersionException(connect_response.version,
+                                         kLibraryVersion);
     case (T::Status::kSuccess):
       *ri_version = connect_response.version;
       break;
     default:
-      throw ProtocolException("libagimus_franka: Protocol error during connection attempt");
+      throw ProtocolException(
+          "libagimus_franka: Protocol error during connection attempt");
   }
 }
 

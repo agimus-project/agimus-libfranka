@@ -1,9 +1,9 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <iostream>
-
 #include <agimus_franka/exception.h>
 #include <agimus_franka/robot.h>
+
+#include <iostream>
 
 /**
  * @example echo_robot_state.cpp
@@ -21,8 +21,8 @@ int main(int argc, char** argv) {
 
     size_t count = 0;
     robot.read([&count](const agimus_franka::RobotState& robot_state) {
-      // Printing to std::cout adds a delay. This is acceptable for a read loop such as this, but
-      // should not be done in a control loop.
+      // Printing to std::cout adds a delay. This is acceptable for a read loop
+      // such as this, but should not be done in a control loop.
       std::cout << robot_state << std::endl;
       return count++ < 100;
     });

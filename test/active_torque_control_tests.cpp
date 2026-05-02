@@ -1,11 +1,10 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <gmock/gmock.h>
-
 #include <agimus_franka/active_control.h>
 #include <agimus_franka/active_torque_control.h>
 #include <agimus_franka/control_types.h>
 #include <agimus_franka/exception.h>
+#include <gmock/gmock.h>
 #include <robot_impl.h>
 
 #include "helpers.h"
@@ -23,13 +22,14 @@ class ActiveTorqueControlTest : public ::testing::Test {
  public:
   ActiveTorqueControlTest()
       : robot_impl_mock(std::make_shared<RobotImplMock>(
-            std::move(std::make_unique<Network>("127.0.0.1", robot::kCommandPort)),
-            0,
-            RealtimeConfig::kIgnore)),
-        robot(RobotMock(robot_impl_mock)){};
+            std::move(
+                std::make_unique<Network>("127.0.0.1", robot::kCommandPort)),
+            0, RealtimeConfig::kIgnore)),
+        robot(RobotMock(robot_impl_mock)) {};
 
   std::unique_ptr<ActiveControlBase> startTorqueControl() {
-    EXPECT_CALL(*robot_impl_mock, startMotion(testing::_, testing::_, testing::_, testing::_))
+    EXPECT_CALL(*robot_impl_mock,
+                startMotion(testing::_, testing::_, testing::_, testing::_))
         .Times(1)
         .WillOnce(::testing::Return(100));
 
@@ -47,7 +47,8 @@ TEST_F(ActiveTorqueControlTest, CanWriteOnceIfControlNotFinished) {
   Torques default_control_output{{0, 0, 0, 0, 0, 0, 0}};
 
   EXPECT_CALL(*robot_impl_mock, cancelMotion(100)).Times(1);
-  EXPECT_CALL(*robot_impl_mock, writeOnce(Matcher<const Torques&>(testing::_))).Times(1);
+  EXPECT_CALL(*robot_impl_mock, writeOnce(Matcher<const Torques&>(testing::_)))
+      .Times(1);
   EXPECT_NO_THROW(active_control->writeOnce(default_control_output));
 }
 
@@ -56,7 +57,8 @@ TEST_F(ActiveTorqueControlTest, CanCallFinishMotionWhenFinished) {
   Torques default_control_output{{0, 0, 0, 0, 0, 0, 0}};
   default_control_output.motion_finished = true;
 
-  EXPECT_CALL(*robot_impl_mock, finishMotion(100, testing::_, testing::_)).Times(1);
+  EXPECT_CALL(*robot_impl_mock, finishMotion(100, testing::_, testing::_))
+      .Times(1);
   EXPECT_NO_THROW(active_control->writeOnce(default_control_output));
 }
 
@@ -65,9 +67,11 @@ TEST_F(ActiveTorqueControlTest, CanNotWriteOnceIfControlFinished) {
   Torques default_control_output{{0, 0, 0, 0, 0, 0, 0}};
   default_control_output.motion_finished = true;
 
-  EXPECT_CALL(*robot_impl_mock, finishMotion(100, testing::_, testing::_)).Times(1);
+  EXPECT_CALL(*robot_impl_mock, finishMotion(100, testing::_, testing::_))
+      .Times(1);
   EXPECT_NO_THROW(active_control->writeOnce(default_control_output));
-  EXPECT_THROW(active_control->writeOnce(default_control_output), ControlException);
+  EXPECT_THROW(active_control->writeOnce(default_control_output),
+               ControlException);
 }
 
 TEST_F(ActiveTorqueControlTest, ControlTokenReleasedAfterFinishingControl) {
@@ -75,7 +79,8 @@ TEST_F(ActiveTorqueControlTest, ControlTokenReleasedAfterFinishingControl) {
   Torques default_control_output{{0, 0, 0, 0, 0, 0, 0}};
   default_control_output.motion_finished = true;
 
-  EXPECT_CALL(*robot_impl_mock, finishMotion(100, testing::_, testing::_)).Times(1);
+  EXPECT_CALL(*robot_impl_mock, finishMotion(100, testing::_, testing::_))
+      .Times(1);
   EXPECT_NO_THROW(active_control->writeOnce(default_control_output));
   EXPECT_CALL(*robot_impl_mock, cancelMotion(100)).Times(1);
   EXPECT_NO_THROW(startTorqueControl());
@@ -94,8 +99,11 @@ TEST_F(ActiveTorqueControlTest, CanReadOnce) {
       .WillOnce(::testing::Return(kSecondExpectedRobotState));
   EXPECT_CALL(*robot_impl_mock, cancelMotion(100)).Times(1);
   auto& first_throw_motion_error_call =
-      EXPECT_CALL(*robot_impl_mock, throwOnMotionError(kFirstExpectedRobotState, 100)).Times(1);
-  EXPECT_CALL(*robot_impl_mock, throwOnMotionError(kSecondExpectedRobotState, 100))
+      EXPECT_CALL(*robot_impl_mock,
+                  throwOnMotionError(kFirstExpectedRobotState, 100))
+          .Times(1);
+  EXPECT_CALL(*robot_impl_mock,
+              throwOnMotionError(kSecondExpectedRobotState, 100))
       .Times(1)
       .After(first_throw_motion_error_call);
 

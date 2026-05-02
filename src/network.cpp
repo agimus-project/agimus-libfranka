@@ -26,9 +26,12 @@ Network::Network(const std::string& agimus_franka_address,
     if (std::get<0>(tcp_keepalive)) {
       tcp_socket_.setKeepAlive(true);
       try {
-        tcp_socket_.setOption(IPPROTO_TCP, TCP_KEEPIDLE, std::get<1>(tcp_keepalive));
-        tcp_socket_.setOption(IPPROTO_TCP, TCP_KEEPCNT, std::get<2>(tcp_keepalive));
-        tcp_socket_.setOption(IPPROTO_TCP, TCP_KEEPINTVL, std::get<3>(tcp_keepalive));
+        tcp_socket_.setOption(IPPROTO_TCP, TCP_KEEPIDLE,
+                              std::get<1>(tcp_keepalive));
+        tcp_socket_.setOption(IPPROTO_TCP, TCP_KEEPCNT,
+                              std::get<2>(tcp_keepalive));
+        tcp_socket_.setOption(IPPROTO_TCP, TCP_KEEPINTVL,
+                              std::get<3>(tcp_keepalive));
       } catch (...) {
       }
     }
@@ -56,9 +59,7 @@ Network::~Network() {
   }
 }
 
-uint16_t Network::udpPort() const noexcept {
-  return udp_port_;
-}
+uint16_t Network::udpPort() const noexcept { return udp_port_; }
 
 void Network::tcpThrowIfConnectionClosed() try {
   std::unique_lock<std::mutex> lock(tcp_mutex_, std::try_to_lock);
@@ -67,7 +68,8 @@ void Network::tcpThrowIfConnectionClosed() try {
   }
   if (tcp_socket_.poll(0, Poco::Net::Socket::SELECT_READ)) {
     std::array<uint8_t, 1> buffer;
-    int rv = tcp_socket_.receiveBytes(buffer.data(), static_cast<int>(buffer.size()), MSG_PEEK);
+    int rv = tcp_socket_.receiveBytes(
+        buffer.data(), static_cast<int>(buffer.size()), MSG_PEEK);
 
     if (rv == 0) {
       throw NetworkException("libagimus_franka: server closed connection");

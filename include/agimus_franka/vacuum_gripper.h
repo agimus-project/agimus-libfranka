@@ -2,12 +2,12 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
+#include <agimus_franka/vacuum_gripper_state.h>
+
 #include <chrono>
 #include <cstdint>
 #include <memory>
 #include <string>
-
-#include <agimus_franka/vacuum_gripper_state.h>
 
 /**
  * @file vacuum_gripper.h
@@ -19,8 +19,8 @@ namespace agimus_franka {
 class Network;
 
 /**
- * Maintains a network connection to the vacuum gripper, provides the current vacuum gripper state,
- * and allows the execution of commands.
+ * Maintains a network connection to the vacuum gripper, provides the current
+ * vacuum gripper state, and allows the execution of commands.
  *
  * @note
  * The members of this class are threadsafe.
@@ -40,10 +40,12 @@ class VacuumGripper {
   /**
    * Establishes a connection with a vacuum gripper connected to a robot.
    *
-   * @param[in] agimus_franka_address IP/hostname of the robot the vacuum gripper is connected to.
+   * @param[in] agimus_franka_address IP/hostname of the robot the vacuum
+   * gripper is connected to.
    *
    * @throw NetworkException if the connection is unsuccessful.
-   * @throw IncompatibleVersionException if this version of `libagimus_franka` is not supported.
+   * @throw IncompatibleVersionException if this version of `libagimus_franka`
+   * is not supported.
    */
   explicit VacuumGripper(const std::string& agimus_franka_address);
 
@@ -80,9 +82,9 @@ class VacuumGripper {
    * @throw CommandException if an error occurred.
    * @throw NetworkException if the connection is lost, e.g. after a timeout.
    */
-  bool vacuum(uint8_t vacuum,
-              std::chrono::milliseconds timeout,
-              ProductionSetupProfile profile = ProductionSetupProfile::kP0) const;
+  bool vacuum(
+      uint8_t vacuum, std::chrono::milliseconds timeout,
+      ProductionSetupProfile profile = ProductionSetupProfile::kP0) const;
 
   /**
    * Drops the grasped object off.

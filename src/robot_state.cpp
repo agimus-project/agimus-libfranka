@@ -13,7 +13,8 @@ namespace {
 template <class T, size_t N>
 std::ostream& operator<<(std::ostream& ostream, const std::array<T, N>& array) {
   ostream << "[";
-  std::copy(array.cbegin(), array.cend() - 1, std::ostream_iterator<T>(ostream, ","));
+  std::copy(array.cbegin(), array.cend() - 1,
+            std::ostream_iterator<T>(ostream, ","));
   std::copy(array.cend() - 1, array.cend(), std::ostream_iterator<T>(ostream));
   ostream << "]";
   return ostream;
@@ -50,22 +51,34 @@ std::ostream& operator<<(std::ostream& ostream, const RobotMode robot_mode) {
   return ostream;
 }
 
-std::ostream& operator<<(std::ostream& ostream, const agimus_franka::RobotState& robot_state) {
-  ostream << "{\"O_T_EE\": " << robot_state.O_T_EE << ", \"O_T_EE_d\": " << robot_state.O_T_EE_d
-          << ", \"F_T_NE\": " << robot_state.F_T_NE << ", \"NE_T_EE\": " << robot_state.NE_T_EE
-          << ", \"F_T_EE\": " << robot_state.F_T_EE << ", \"EE_T_K\": " << robot_state.EE_T_K
-          << ", \"m_ee\": " << robot_state.m_ee << ", \"F_x_Cee\": " << robot_state.F_x_Cee
-          << ", \"I_ee\": " << robot_state.I_ee << ", \"m_load\": " << robot_state.m_load
-          << ", \"F_x_Cload\": " << robot_state.F_x_Cload << ", \"I_load\": " << robot_state.I_load
+std::ostream& operator<<(std::ostream& ostream,
+                         const agimus_franka::RobotState& robot_state) {
+  ostream << "{\"O_T_EE\": " << robot_state.O_T_EE
+          << ", \"O_T_EE_d\": " << robot_state.O_T_EE_d
+          << ", \"F_T_NE\": " << robot_state.F_T_NE
+          << ", \"NE_T_EE\": " << robot_state.NE_T_EE
+          << ", \"F_T_EE\": " << robot_state.F_T_EE
+          << ", \"EE_T_K\": " << robot_state.EE_T_K
+          << ", \"m_ee\": " << robot_state.m_ee
+          << ", \"F_x_Cee\": " << robot_state.F_x_Cee
+          << ", \"I_ee\": " << robot_state.I_ee
+          << ", \"m_load\": " << robot_state.m_load
+          << ", \"F_x_Cload\": " << robot_state.F_x_Cload
+          << ", \"I_load\": " << robot_state.I_load
           << ", \"m_total\": " << robot_state.m_total
           << ", \"F_x_Ctotal\": " << robot_state.F_x_Ctotal
-          << ", \"I_total\": " << robot_state.I_total << ", \"elbow\": " << robot_state.elbow
-          << ", \"elbow_d\": " << robot_state.elbow_d << ", \"elbow_c\": " << robot_state.elbow_c
+          << ", \"I_total\": " << robot_state.I_total
+          << ", \"elbow\": " << robot_state.elbow
+          << ", \"elbow_d\": " << robot_state.elbow_d
+          << ", \"elbow_c\": " << robot_state.elbow_c
           << ", \"delbow_c\": " << robot_state.delbow_c
-          << ", \"ddelbow_c\": " << robot_state.ddelbow_c << ", \"tau_J\": " << robot_state.tau_J
-          << ", \"tau_J_d\": " << robot_state.tau_J_d << ", \"dtau_J\": " << robot_state.dtau_J
+          << ", \"ddelbow_c\": " << robot_state.ddelbow_c
+          << ", \"tau_J\": " << robot_state.tau_J
+          << ", \"tau_J_d\": " << robot_state.tau_J_d
+          << ", \"dtau_J\": " << robot_state.dtau_J
           << ", \"q\": " << robot_state.q << ", \"dq\": " << robot_state.dq
-          << ", \"q_d\": " << robot_state.q_d << ", \"dq_d\": " << robot_state.dq_d
+          << ", \"q_d\": " << robot_state.q_d
+          << ", \"dq_d\": " << robot_state.dq_d
           << ", \"ddq_d\": " << robot_state.ddq_d
           << ", \"joint_contact\": " << robot_state.joint_contact
           << ", \"cartesian_contact\": " << robot_state.cartesian_contact
@@ -75,13 +88,16 @@ std::ostream& operator<<(std::ostream& ostream, const agimus_franka::RobotState&
           << ", \"O_F_ext_hat_K\": " << robot_state.O_F_ext_hat_K
           << ", \"K_F_ext_hat_K\": " << robot_state.K_F_ext_hat_K
           << ", \"O_dP_EE_d\": " << robot_state.O_dP_EE_d
-          << ", \"O_ddP_O\": " << robot_state.O_ddP_O << ", \"O_T_EE_c\": " << robot_state.O_T_EE_c
+          << ", \"O_ddP_O\": " << robot_state.O_ddP_O
+          << ", \"O_T_EE_c\": " << robot_state.O_T_EE_c
           << ", \"O_dP_EE_c\": " << robot_state.O_dP_EE_c
-          << ", \"O_ddP_EE_c\": " << robot_state.O_ddP_EE_c << ", \"theta\": " << robot_state.theta
+          << ", \"O_ddP_EE_c\": " << robot_state.O_ddP_EE_c
+          << ", \"theta\": " << robot_state.theta
           << ", \"dtheta\": " << robot_state.dtheta
           << ", \"current_errors\": " << robot_state.current_errors
           << ", \"last_motion_errors\": " << robot_state.last_motion_errors
-          << ", \"control_command_success_rate\": " << robot_state.control_command_success_rate
+          << ", \"control_command_success_rate\": "
+          << robot_state.control_command_success_rate
           << ", \"robot_mode\": " << robot_state.robot_mode
           << ", \"time\": " << robot_state.time.toMSec() << "}";
   return ostream;

@@ -2,10 +2,10 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
-#include <vector>
-
 #include <agimus_franka/control_types.h>
 #include <agimus_franka/robot_state.h>
+
+#include <vector>
 
 /**
  * @file log.h
@@ -57,8 +57,9 @@ struct Record {
 };
 
 /**
- * Writes the log to a string in CSV format. If the string is not empty, the first row contains the
- * header with names of columns. The following lines contain rows of values separated by commas.
+ * Writes the log to a string in CSV format. If the string is not empty, the
+ * first row contains the header with names of columns. The following lines
+ * contain rows of values separated by commas.
  *
  * If the log is empty, the function returns an empty string.
  *

@@ -15,9 +15,9 @@
 #include <pthread.h>
 #endif
 
-// `using std::string_literals::operator""s` produces a GCC warning that cannot be disabled, so we
-// have to use `using namespace ...`.
-// See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65923#c0
+// `using std::string_literals::operator""s` produces a GCC warning that cannot
+// be disabled, so we have to use `using namespace ...`. See
+// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65923#c0
 using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
 
 namespace agimus_franka {
@@ -39,15 +39,18 @@ bool setCurrentThreadToHighestSchedulerPriority(std::string* error_message) {
     DWORD error_id = GetLastError();
     LPSTR buffer = nullptr;
     size_t size = FormatMessageA(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        nullptr, error_id, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)(&buffer), 0, nullptr);
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+        nullptr, error_id, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPSTR)(&buffer), 0, nullptr);
     return std::string(buffer, size);
   };
 
   if (!SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS)) {
     if (error_message != nullptr) {
       *error_message =
-          "libagimus_franka: unable to set priority for the process: "s + get_last_windows_error();
+          "libagimus_franka: unable to set priority for the process: "s +
+          get_last_windows_error();
     }
     return false;
   }
@@ -55,7 +58,8 @@ bool setCurrentThreadToHighestSchedulerPriority(std::string* error_message) {
   if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL)) {
     if (error_message != nullptr) {
       *error_message =
-          "libagimus_franka: unable to set priority for the thread: "s + get_last_windows_error();
+          "libagimus_franka: unable to set priority for the thread: "s +
+          get_last_windows_error();
     }
     return false;
   }
@@ -66,7 +70,8 @@ bool setCurrentThreadToHighestSchedulerPriority(std::string* error_message) {
   if (thread_priority == -1) {
     if (error_message != nullptr) {
       *error_message =
-          "libagimus_franka: unable to get maximum possible thread priority: "s + std::strerror(errno);
+          "libagimus_franka: unable to get maximum possible thread priority: "s +
+          std::strerror(errno);
     }
     return false;
   }
@@ -75,7 +80,9 @@ bool setCurrentThreadToHighestSchedulerPriority(std::string* error_message) {
   thread_param.sched_priority = thread_priority;
   if (pthread_setschedparam(pthread_self(), SCHED_FIFO, &thread_param) != 0) {
     if (error_message != nullptr) {
-      *error_message = "libagimus_franka: unable to set realtime scheduling: "s + std::strerror(errno);
+      *error_message =
+          "libagimus_franka: unable to set realtime scheduling: "s +
+          std::strerror(errno);
     }
     return false;
   }

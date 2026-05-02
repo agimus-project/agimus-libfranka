@@ -2,6 +2,12 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
+#include <agimus_franka/robot_state.h>
+#include <agimus_research_interface/gripper/types.h>
+#include <agimus_research_interface/robot/rbk_types.h>
+#include <agimus_research_interface/robot/service_types.h>
+#include <agimus_research_interface/vacuum_gripper/types.h>
+
 #include <atomic>
 #include <condition_variable>
 #include <deque>
@@ -10,28 +16,25 @@
 #include <string>
 #include <thread>
 
-#include <agimus_franka/robot_state.h>
-#include <agimus_research_interface/gripper/types.h>
-#include <agimus_research_interface/robot/rbk_types.h>
-#include <agimus_research_interface/robot/service_types.h>
-#include <agimus_research_interface/vacuum_gripper/types.h>
-
 struct RobotTypes {
   using Connect = agimus_research_interface::robot::Connect;
   using State = agimus_research_interface::robot::RobotState;
-  static constexpr uint16_t kCommandPort = agimus_research_interface::robot::kCommandPort;
+  static constexpr uint16_t kCommandPort =
+      agimus_research_interface::robot::kCommandPort;
 };
 
 struct GripperTypes {
   using Connect = agimus_research_interface::gripper::Connect;
   using State = agimus_research_interface::gripper::GripperState;
-  static constexpr uint16_t kCommandPort = agimus_research_interface::gripper::kCommandPort;
+  static constexpr uint16_t kCommandPort =
+      agimus_research_interface::gripper::kCommandPort;
 };
 
 struct VacuumGripperTypes {
   using Connect = agimus_research_interface::vacuum_gripper::Connect;
   using State = agimus_research_interface::vacuum_gripper::VacuumGripperState;
-  static constexpr uint16_t kCommandPort = agimus_research_interface::vacuum_gripper::kCommandPort;
+  static constexpr uint16_t kCommandPort =
+      agimus_research_interface::vacuum_gripper::kCommandPort;
 };
 
 template <typename C>
@@ -42,27 +45,31 @@ class MockServer {
     std::function<void(void*, size_t)> receiveBytes;
   };
 
-  using ConnectCallbackT =
-      std::function<typename C::Connect::Response(const typename C::Connect::Request&)>;
-  using ReceiveRobotCommandCallbackT =
-      std::function<void(const agimus_research_interface::robot::RobotCommand&)>;
+  using ConnectCallbackT = std::function<typename C::Connect::Response(
+      const typename C::Connect::Request&)>;
+  using ReceiveRobotCommandCallbackT = std::function<void(
+      const agimus_research_interface::robot::RobotCommand&)>;
 
-  MockServer(ConnectCallbackT on_connect = ConnectCallbackT(), uint32_t sequence_number = 0);
+  MockServer(ConnectCallbackT on_connect = ConnectCallbackT(),
+             uint32_t sequence_number = 0);
   ~MockServer();
 
   template <typename T>
   MockServer& sendEmptyState();
 
   template <typename T>
-  MockServer& sendResponse(const uint32_t& command_id,
-                           std::function<typename T::Response()> create_response);
+  MockServer& sendResponse(
+      const uint32_t& command_id,
+      std::function<typename T::Response()> create_response);
 
   template <typename T>
-  MockServer& queueResponse(const uint32_t& command_id,
-                            std::function<typename T::Response()> create_response);
+  MockServer& queueResponse(
+      const uint32_t& command_id,
+      std::function<typename T::Response()> create_response);
 
   template <typename T>
-  MockServer& sendRandomState(std::function<void(T&)> random_generator, T* sent_state = nullptr);
+  MockServer& sendRandomState(std::function<void(T&)> random_generator,
+                              T* sent_state = nullptr);
 
   MockServer& doForever(std::function<bool()> callback);
 
@@ -70,22 +77,24 @@ class MockServer {
   MockServer& onSendUDP(std::function<void(T&)> on_send_udp);
 
   MockServer& onReceiveRobotCommand(
-      ReceiveRobotCommandCallbackT on_receive_robot_command = ReceiveRobotCommandCallbackT());
+      ReceiveRobotCommandCallbackT on_receive_robot_command =
+          ReceiveRobotCommandCallbackT());
 
   MockServer& generic(std::function<void(Socket&, Socket&)> generic_command);
 
   template <typename T>
-  typename T::Request receiveRequest(Socket& tcp_socket, typename T::Header* header = nullptr);
+  typename T::Request receiveRequest(Socket& tcp_socket,
+                                     typename T::Header* header = nullptr);
 
   template <typename T>
-  void sendResponse(Socket& tcp_socket,
-                    const typename T::Header& header,
+  void sendResponse(Socket& tcp_socket, const typename T::Header& header,
                     const typename T::Response& response);
 
   template <typename T>
-  void handleCommand(Socket& tcp_socket,
-                     std::function<typename T::Response(const typename T::Request&)> callback,
-                     uint32_t* command_id = nullptr);
+  void handleCommand(
+      Socket& tcp_socket,
+      std::function<typename T::Response(const typename T::Request&)> callback,
+      uint32_t* command_id = nullptr);
 
   template <typename T>
   MockServer& waitForCommand(
@@ -121,7 +130,8 @@ class MockServer {
   bool ignore_udp_buffer_ = false;
 
   const ConnectCallbackT on_connect_;
-  std::deque<std::pair<std::string, std::function<void(Socket&, Socket&)>>> commands_;
+  std::deque<std::pair<std::string, std::function<void(Socket&, Socket&)>>>
+      commands_;
 
   MockServer& doForever(std::function<bool()> callback,
                         typename decltype(MockServer::commands_)::iterator it);
@@ -129,8 +139,9 @@ class MockServer {
 
 template <typename C>
 template <typename T>
-MockServer<C>& MockServer<C>::sendResponse(const uint32_t& command_id,
-                                           std::function<typename T::Response()> create_response) {
+MockServer<C>& MockServer<C>::sendResponse(
+    const uint32_t& command_id,
+    std::function<typename T::Response()> create_response) {
   using namespace std::string_literals;
 
   std::lock_guard<std::mutex> _(command_mutex_);
@@ -139,8 +150,9 @@ MockServer<C>& MockServer<C>::sendResponse(const uint32_t& command_id,
       "sendResponse<"s + typeid(typename T::Response).name() + ">",
       [=, &command_id](Socket& tcp_socket, Socket&) {
         typename T::template Message<typename T::Response> message(
-            typename T::Header(T::kCommand, command_id,
-                               sizeof(typename T::template Message<typename T::Response>)),
+            typename T::Header(
+                T::kCommand, command_id,
+                sizeof(typename T::template Message<typename T::Response>)),
             create_response());
         tcp_socket.sendBytes(&message, sizeof(message));
       });
@@ -149,8 +161,9 @@ MockServer<C>& MockServer<C>::sendResponse(const uint32_t& command_id,
 
 template <typename C>
 template <typename T>
-MockServer<C>& MockServer<C>::queueResponse(const uint32_t& command_id,
-                                            std::function<typename T::Response()> create_response) {
+MockServer<C>& MockServer<C>::queueResponse(
+    const uint32_t& command_id,
+    std::function<typename T::Response()> create_response) {
   using namespace std::string_literals;
 
   std::lock_guard<std::mutex> _(command_mutex_);
@@ -158,8 +171,9 @@ MockServer<C>& MockServer<C>::queueResponse(const uint32_t& command_id,
       "sendResponse<"s + typeid(typename T::Response).name() + ">",
       [=, &command_id](Socket& tcp_socket, Socket&) {
         typename T::template Message<typename T::Response> message(
-            typename T::Header(T::kCommand, command_id,
-                               sizeof(typename T::template Message<typename T::Response>)),
+            typename T::Header(
+                T::kCommand, command_id,
+                sizeof(typename T::template Message<typename T::Response>)),
             create_response());
         tcp_socket.sendBytes(&message, sizeof(message));
       });
@@ -174,8 +188,8 @@ MockServer<C>& MockServer<C>::sendEmptyState() {
 
 template <typename C>
 template <typename T>
-MockServer<C>& MockServer<C>::sendRandomState(std::function<void(T&)> random_generator,
-                                              T* sent_state) {
+MockServer<C>& MockServer<C>::sendRandomState(
+    std::function<void(T&)> random_generator, T* sent_state) {
   return onSendUDP<T>([=](T& state) {
     random_generator(state);
     state.message_id = ++sequence_number_;
@@ -212,8 +226,8 @@ MockServer<C>& MockServer<C>::onSendUDP(std::function<void(T&)> on_send_udp) {
 
 template <typename C>
 template <typename T>
-typename T::Request MockServer<C>::receiveRequest(Socket& tcp_socket,
-                                                  typename T::Header* header_ptr) {
+typename T::Request MockServer<C>::receiveRequest(
+    Socket& tcp_socket, typename T::Header* header_ptr) {
   typename T::template Message<typename T::Request> request_message;
   tcp_socket.receiveBytes(&request_message, sizeof(request_message));
   if (header_ptr != nullptr) {
@@ -227,7 +241,8 @@ template <typename T>
 void MockServer<C>::sendResponse(Socket& tcp_socket,
                                  const typename T::Header& header,
                                  const typename T::Response& response) {
-  typename T::template Message<typename T::Response> response_message(header, response);
+  typename T::template Message<typename T::Response> response_message(header,
+                                                                      response);
   tcp_socket.sendBytes(&response_message, sizeof(response_message));
 }
 
@@ -242,10 +257,12 @@ void MockServer<C>::handleCommand(
   if (command_id != nullptr) {
     *command_id = header.command_id;
   }
-  sendResponse<T>(tcp_socket,
-                  typename T::Header(T::kCommand, header.command_id,
-                                     sizeof(typename T::template Message<typename T::Response>)),
-                  callback(request));
+  sendResponse<T>(
+      tcp_socket,
+      typename T::Header(
+          T::kCommand, header.command_id,
+          sizeof(typename T::template Message<typename T::Response>)),
+      callback(request));
 }
 
 template <typename C>
@@ -256,11 +273,12 @@ MockServer<C>& MockServer<C>::waitForCommand(
   using namespace std::string_literals;
 
   std::lock_guard<std::mutex> _(command_mutex_);
-  std::string name = "waitForCommand<"s + typeid(typename T::Request).name() + ", " +
-                     typeid(typename T::Response).name();
-  commands_.emplace_back(name, [this, callback, command_id](Socket& tcp_socket, Socket&) {
-    handleCommand<T>(tcp_socket, callback, command_id);
-  });
+  std::string name = "waitForCommand<"s + typeid(typename T::Request).name() +
+                     ", " + typeid(typename T::Response).name();
+  commands_.emplace_back(
+      name, [this, callback, command_id](Socket& tcp_socket, Socket&) {
+        handleCommand<T>(tcp_socket, callback, command_id);
+      });
   return *this;
 }
 

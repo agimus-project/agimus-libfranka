@@ -9,8 +9,9 @@
 
 /**
  * @file active_control.h
- * Implements the ActiveControlBase abstract class. Contains the `agimus_franka::ActiveControl`,
- * `agimus_franka::ActiveTorqueControl` and `agimus_franka::ActiveMotionGenerator` type.
+ * Implements the ActiveControlBase abstract class. Contains the
+ * `agimus_franka::ActiveControl`, `agimus_franka::ActiveTorqueControl` and
+ * `agimus_franka::ActiveMotionGenerator` type.
  */
 
 namespace agimus_franka {
@@ -28,23 +29,27 @@ class ActiveControl : public ActiveControlBase {
     throw agimus_franka::ControlException(wrong_write_once_method_called);
   };
 
-  void writeOnce(const JointPositions& /* motion_generator_input */,
-                 const std::optional<const Torques>& /*control_input*/) override {
+  void writeOnce(
+      const JointPositions& /* motion_generator_input */,
+      const std::optional<const Torques>& /*control_input*/) override {
     throw agimus_franka::ControlException(wrong_write_once_method_called);
   };
 
-  void writeOnce(const JointVelocities& /* motion_generator_input */,
-                 const std::optional<const Torques>& /* control_input */) override {
+  void writeOnce(
+      const JointVelocities& /* motion_generator_input */,
+      const std::optional<const Torques>& /* control_input */) override {
     throw agimus_franka::ControlException(wrong_write_once_method_called);
   };
 
-  void writeOnce(const CartesianPose& /* motion_generator_input */,
-                 const std::optional<const Torques>& /* control_input */) override {
+  void writeOnce(
+      const CartesianPose& /* motion_generator_input */,
+      const std::optional<const Torques>& /* control_input */) override {
     throw agimus_franka::ControlException(wrong_write_once_method_called);
   };
 
-  void writeOnce(const CartesianVelocities& /* motion_generator_input */,
-                 const std::optional<const Torques>& /* control_input */) override {
+  void writeOnce(
+      const CartesianVelocities& /* motion_generator_input */,
+      const std::optional<const Torques>& /* control_input */) override {
     throw agimus_franka::ControlException(wrong_write_once_method_called);
   };
 
@@ -70,11 +75,10 @@ class ActiveControl : public ActiveControlBase {
    *
    * @param robot_impl shared_ptr to the Robot::Impl in the Robot
    * @param motion_id id of the managed motion
-   * @param control_lock of the Robot, preventing other read and write accesses during the active
-   * control
+   * @param control_lock of the Robot, preventing other read and write accesses
+   * during the active control
    */
-  ActiveControl(std::shared_ptr<Robot::Impl> robot_impl,
-                uint32_t motion_id,
+  ActiveControl(std::shared_ptr<Robot::Impl> robot_impl, uint32_t motion_id,
                 std::unique_lock<std::mutex> control_lock);
 
   /// shared pointer to Robot::Impl instance for read and write accesses

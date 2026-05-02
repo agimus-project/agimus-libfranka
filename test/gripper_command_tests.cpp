@@ -1,9 +1,8 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <gmock/gmock.h>
-
 #include <agimus_franka/exception.h>
 #include <agimus_franka/gripper.h>
+#include <gmock/gmock.h>
 
 #include "helpers.h"
 #include "mock_server.h"
@@ -24,7 +23,8 @@ class GripperCommand : public ::testing::Test {
   bool executeCommand(Gripper& gripper);
   typename T::Request getExpected();
   typename T::Status getSuccess();
-  bool compare(const typename T::Request& request_one, const typename T::Request& request_two);
+  bool compare(const typename T::Request& request_one,
+               const typename T::Request& request_two);
   typename T::Response createResponse(const typename T::Request& request,
                                       const typename T::Status status);
 };
@@ -35,7 +35,8 @@ typename T::Status GripperCommand<T>::getSuccess() {
 }
 
 template <typename T>
-bool GripperCommand<T>::compare(const typename T::Request&, const typename T::Request&) {
+bool GripperCommand<T>::compare(const typename T::Request&,
+                                const typename T::Request&) {
   return true;
 }
 
@@ -45,13 +46,15 @@ bool GripperCommand<Grasp>::compare(const Grasp::Request& request_one,
   return request_one.width == request_two.width &&
          request_one.epsilon.inner == request_two.epsilon.inner &&
          request_one.epsilon.outer == request_two.epsilon.outer &&
-         request_one.speed == request_two.speed && request_one.force == request_two.force;
+         request_one.speed == request_two.speed &&
+         request_one.force == request_two.force;
 }
 
 template <>
 bool GripperCommand<Move>::compare(const Move::Request& request_one,
                                    const Move::Request& request_two) {
-  return request_one.width == request_two.width && request_one.speed == request_two.speed;
+  return request_one.width == request_two.width &&
+         request_one.speed == request_two.speed;
 }
 
 template <typename T>
@@ -104,8 +107,8 @@ bool GripperCommand<Homing>::executeCommand(Gripper& gripper) {
 }
 
 template <typename T>
-typename T::Response GripperCommand<T>::createResponse(const typename T::Request&,
-                                                       const typename T::Status status) {
+typename T::Response GripperCommand<T>::createResponse(
+    const typename T::Request&, const typename T::Status status) {
   return typename T::Response(status);
 }
 
@@ -138,7 +141,8 @@ TYPED_TEST(GripperCommand, CanSendAndReceiveFail) {
           [this](const typename TestFixture::TCommand::Request& request) ->
           typename TestFixture::TCommand::Response {
             EXPECT_TRUE(this->compare(request, this->getExpected()));
-            return this->createResponse(request, TestFixture::TCommand::Status::kFail);
+            return this->createResponse(request,
+                                        TestFixture::TCommand::Status::kFail);
           })
       .spinOnce();
 
@@ -154,7 +158,8 @@ TYPED_TEST(GripperCommand, CanSendAndReceiveUnsucessful) {
           [this](const typename TestFixture::TCommand::Request& request) ->
           typename TestFixture::TCommand::Response {
             EXPECT_TRUE(this->compare(request, this->getExpected()));
-            return this->createResponse(request, TestFixture::TCommand::Status::kUnsuccessful);
+            return this->createResponse(
+                request, TestFixture::TCommand::Status::kUnsuccessful);
           })
       .spinOnce();
 
@@ -170,7 +175,8 @@ TYPED_TEST(GripperCommand, CanSendAndReceiveAborted) {
           [this](const typename TestFixture::TCommand::Request& request) ->
           typename TestFixture::TCommand::Response {
             EXPECT_TRUE(this->compare(request, this->getExpected()));
-            return this->createResponse(request, TestFixture::TCommand::Status::kAborted);
+            return this->createResponse(
+                request, TestFixture::TCommand::Status::kAborted);
           })
       .spinOnce();
 

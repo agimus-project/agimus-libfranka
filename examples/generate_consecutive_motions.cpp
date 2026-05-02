@@ -1,10 +1,10 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <cmath>
-#include <iostream>
-
 #include <agimus_franka/exception.h>
 #include <agimus_franka/robot.h>
+
+#include <cmath>
+#include <iostream>
 
 #include "examples_common.h"
 
@@ -12,8 +12,8 @@
  * @example generate_consecutive_motions.cpp
  * An example showing how to execute consecutive motions with error recovery.
  *
- * @warning Before executing this example, make sure there is enough space in front and to the side
- * of the robot.
+ * @warning Before executing this example, make sure there is enough space in
+ * front and to the side of the robot.
  */
 
 int main(int argc, char** argv) {
@@ -26,22 +26,27 @@ int main(int argc, char** argv) {
     setDefaultBehavior(robot);
 
     // First move the robot to a suitable joint configuration
-    std::array<double, 7> q_goal = {{0, -M_PI_4, 0, -3 * M_PI_4, 0, M_PI_2, M_PI_4}};
+    std::array<double, 7> q_goal = {
+        {0, -M_PI_4, 0, -3 * M_PI_4, 0, M_PI_2, M_PI_4}};
     MotionGenerator motion_generator(0.5, q_goal);
     std::cout << "WARNING: This example will move the robot! "
-              << "Please make sure to have the user stop button at hand!" << std::endl
+              << "Please make sure to have the user stop button at hand!"
+              << std::endl
               << "Press Enter to continue..." << std::endl;
     std::cin.ignore();
     robot.control(motion_generator);
     std::cout << "Finished moving to initial joint configuration." << std::endl;
 
-    // Set additional parameters always before the control loop, NEVER in the control loop!
-    // Set collision behavior.
-    robot.setCollisionBehavior(
-        {{10.0, 10.0, 9.0, 9.0, 8.0, 7.0, 6.0}}, {{10.0, 10.0, 9.0, 9.0, 8.0, 7.0, 6.0}},
-        {{10.0, 10.0, 9.0, 9.0, 8.0, 7.0, 6.0}}, {{10.0, 10.0, 9.0, 9.0, 8.0, 7.0, 6.0}},
-        {{10.0, 10.0, 10.0, 12.5, 12.5, 12.5}}, {{10.0, 10.0, 10.0, 12.5, 12.5, 12.5}},
-        {{10.0, 10.0, 10.0, 12.5, 12.5, 12.5}}, {{10.0, 10.0, 10.0, 12.5, 12.5, 12.5}});
+    // Set additional parameters always before the control loop, NEVER in the
+    // control loop! Set collision behavior.
+    robot.setCollisionBehavior({{10.0, 10.0, 9.0, 9.0, 8.0, 7.0, 6.0}},
+                               {{10.0, 10.0, 9.0, 9.0, 8.0, 7.0, 6.0}},
+                               {{10.0, 10.0, 9.0, 9.0, 8.0, 7.0, 6.0}},
+                               {{10.0, 10.0, 9.0, 9.0, 8.0, 7.0, 6.0}},
+                               {{10.0, 10.0, 10.0, 12.5, 12.5, 12.5}},
+                               {{10.0, 10.0, 10.0, 12.5, 12.5, 12.5}},
+                               {{10.0, 10.0, 10.0, 12.5, 12.5, 12.5}},
+                               {{10.0, 10.0, 10.0, 12.5, 12.5, 12.5}});
 
     for (size_t i = 0; i < 5; i++) {
       std::cout << "Executing motion." << std::endl;
@@ -50,13 +55,17 @@ int main(int argc, char** argv) {
         double omega_max = 0.2;
         double time = 0.0;
         robot.control([=, &time](const agimus_franka::RobotState&,
-                                 agimus_franka::Duration period) -> agimus_franka::JointVelocities {
+                                 agimus_franka::Duration period)
+                          -> agimus_franka::JointVelocities {
           time += period.toSec();
 
-          double cycle = std::floor(std::pow(-1.0, (time - std::fmod(time, time_max)) / time_max));
-          double omega = cycle * omega_max / 2.0 * (1.0 - std::cos(2.0 * M_PI / time_max * time));
+          double cycle = std::floor(
+              std::pow(-1.0, (time - std::fmod(time, time_max)) / time_max));
+          double omega = cycle * omega_max / 2.0 *
+                         (1.0 - std::cos(2.0 * M_PI / time_max * time));
 
-          agimus_franka::JointVelocities velocities = {{0.0, 0.0, omega, 0.0, 0.0, 0.0, 0.0}};
+          agimus_franka::JointVelocities velocities = {
+              {0.0, 0.0, omega, 0.0, 0.0, 0.0, 0.0}};
           if (time >= 2 * time_max) {
             std::cout << std::endl << "Finished motion." << std::endl;
             return agimus_franka::MotionFinished(velocities);

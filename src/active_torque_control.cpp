@@ -11,7 +11,8 @@ namespace agimus_franka {
 
 void ActiveTorqueControl::writeOnce(const Torques& control_input) {
   if (control_finished) {
-    throw agimus_franka::ControlException("writeOnce must not be called after the motion has finished.");
+    throw agimus_franka::ControlException(
+        "writeOnce must not be called after the motion has finished.");
   }
 
   if (control_input.motion_finished) {

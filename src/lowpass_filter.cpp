@@ -1,16 +1,18 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 
+#include <agimus_franka/lowpass_filter.h>
+
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
-#include <agimus_franka/lowpass_filter.h>
-
 namespace agimus_franka {
 
-double lowpassFilter(double sample_time, double y, double y_last, double cutoff_frequency) {
+double lowpassFilter(double sample_time, double y, double y_last,
+                     double cutoff_frequency) {
   if (sample_time < 0 || !std::isfinite(sample_time)) {
-    throw std::invalid_argument("lowpass-filter: sample_time is negative, infinite or NaN.");
+    throw std::invalid_argument(
+        "lowpass-filter: sample_time is negative, infinite or NaN.");
   }
   if (cutoff_frequency <= 0 || !std::isfinite(cutoff_frequency)) {
     throw std::invalid_argument(
@@ -18,10 +20,12 @@ double lowpassFilter(double sample_time, double y, double y_last, double cutoff_
   }
   if (!std::isfinite(y) || !std::isfinite(y_last)) {
     throw std::invalid_argument(
-        "lowpass-filter: current or past input value of the signal to be filtered is infinite or "
+        "lowpass-filter: current or past input value of the signal to be "
+        "filtered is infinite or "
         "NaN.");
   }
-  double gain = sample_time / (sample_time + (1.0 / (2.0 * M_PI * cutoff_frequency)));
+  double gain =
+      sample_time / (sample_time + (1.0 / (2.0 * M_PI * cutoff_frequency)));
   return gain * y + (1 - gain) * y_last;
 }
 
@@ -35,12 +39,14 @@ std::array<double, 16> cartesianLowpassFilter(double sample_time,
   }
   if (cutoff_frequency <= 0 || !std::isfinite(cutoff_frequency)) {
     throw std::invalid_argument(
-        "Cartesian lowpass-filter: cutoff_frequency is zero, negative, infinite or NaN.");
+        "Cartesian lowpass-filter: cutoff_frequency is zero, negative, "
+        "infinite or NaN.");
   }
   for (size_t i = 0; i < y.size(); i++) {
     if (!std::isfinite(y[i]) || !std::isfinite(y_last[i])) {
       throw std::invalid_argument(
-          "Cartesian lowpass-filter: current or past input value of the signal to be filtered is "
+          "Cartesian lowpass-filter: current or past input value of the signal "
+          "to be filtered is "
           "infinite or NaN.");
     }
   }
@@ -49,9 +55,10 @@ std::array<double, 16> cartesianLowpassFilter(double sample_time,
   Eigen::Quaterniond orientation(transform.rotation());
   Eigen::Quaterniond orientation_last(transform_last.rotation());
 
-  double gain = sample_time / (sample_time + (1.0 / (2.0 * M_PI * cutoff_frequency)));
-  transform.translation() =
-      gain * transform.translation() + (1.0 - gain) * transform_last.translation();
+  double gain =
+      sample_time / (sample_time + (1.0 / (2.0 * M_PI * cutoff_frequency)));
+  transform.translation() = gain * transform.translation() +
+                            (1.0 - gain) * transform_last.translation();
   orientation = orientation_last.slerp(gain, orientation);
 
   transform.linear() << orientation.normalized().toRotationMatrix();

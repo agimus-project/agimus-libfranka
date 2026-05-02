@@ -1,10 +1,9 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <gtest/gtest.h>
-
 #include <agimus_franka/errors.h>
 #include <agimus_research_interface/robot/error.h>
 #include <agimus_research_interface/robot/rbk_types.h>
+#include <gtest/gtest.h>
 
 #include "helpers.h"
 
@@ -15,7 +14,8 @@ TEST(Errors, IsInitializedToNoErrors) {
 }
 
 TEST(Errors, EvaluatedToTrueOnError) {
-  std::array<bool, sizeof(agimus_research_interface::robot::RobotState::errors)> error_flags{};
+  std::array<bool, sizeof(agimus_research_interface::robot::RobotState::errors)>
+      error_flags{};
   error_flags[rand() % error_flags.size()] = true;
 
   agimus_franka::Errors errors(error_flags);
@@ -24,12 +24,14 @@ TEST(Errors, EvaluatedToTrueOnError) {
 }
 
 TEST(Errors, CanGetNamesOfErrors) {
-  std::array<bool, sizeof(agimus_research_interface::robot::RobotState::errors)> error_flags{};
+  std::array<bool, sizeof(agimus_research_interface::robot::RobotState::errors)>
+      error_flags{};
   std::fill(error_flags.begin(), error_flags.end(), false);
   error_flags[static_cast<size_t>(
-      agimus_research_interface::robot::Error::kJointPositionLimitsViolation)] = true;
-  error_flags[static_cast<size_t>(
-      agimus_research_interface::robot::Error::kSelfcollisionAvoidanceViolation)] = true;
+      agimus_research_interface::robot::Error::kJointPositionLimitsViolation)] =
+      true;
+  error_flags[static_cast<size_t>(agimus_research_interface::robot::Error::
+                                      kSelfcollisionAvoidanceViolation)] = true;
 
   agimus_franka::Errors errors(error_flags);
 

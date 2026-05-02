@@ -1,9 +1,8 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <gmock/gmock.h>
-
 #include <agimus_franka/exception.h>
 #include <agimus_franka/vacuum_gripper.h>
+#include <gmock/gmock.h>
 
 #include <chrono>
 
@@ -26,7 +25,8 @@ class VacuumGripperCommand : public ::testing::Test {
   bool executeCommand(VacuumGripper& vacuum_gripper);
   typename T::Request getExpected();
   typename T::Status getSuccess();
-  bool compare(const typename T::Request& request_one, const typename T::Request& request_two);
+  bool compare(const typename T::Request& request_one,
+               const typename T::Request& request_two);
   typename T::Response createResponse(const typename T::Request& request,
                                       const typename T::Status status);
 };
@@ -37,20 +37,22 @@ typename T::Status VacuumGripperCommand<T>::getSuccess() {
 }
 
 template <typename T>
-bool VacuumGripperCommand<T>::compare(const typename T::Request&, const typename T::Request&) {
+bool VacuumGripperCommand<T>::compare(const typename T::Request&,
+                                      const typename T::Request&) {
   return true;
 }
 
 template <>
 bool VacuumGripperCommand<Vacuum>::compare(const Vacuum::Request& request_one,
                                            const Vacuum::Request& request_two) {
-  return request_one.vacuum == request_two.vacuum && request_one.profile == request_two.profile &&
+  return request_one.vacuum == request_two.vacuum &&
+         request_one.profile == request_two.profile &&
          request_one.timeout == request_two.timeout;
 }
 
 template <>
-bool VacuumGripperCommand<DropOff>::compare(const DropOff::Request& request_one,
-                                            const DropOff::Request& request_two) {
+bool VacuumGripperCommand<DropOff>::compare(
+    const DropOff::Request& request_one, const DropOff::Request& request_two) {
   return request_one.timeout == request_two.timeout;
 }
 
@@ -74,7 +76,8 @@ DropOff::Request VacuumGripperCommand<DropOff>::getExpected() {
 }
 
 template <>
-bool VacuumGripperCommand<Vacuum>::executeCommand(VacuumGripper& vacuum_gripper) {
+bool VacuumGripperCommand<Vacuum>::executeCommand(
+    VacuumGripper& vacuum_gripper) {
   uint8_t vacuum = 100;
   agimus_franka::VacuumGripper::ProductionSetupProfile profile =
       agimus_franka::VacuumGripper::ProductionSetupProfile::kP0;
@@ -83,7 +86,8 @@ bool VacuumGripperCommand<Vacuum>::executeCommand(VacuumGripper& vacuum_gripper)
 }
 
 template <>
-bool VacuumGripperCommand<DropOff>::executeCommand(VacuumGripper& vacuum_gripper) {
+bool VacuumGripperCommand<DropOff>::executeCommand(
+    VacuumGripper& vacuum_gripper) {
   std::chrono::milliseconds timeout = std::chrono::milliseconds(1000);
   return vacuum_gripper.dropOff(timeout);
 }
@@ -94,8 +98,8 @@ bool VacuumGripperCommand<Stop>::executeCommand(VacuumGripper& vacuum_gripper) {
 }
 
 template <typename T>
-typename T::Response VacuumGripperCommand<T>::createResponse(const typename T::Request&,
-                                                             const typename T::Status status) {
+typename T::Response VacuumGripperCommand<T>::createResponse(
+    const typename T::Request&, const typename T::Status status) {
   return typename T::Response(status);
 }
 
@@ -128,7 +132,8 @@ TYPED_TEST(VacuumGripperCommand, CanSendAndReceiveFail) {
           [this](const typename TestFixture::TCommand::Request& request) ->
           typename TestFixture::TCommand::Response {
             EXPECT_TRUE(this->compare(request, this->getExpected()));
-            return this->createResponse(request, TestFixture::TCommand::Status::kFail);
+            return this->createResponse(request,
+                                        TestFixture::TCommand::Status::kFail);
           })
       .spinOnce();
 
@@ -144,7 +149,8 @@ TYPED_TEST(VacuumGripperCommand, CanSendAndReceiveUnsucessful) {
           [this](const typename TestFixture::TCommand::Request& request) ->
           typename TestFixture::TCommand::Response {
             EXPECT_TRUE(this->compare(request, this->getExpected()));
-            return this->createResponse(request, TestFixture::TCommand::Status::kUnsuccessful);
+            return this->createResponse(
+                request, TestFixture::TCommand::Status::kUnsuccessful);
           })
       .spinOnce();
 
@@ -160,7 +166,8 @@ TYPED_TEST(VacuumGripperCommand, CanSendAndReceiveAborted) {
           [this](const typename TestFixture::TCommand::Request& request) ->
           typename TestFixture::TCommand::Response {
             EXPECT_TRUE(this->compare(request, this->getExpected()));
-            return this->createResponse(request, TestFixture::TCommand::Status::kAborted);
+            return this->createResponse(
+                request, TestFixture::TCommand::Status::kAborted);
           })
       .spinOnce();
 

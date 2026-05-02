@@ -1,11 +1,10 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
+#include <agimus_franka/exception.h>
 #include <agimus_franka/vacuum_gripper.h>
+#include <agimus_research_interface/vacuum_gripper/types.h>
 
 #include <sstream>
-
-#include <agimus_franka/exception.h>
-#include <agimus_research_interface/vacuum_gripper/types.h>
 
 #include "network.h"
 
@@ -16,25 +15,30 @@ namespace {
 template <typename T, typename... TArgs>
 bool executeCommand(Network& network, TArgs&&... args) {
   uint32_t command_id = network.tcpSendRequest<T>(std::forward<TArgs>(args)...);
-  typename T::Response response = network.tcpBlockingReceiveResponse<T>(command_id);
+  typename T::Response response =
+      network.tcpBlockingReceiveResponse<T>(command_id);
 
   switch (response.status) {
     case T::Status::kSuccess:
       return true;
     case T::Status::kFail:
-      throw CommandException("libagimus_franka vacuum gripper: Command failed!");
+      throw CommandException(
+          "libagimus_franka vacuum gripper: Command failed!");
     case T::Status::kUnsuccessful:
       return false;
     case T::Status::kAborted:
-      throw CommandException("libagimus_franka vacuum gripper: Command aborted!");
+      throw CommandException(
+          "libagimus_franka vacuum gripper: Command aborted!");
     default:
       throw ProtocolException(
-          "libagimus_franka vacuum gripper: Unexpected response while handling command!");
+          "libagimus_franka vacuum gripper: Unexpected response while handling "
+          "command!");
   }
 }
 
 VacuumGripperState convertVacuumGripperState(
-    const agimus_research_interface::vacuum_gripper::VacuumGripperState& vacuum_gripper_state) noexcept {
+    const agimus_research_interface::vacuum_gripper::VacuumGripperState&
+        vacuum_gripper_state) noexcept {
   VacuumGripperState converted{};
   converted.in_control_range = vacuum_gripper_state.in_control_range;
   converted.part_detached = vacuum_gripper_state.part_detached;
@@ -62,10 +66,12 @@ VacuumGripperState convertVacuumGripperState(
 }  // anonymous namespace
 
 VacuumGripper::VacuumGripper(const std::string& agimus_franka_address)
-    : network_{std::make_unique<Network>(agimus_franka_address,
-                                         agimus_research_interface::vacuum_gripper::kCommandPort)} {
+    : network_{std::make_unique<Network>(
+          agimus_franka_address,
+          agimus_research_interface::vacuum_gripper::kCommandPort)} {
   connect<agimus_research_interface::vacuum_gripper::Connect,
-          agimus_research_interface::vacuum_gripper::kVersion>(*network_, &ri_version_);
+          agimus_research_interface::vacuum_gripper::kVersion>(*network_,
+                                                               &ri_version_);
 }
 
 VacuumGripper::~VacuumGripper() noexcept = default;
@@ -76,46 +82,54 @@ VacuumGripper::ServerVersion VacuumGripper::serverVersion() const noexcept {
   return ri_version_;
 }
 
-bool VacuumGripper::vacuum(uint8_t vacuum,
-                           std::chrono::milliseconds timeout,
+bool VacuumGripper::vacuum(uint8_t vacuum, std::chrono::milliseconds timeout,
                            ProductionSetupProfile profile) const {
   agimus_research_interface::vacuum_gripper::Profile converted_profile;
   switch (profile) {
     case ProductionSetupProfile::kP0:
-      converted_profile = agimus_research_interface::vacuum_gripper::Profile::kP0;
+      converted_profile =
+          agimus_research_interface::vacuum_gripper::Profile::kP0;
       break;
     case ProductionSetupProfile::kP1:
-      converted_profile = agimus_research_interface::vacuum_gripper::Profile::kP1;
+      converted_profile =
+          agimus_research_interface::vacuum_gripper::Profile::kP1;
       break;
     case ProductionSetupProfile::kP2:
-      converted_profile = agimus_research_interface::vacuum_gripper::Profile::kP2;
+      converted_profile =
+          agimus_research_interface::vacuum_gripper::Profile::kP2;
       break;
     case ProductionSetupProfile::kP3:
-      converted_profile = agimus_research_interface::vacuum_gripper::Profile::kP3;
+      converted_profile =
+          agimus_research_interface::vacuum_gripper::Profile::kP3;
       break;
     default:
       throw CommandException("Vacuum Gripper: Vacuum profile not defined!");
       break;
   }
-  return executeCommand<agimus_research_interface::vacuum_gripper::Vacuum>(*network_, vacuum,
-                                                                    converted_profile, timeout);
+  return executeCommand<agimus_research_interface::vacuum_gripper::Vacuum>(
+      *network_, vacuum, converted_profile, timeout);
 }
 
 bool VacuumGripper::dropOff(std::chrono::milliseconds timeout) const {
-  return executeCommand<agimus_research_interface::vacuum_gripper::DropOff>(*network_, timeout);
+  return executeCommand<agimus_research_interface::vacuum_gripper::DropOff>(
+      *network_, timeout);
 }
 
 bool VacuumGripper::stop() const {
-  return executeCommand<agimus_research_interface::vacuum_gripper::Stop>(*network_);
+  return executeCommand<agimus_research_interface::vacuum_gripper::Stop>(
+      *network_);
 }
 
 VacuumGripperState VacuumGripper::readOnce() const {
-  agimus_research_interface::vacuum_gripper::VacuumGripperState vacuum_gripper_state{};
+  agimus_research_interface::vacuum_gripper::VacuumGripperState
+      vacuum_gripper_state{};
   // Delete old data from the UDP buffer.
-  while (network_->udpReceive<decltype(vacuum_gripper_state)>(&vacuum_gripper_state)) {
+  while (network_->udpReceive<decltype(vacuum_gripper_state)>(
+      &vacuum_gripper_state)) {
   }
 
-  vacuum_gripper_state = network_->udpBlockingReceive<decltype(vacuum_gripper_state)>();
+  vacuum_gripper_state =
+      network_->udpBlockingReceive<decltype(vacuum_gripper_state)>();
   return convertVacuumGripperState(vacuum_gripper_state);
 }
 

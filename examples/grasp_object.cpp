@@ -1,12 +1,12 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
+#include <agimus_franka/exception.h>
+#include <agimus_franka/gripper.h>
+
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <thread>
-
-#include <agimus_franka/exception.h>
-#include <agimus_franka/gripper.h>
 
 /**
  * @example grasp_object.cpp
@@ -15,7 +15,9 @@
 
 int main(int argc, char** argv) {
   if (argc != 4) {
-    std::cerr << "Usage: ./grasp_object <gripper-hostname> <homing> <object-width>" << std::endl;
+    std::cerr
+        << "Usage: ./grasp_object <gripper-hostname> <homing> <object-width>"
+        << std::endl;
     return -1;
   }
 
@@ -31,14 +33,16 @@ int main(int argc, char** argv) {
     }
 
     if (homing) {
-      // Do a homing in order to estimate the maximum grasping width with the current fingers.
+      // Do a homing in order to estimate the maximum grasping width with the
+      // current fingers.
       gripper.homing();
     }
 
     // Check for the maximum grasping width.
     agimus_franka::GripperState gripper_state = gripper.readOnce();
     if (gripper_state.max_width < grasping_width) {
-      std::cout << "Object is too large for the current fingers on the gripper." << std::endl;
+      std::cout << "Object is too large for the current fingers on the gripper."
+                << std::endl;
       return -1;
     }
 
@@ -49,7 +53,8 @@ int main(int argc, char** argv) {
     }
 
     // Wait 3s and check afterwards, if the object is still grasped.
-    std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(3000));
+    std::this_thread::sleep_for(
+        std::chrono::duration<double, std::milli>(3000));
 
     gripper_state = gripper.readOnce();
     if (!gripper_state.is_grasped) {

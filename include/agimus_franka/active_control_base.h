@@ -5,6 +5,7 @@
 #include <agimus_franka/control_types.h>
 #include <agimus_franka/exception.h>
 #include <agimus_franka/robot_state.h>
+
 #include <memory>
 #include <optional>
 #include <utility>
@@ -17,11 +18,11 @@
 namespace agimus_franka {
 
 /**
- * Allows the user to read the state of a Robot and to send new control commands after starting a
- * control process of a Robot.
+ * Allows the user to read the state of a Robot and to send new control commands
+ * after starting a control process of a Robot.
  *
- * hint: To create an ActiveControlBase, see agimus_franka::ActiveTorqueControl or
- * agimus_franka::ActiveMotionGenerator
+ * hint: To create an ActiveControlBase, see agimus_franka::ActiveTorqueControl
+ * or agimus_franka::ActiveMotionGenerator
  *
  */
 class ActiveControlBase {
@@ -53,8 +54,9 @@ class ActiveControlBase {
    * hint: implemented in ActiveMotionGenerator<JointPositions>
    *
    */
-  virtual void writeOnce(const JointPositions& /* motion_generator_input */,
-                         const std::optional<const Torques>& /*control_input*/) = 0;
+  virtual void writeOnce(
+      const JointPositions& /* motion_generator_input */,
+      const std::optional<const Torques>& /*control_input*/) = 0;
 
   /**
    * Updates the joint velocity and torque commands of an active control
@@ -62,16 +64,18 @@ class ActiveControlBase {
    * hint: implemented in ActiveMotionGenerator<JointVelocities>
    *
    */
-  virtual void writeOnce(const JointVelocities& /* motion_generator_input */,
-                         const std::optional<const Torques>& /* control_input */) = 0;
+  virtual void writeOnce(
+      const JointVelocities& /* motion_generator_input */,
+      const std::optional<const Torques>& /* control_input */) = 0;
   /**
    * Updates the cartesian position and torque commands of an active control
    *
    * hint: implemented in ActiveMotionGenerator<CartesianPose>
    *
    */
-  virtual void writeOnce(const CartesianPose& /* motion_generator_input */,
-                         const std::optional<const Torques>& /* control_input */) = 0;
+  virtual void writeOnce(
+      const CartesianPose& /* motion_generator_input */,
+      const std::optional<const Torques>& /* control_input */) = 0;
 
   /**
    * Updates the cartesian velocity and torque commands of an active control
@@ -79,10 +83,12 @@ class ActiveControlBase {
    * hint: implemented in ActiveMotionGenerator<CartesianVelocities>
    *
    */
-  virtual void writeOnce(const CartesianVelocities& /* motion_generator_input */,
-                         const std::optional<const Torques>& /* control_input */) = 0;
+  virtual void writeOnce(
+      const CartesianVelocities& /* motion_generator_input */,
+      const std::optional<const Torques>& /* control_input */) = 0;
   /**
-   * Updates the joint position commands of an active control, with internal controller
+   * Updates the joint position commands of an active control, with internal
+   * controller
    *
    * @param motion_generator_input the new motion generator input
    *
@@ -90,14 +96,16 @@ class ActiveControlBase {
   virtual void writeOnce(const JointPositions& motion_generator_input) = 0;
 
   /**
-   * Updates the joint velocity commands of an active control, with internal controller
+   * Updates the joint velocity commands of an active control, with internal
+   * controller
    *
    * @param motion_generator_input the new motion generator input
    *
    */
   virtual void writeOnce(const JointVelocities& motion_generator_input) = 0;
   /**
-   * Updates the cartesian pose commands of an active control, with internal controller
+   * Updates the cartesian pose commands of an active control, with internal
+   * controller
    *
    * @param motion_generator_input the new motion generator input
    *
@@ -105,7 +113,8 @@ class ActiveControlBase {
   virtual void writeOnce(const CartesianPose& motion_generator_input) = 0;
 
   /**
-   * Updates the cartesian velocity commands of an active control, with internal controller
+   * Updates the cartesian velocity commands of an active control, with internal
+   * controller
    *
    * @param motion_generator_input the new motion generator input
    *

@@ -2,9 +2,9 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #include "robot_impl.h"
 
-#include <sstream>
-
 #include <agimus_franka/control_tools.h>
+
+#include <sstream>
 
 #include "load_calculations.h"
 
@@ -12,10 +12,10 @@ namespace agimus_franka {
 
 namespace {
 
-inline ControlException createControlException(const char* message,
-                                               agimus_research_interface::robot::Move::Status move_status,
-                                               const Errors& reflex_errors,
-                                               const std::vector<Record>& log) {
+inline ControlException createControlException(
+    const char* message,
+    agimus_research_interface::robot::Move::Status move_status,
+    const Errors& reflex_errors, const std::vector<Record>& log) {
   std::ostringstream message_stream;
   message_stream << message;
   if (move_status == decltype(move_status)::kReflexAborted) {
@@ -23,17 +23,20 @@ inline ControlException createControlException(const char* message,
 
     if (log.size() >= 2) {
       // Count number of lost packets in the last and before last packets.
-      uint64_t lost_packets =
-          log[log.size() - 1].state.time.toMSec() - log[log.size() - 2].state.time.toMSec() - 1;
-      // Read second to last control_command_success_rate since the last one will always be zero and
-      // consider in the success rate assumming all previous packets were lost.
-      message_stream << std::endl
-                     << "control_command_success_rate: "
-                     << (log[log.size() - 2].state.control_command_success_rate *
-                         (1 - static_cast<double>(lost_packets) / 100));
+      uint64_t lost_packets = log[log.size() - 1].state.time.toMSec() -
+                              log[log.size() - 2].state.time.toMSec() - 1;
+      // Read second to last control_command_success_rate since the last one
+      // will always be zero and consider in the success rate assumming all
+      // previous packets were lost.
+      message_stream
+          << std::endl
+          << "control_command_success_rate: "
+          << (log[log.size() - 2].state.control_command_success_rate *
+              (1 - static_cast<double>(lost_packets) / 100));
       // Packets lost in a row
       if (lost_packets > 0) {
-        message_stream << " packets lost in a row in the last sample: " << lost_packets;
+        message_stream << " packets lost in a row in the last sample: "
+                       << lost_packets;
       }
     }
   }
@@ -42,20 +45,27 @@ inline ControlException createControlException(const char* message,
 
 }  // anonymous namespace
 
-Robot::Impl::Impl(std::unique_ptr<Network> network, size_t log_size, RealtimeConfig realtime_config)
-    : network_{std::move(network)}, logger_{log_size}, realtime_config_{realtime_config} {
+Robot::Impl::Impl(std::unique_ptr<Network> network, size_t log_size,
+                  RealtimeConfig realtime_config)
+    : network_{std::move(network)},
+      logger_{log_size},
+      realtime_config_{realtime_config} {
   if (!network_) {
     throw std::invalid_argument("libagimus_franka robot: Invalid argument");
   }
 
-  connect<agimus_research_interface::robot::Connect, agimus_research_interface::robot::kVersion>(*network_,
-                                                                                   &ri_version_);
-  updateState(network_->udpBlockingReceive<agimus_research_interface::robot::RobotState>());
+  connect<agimus_research_interface::robot::Connect,
+          agimus_research_interface::robot::kVersion>(*network_, &ri_version_);
+  updateState(
+      network_
+          ->udpBlockingReceive<agimus_research_interface::robot::RobotState>());
 }
 
 RobotState Robot::Impl::update(
-    const agimus_research_interface::robot::MotionGeneratorCommand* motion_command,
-    const agimus_research_interface::robot::ControllerCommand* control_command) {
+    const agimus_research_interface::robot::MotionGeneratorCommand*
+        motion_command,
+    const agimus_research_interface::robot::ControllerCommand*
+        control_command) {
   network_->tcpThrowIfConnectionClosed();
 
   agimus_research_interface::robot::RobotCommand robot_command =
@@ -67,18 +77,20 @@ RobotState Robot::Impl::update(
   return state;
 }
 
-void Robot::Impl::throwOnMotionError(const RobotState& robot_state, uint32_t motion_id) {
+void Robot::Impl::throwOnMotionError(const RobotState& robot_state,
+                                     uint32_t motion_id) {
   if (robot_state.robot_mode != RobotMode::kMove ||
       motion_generator_mode_ != current_move_motion_generator_mode_ ||
       controller_mode_ != current_move_controller_mode_) {
-    // We detect a move error by changes in the robot state and we will receive a TCP response to
-    // the Move command.
-    auto response =
-        network_->tcpBlockingReceiveResponse<agimus_research_interface::robot::Move>(motion_id);
+    // We detect a move error by changes in the robot state and we will receive
+    // a TCP response to the Move command.
+    auto response = network_->tcpBlockingReceiveResponse<
+        agimus_research_interface::robot::Move>(motion_id);
     try {
       handleCommandResponse<agimus_research_interface::robot::Move>(response);
     } catch (const CommandException& e) {
-      throw createControlException(e.what(), response.status, robot_state.last_motion_errors,
+      throw createControlException(e.what(), response.status,
+                                   robot_state.last_motion_errors,
                                    logger_.flush());
     }
     throw ProtocolException("Unexpected reply to a Move command");
@@ -122,8 +134,10 @@ void Robot::Impl::writeOnce(const MotionGeneratorType& motion_generator_input) {
 }
 
 agimus_research_interface::robot::RobotCommand Robot::Impl::sendRobotCommand(
-    const agimus_research_interface::robot::MotionGeneratorCommand* motion_command,
-    const agimus_research_interface::robot::ControllerCommand* control_command) const {
+    const agimus_research_interface::robot::MotionGeneratorCommand*
+        motion_command,
+    const agimus_research_interface::robot::ControllerCommand* control_command)
+    const {
   agimus_research_interface::robot::RobotCommand robot_command{};
   if (motion_command != nullptr || control_command != nullptr) {
     robot_command.message_id = message_id_;
@@ -131,15 +145,18 @@ agimus_research_interface::robot::RobotCommand Robot::Impl::sendRobotCommand(
       if (current_move_motion_generator_mode_ ==
           agimus_research_interface::robot::MotionGeneratorMode::kIdle) {
         throw ControlException(
-            "libagimus_franka robot: Trying to send motion command, but no motion generator running!");
+            "libagimus_franka robot: Trying to send motion command, but no "
+            "motion generator running!");
       }
       robot_command.motion = *motion_command;
     }
     if (control_command != nullptr) {
       if (current_move_controller_mode_ !=
-          agimus_research_interface::robot::ControllerMode::kExternalController) {
+          agimus_research_interface::robot::ControllerMode::
+              kExternalController) {
         throw ControlException(
-            "libagimus_franka robot: Trying to send control command, but no controller running!");
+            "libagimus_franka robot: Trying to send control command, but no "
+            "controller running!");
       }
       robot_command.control = *control_command;
     }
@@ -147,12 +164,15 @@ agimus_research_interface::robot::RobotCommand Robot::Impl::sendRobotCommand(
     if (current_move_motion_generator_mode_ !=
             agimus_research_interface::robot::MotionGeneratorMode::kIdle &&
         current_move_controller_mode_ ==
-            agimus_research_interface::robot::ControllerMode::kExternalController &&
+            agimus_research_interface::robot::ControllerMode::
+                kExternalController &&
         (motion_command == nullptr || control_command == nullptr)) {
-      throw ControlException("libagimus_franka robot: Trying to send partial robot command!");
+      throw ControlException(
+          "libagimus_franka robot: Trying to send partial robot command!");
     }
 
-    network_->udpSend<agimus_research_interface::robot::RobotCommand>(robot_command);
+    network_->udpSend<agimus_research_interface::robot::RobotCommand>(
+        robot_command);
   }
 
   return robot_command;
@@ -162,7 +182,8 @@ agimus_research_interface::robot::RobotState Robot::Impl::receiveRobotState() {
   agimus_research_interface::robot::RobotState latest_accepted_state;
   latest_accepted_state.message_id = message_id_;
 
-  // If states are already available on the socket, use the one with the most recent message ID.
+  // If states are already available on the socket, use the one with the most
+  // recent message ID.
   agimus_research_interface::robot::RobotState received_state{};
   while (network_->udpReceive(&received_state)) {
     if (received_state.message_id > latest_accepted_state.message_id) {
@@ -182,7 +203,8 @@ agimus_research_interface::robot::RobotState Robot::Impl::receiveRobotState() {
   return latest_accepted_state;
 }
 
-void Robot::Impl::updateState(const agimus_research_interface::robot::RobotState& robot_state) {
+void Robot::Impl::updateState(
+    const agimus_research_interface::robot::RobotState& robot_state) {
   robot_mode_ = robot_state.robot_mode;
   motion_generator_mode_ = robot_state.motion_generator_mode;
   controller_mode_ = robot_state.controller_mode;
@@ -194,11 +216,13 @@ Robot::ServerVersion Robot::Impl::serverVersion() const noexcept {
 }
 
 bool Robot::Impl::motionGeneratorRunning() const noexcept {
-  return motion_generator_mode_ != agimus_research_interface::robot::MotionGeneratorMode::kIdle;
+  return motion_generator_mode_ !=
+         agimus_research_interface::robot::MotionGeneratorMode::kIdle;
 }
 
 bool Robot::Impl::controllerRunning() const noexcept {
-  return controller_mode_ == agimus_research_interface::robot::ControllerMode::kExternalController;
+  return controller_mode_ ==
+         agimus_research_interface::robot::ControllerMode::kExternalController;
 }
 
 RealtimeConfig Robot::Impl::realtimeConfig() const noexcept {
@@ -207,11 +231,15 @@ RealtimeConfig Robot::Impl::realtimeConfig() const noexcept {
 
 uint32_t Robot::Impl::startMotion(
     agimus_research_interface::robot::Move::ControllerMode controller_mode,
-    agimus_research_interface::robot::Move::MotionGeneratorMode motion_generator_mode,
-    const agimus_research_interface::robot::Move::Deviation& maximum_path_deviation,
-    const agimus_research_interface::robot::Move::Deviation& maximum_goal_pose_deviation) {
+    agimus_research_interface::robot::Move::MotionGeneratorMode
+        motion_generator_mode,
+    const agimus_research_interface::robot::Move::Deviation&
+        maximum_path_deviation,
+    const agimus_research_interface::robot::Move::Deviation&
+        maximum_goal_pose_deviation) {
   if (motionGeneratorRunning() || controllerRunning()) {
-    throw ControlException("libagimus_franka robot: Attempted to start multiple motions!");
+    throw ControlException(
+        "libagimus_franka robot: Attempted to start multiple motions!");
   }
 
   switch (motion_generator_mode) {
@@ -232,25 +260,32 @@ uint32_t Robot::Impl::startMotion(
           decltype(current_move_motion_generator_mode_)::kCartesianVelocity;
       break;
     default:
-      throw std::invalid_argument("libagimus_franka: Invalid motion generator mode given.");
+      throw std::invalid_argument(
+          "libagimus_franka: Invalid motion generator mode given.");
   }
 
   switch (controller_mode) {
     case decltype(controller_mode)::kJointImpedance:
-      current_move_controller_mode_ = decltype(current_move_controller_mode_)::kJointImpedance;
+      current_move_controller_mode_ =
+          decltype(current_move_controller_mode_)::kJointImpedance;
       break;
     case decltype(controller_mode)::kCartesianImpedance:
-      current_move_controller_mode_ = decltype(current_move_controller_mode_)::kCartesianImpedance;
+      current_move_controller_mode_ =
+          decltype(current_move_controller_mode_)::kCartesianImpedance;
       break;
     case decltype(controller_mode)::kExternalController:
-      current_move_controller_mode_ = decltype(current_move_controller_mode_)::kExternalController;
+      current_move_controller_mode_ =
+          decltype(current_move_controller_mode_)::kExternalController;
       break;
     default:
-      throw std::invalid_argument("libagimus_franka robot: Invalid controller mode given.");
+      throw std::invalid_argument(
+          "libagimus_franka robot: Invalid controller mode given.");
   }
 
-  const uint32_t move_command_id = executeCommand<agimus_research_interface::robot::Move>(
-      controller_mode, motion_generator_mode, maximum_path_deviation, maximum_goal_pose_deviation);
+  const uint32_t move_command_id =
+      executeCommand<agimus_research_interface::robot::Move>(
+          controller_mode, motion_generator_mode, maximum_path_deviation,
+          maximum_goal_pose_deviation);
 
   RobotState robot_state{};
   while (motion_generator_mode_ != current_move_motion_generator_mode_ ||
@@ -258,8 +293,9 @@ uint32_t Robot::Impl::startMotion(
     try {
       if (network_->tcpReceiveResponse<agimus_research_interface::robot::Move>(
               move_command_id,
-              std::bind(&Robot::Impl::handleCommandResponse<agimus_research_interface::robot::Move>, this,
-                        std::placeholders::_1))) {
+              std::bind(&Robot::Impl::handleCommandResponse<
+                            agimus_research_interface::robot::Move>,
+                        this, std::placeholders::_1))) {
         break;
       }
     } catch (const CommandException& e) {
@@ -276,44 +312,60 @@ uint32_t Robot::Impl::startMotion(
 
 void Robot::Impl::finishMotion(
     uint32_t motion_id,
-    const agimus_research_interface::robot::MotionGeneratorCommand* motion_command,
-    const agimus_research_interface::robot::ControllerCommand* control_command) {
+    const agimus_research_interface::robot::MotionGeneratorCommand*
+        motion_command,
+    const agimus_research_interface::robot::ControllerCommand*
+        control_command) {
   if (!motionGeneratorRunning() && !controllerRunning()) {
-    current_move_motion_generator_mode_ = agimus_research_interface::robot::MotionGeneratorMode::kIdle;
-    current_move_controller_mode_ = agimus_research_interface::robot::ControllerMode::kOther;
+    current_move_motion_generator_mode_ =
+        agimus_research_interface::robot::MotionGeneratorMode::kIdle;
+    current_move_controller_mode_ =
+        agimus_research_interface::robot::ControllerMode::kOther;
     return;
   }
 
   if (motion_command == nullptr) {
-    throw ControlException("libagimus_franka robot: No motion generator command given!");
+    throw ControlException(
+        "libagimus_franka robot: No motion generator command given!");
   }
-  agimus_research_interface::robot::MotionGeneratorCommand motion_finished_command = *motion_command;
+  agimus_research_interface::robot::MotionGeneratorCommand
+      motion_finished_command = *motion_command;
   motion_finished_command.motion_generation_finished = true;
 
-  // The TCP response for the finished Move might arrive while the robot state still shows that the
-  // motion is running, or afterwards. To handle both situations, we do not process TCP packages in
-  // this loop and explicitly wait for the Move response over TCP afterwards.
+  // The TCP response for the finished Move might arrive while the robot state
+  // still shows that the motion is running, or afterwards. To handle both
+  // situations, we do not process TCP packages in this loop and explicitly wait
+  // for the Move response over TCP afterwards.
   RobotState robot_state{};
   while (motionGeneratorRunning() || controllerRunning()) {
     robot_state = update(&motion_finished_command, control_command);
   }
 
-  auto response = network_->tcpBlockingReceiveResponse<agimus_research_interface::robot::Move>(motion_id);
-  if (response.status == agimus_research_interface::robot::Move::Status::kReflexAborted) {
-    throw createControlException("Motion finished commanded, but the robot is still moving!",
-                                 response.status, robot_state.last_motion_errors, logger_.flush());
+  auto response =
+      network_
+          ->tcpBlockingReceiveResponse<agimus_research_interface::robot::Move>(
+              motion_id);
+  if (response.status ==
+      agimus_research_interface::robot::Move::Status::kReflexAborted) {
+    throw createControlException(
+        "Motion finished commanded, but the robot is still moving!",
+        response.status, robot_state.last_motion_errors, logger_.flush());
   }
   try {
     handleCommandResponse<agimus_research_interface::robot::Move>(response);
   } catch (const CommandException& e) {
-    throw createControlException(e.what(), response.status, robot_state.last_motion_errors,
+    throw createControlException(e.what(), response.status,
+                                 robot_state.last_motion_errors,
                                  logger_.flush());
   }
-  current_move_motion_generator_mode_ = agimus_research_interface::robot::MotionGeneratorMode::kIdle;
-  current_move_controller_mode_ = agimus_research_interface::robot::ControllerMode::kOther;
+  current_move_motion_generator_mode_ =
+      agimus_research_interface::robot::MotionGeneratorMode::kIdle;
+  current_move_controller_mode_ =
+      agimus_research_interface::robot::ControllerMode::kOther;
 }
 
-void Robot::Impl::finishMotion(uint32_t motion_id, const Torques& control_input) {
+void Robot::Impl::finishMotion(uint32_t motion_id,
+                               const Torques& control_input) {
   agimus_research_interface::robot::MotionGeneratorCommand motion_command{};
   motion_command.dq_c = {0, 0, 0, 0, 0, 0, 0};
 
@@ -322,8 +374,8 @@ void Robot::Impl::finishMotion(uint32_t motion_id, const Torques& control_input)
 
   finishMotion(motion_id, &motion_command, &controller_command);
 }
-agimus_research_interface::robot::MotionGeneratorCommand Robot::Impl::createMotionCommand(
-    const JointPositions& motion_input) {
+agimus_research_interface::robot::MotionGeneratorCommand
+Robot::Impl::createMotionCommand(const JointPositions& motion_input) {
   checkFinite(motion_input.q);
 
   agimus_research_interface::robot::MotionGeneratorCommand motion_command{};
@@ -332,8 +384,8 @@ agimus_research_interface::robot::MotionGeneratorCommand Robot::Impl::createMoti
   return motion_command;
 }
 
-agimus_research_interface::robot::MotionGeneratorCommand Robot::Impl::createMotionCommand(
-    const JointVelocities& motion_input) {
+agimus_research_interface::robot::MotionGeneratorCommand
+Robot::Impl::createMotionCommand(const JointVelocities& motion_input) {
   checkFinite(motion_input.dq);
 
   agimus_research_interface::robot::MotionGeneratorCommand motion_command{};
@@ -342,8 +394,8 @@ agimus_research_interface::robot::MotionGeneratorCommand Robot::Impl::createMoti
   return motion_command;
 }
 
-agimus_research_interface::robot::MotionGeneratorCommand Robot::Impl::createMotionCommand(
-    const CartesianPose& motion_input) {
+agimus_research_interface::robot::MotionGeneratorCommand
+Robot::Impl::createMotionCommand(const CartesianPose& motion_input) {
   checkMatrix(motion_input.O_T_EE);
 
   agimus_research_interface::robot::MotionGeneratorCommand motion_command{};
@@ -361,8 +413,8 @@ agimus_research_interface::robot::MotionGeneratorCommand Robot::Impl::createMoti
   return motion_command;
 }
 
-agimus_research_interface::robot::MotionGeneratorCommand Robot::Impl::createMotionCommand(
-    const CartesianVelocities& motion_input) {
+agimus_research_interface::robot::MotionGeneratorCommand
+Robot::Impl::createMotionCommand(const CartesianVelocities& motion_input) {
   checkFinite(motion_input.O_dP_EE);
 
   agimus_research_interface::robot::MotionGeneratorCommand motion_command{};
@@ -380,8 +432,8 @@ agimus_research_interface::robot::MotionGeneratorCommand Robot::Impl::createMoti
   return motion_command;
 }
 
-agimus_research_interface::robot::ControllerCommand Robot::Impl::createControllerCommand(
-    const Torques& control_input) {
+agimus_research_interface::robot::ControllerCommand
+Robot::Impl::createControllerCommand(const Torques& control_input) {
   checkFinite(control_input.tau_J);
 
   agimus_research_interface::robot::ControllerCommand control_command{};
@@ -404,16 +456,18 @@ void Robot::Impl::cancelMotion(uint32_t motion_id) {
 
   // Ignore Move response.
   // TODO (FWA): It is not guaranteed that the Move response won't come later
-  network_->tcpReceiveResponse<agimus_research_interface::robot::Move>(motion_id, [](auto) {});
-  current_move_motion_generator_mode_ = agimus_research_interface::robot::MotionGeneratorMode::kIdle;
-  current_move_controller_mode_ = agimus_research_interface::robot::ControllerMode::kOther;
+  network_->tcpReceiveResponse<agimus_research_interface::robot::Move>(
+      motion_id, [](auto) {});
+  current_move_motion_generator_mode_ =
+      agimus_research_interface::robot::MotionGeneratorMode::kIdle;
+  current_move_controller_mode_ =
+      agimus_research_interface::robot::ControllerMode::kOther;
 }
 
-Model Robot::Impl::loadModel() const {
-  return Model(*network_);
-}
+Model Robot::Impl::loadModel() const { return Model(*network_); }
 
-RobotState convertRobotState(const agimus_research_interface::robot::RobotState& robot_state) noexcept {
+RobotState convertRobotState(
+    const agimus_research_interface::robot::RobotState& robot_state) noexcept {
   RobotState converted;
   converted.O_T_EE = robot_state.O_T_EE;
   converted.O_T_EE_d = robot_state.O_T_EE_d;
@@ -428,11 +482,13 @@ RobotState convertRobotState(const agimus_research_interface::robot::RobotState&
   converted.F_x_Cload = robot_state.F_x_Cload;
   converted.I_load = robot_state.I_load;
   converted.m_total = robot_state.m_ee + robot_state.m_load;
-  converted.F_x_Ctotal = combineCenterOfMass(robot_state.m_ee, robot_state.F_x_Cee,
-                                             robot_state.m_load, robot_state.F_x_Cload);
+  converted.F_x_Ctotal =
+      combineCenterOfMass(robot_state.m_ee, robot_state.F_x_Cee,
+                          robot_state.m_load, robot_state.F_x_Cload);
   converted.I_total = combineInertiaTensor(
-      robot_state.m_ee, robot_state.F_x_Cee, robot_state.I_ee, robot_state.m_load,
-      robot_state.F_x_Cload, robot_state.I_load, converted.m_total, converted.F_x_Ctotal);
+      robot_state.m_ee, robot_state.F_x_Cee, robot_state.I_ee,
+      robot_state.m_load, robot_state.F_x_Cload, robot_state.I_load,
+      converted.m_total, converted.F_x_Ctotal);
   converted.elbow = robot_state.elbow;
   converted.elbow_d = robot_state.elbow_d;
   converted.elbow_c = robot_state.elbow_c;
@@ -462,7 +518,8 @@ RobotState convertRobotState(const agimus_research_interface::robot::RobotState&
   converted.dtheta = robot_state.dtheta;
   converted.current_errors = robot_state.errors;
   converted.last_motion_errors = robot_state.reflex_reason;
-  converted.control_command_success_rate = robot_state.control_command_success_rate;
+  converted.control_command_success_rate =
+      robot_state.control_command_success_rate;
   converted.time = Duration(robot_state.message_id);
 
   converted.robot_mode = RobotMode::kOther;
@@ -493,21 +550,24 @@ RobotState convertRobotState(const agimus_research_interface::robot::RobotState&
   return converted;
 }
 
-template void Robot::Impl::writeOnce<JointPositions>(const JointPositions& motion_generator_input);
+template void Robot::Impl::writeOnce<JointPositions>(
+    const JointPositions& motion_generator_input);
 template void Robot::Impl::writeOnce<JointVelocities>(
     const JointVelocities& motion_generator_input);
-template void Robot::Impl::writeOnce<CartesianPose>(const CartesianPose& motion_generator_input);
+template void Robot::Impl::writeOnce<CartesianPose>(
+    const CartesianPose& motion_generator_input);
 template void Robot::Impl::writeOnce<CartesianVelocities>(
     const CartesianVelocities& motion_generator_input);
 
-template void Robot::Impl::writeOnce<JointPositions>(const JointPositions& motion_generator_input,
-                                                     const Torques& control_input);
+template void Robot::Impl::writeOnce<JointPositions>(
+    const JointPositions& motion_generator_input, const Torques& control_input);
 
-template void Robot::Impl::writeOnce<JointVelocities>(const JointVelocities& motion_generator_input,
-                                                      const Torques& control_input);
+template void Robot::Impl::writeOnce<JointVelocities>(
+    const JointVelocities& motion_generator_input,
+    const Torques& control_input);
 
-template void Robot::Impl::writeOnce<CartesianPose>(const CartesianPose& motion_generator_input,
-                                                    const Torques& control_input);
+template void Robot::Impl::writeOnce<CartesianPose>(
+    const CartesianPose& motion_generator_input, const Torques& control_input);
 
 template void Robot::Impl::writeOnce<CartesianVelocities>(
     const CartesianVelocities& motion_generator_input,

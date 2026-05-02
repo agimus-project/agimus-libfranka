@@ -2,10 +2,10 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
+#include <agimus_franka/duration.h>
+
 #include <cstdint>
 #include <ostream>
-
-#include <agimus_franka/duration.h>
 
 /**
  * @file gripper_state.h
@@ -26,7 +26,8 @@ struct GripperState {
   /**
    * Maximum gripper opening width.
    * This parameter is estimated by homing the gripper.
-   * After changing the gripper fingers, a homing needs to be done. Unit: \f$[m]\f$.
+   * After changing the gripper fingers, a homing needs to be done. Unit:
+   * \f$[m]\f$.
    *
    * @see Gripper::homing.
    */
@@ -49,13 +50,15 @@ struct GripperState {
 };
 
 /**
- * Streams the gripper state as JSON object: {"field_name_1": value, "field_name_2": value, ...}
+ * Streams the gripper state as JSON object: {"field_name_1": value,
+ * "field_name_2": value, ...}
  *
  * @param[in] ostream Ostream instance
  * @param[in] gripper_state GripperState struct instance to stream
  *
  * @return Ostream instance
  */
-std::ostream& operator<<(std::ostream& ostream, const agimus_franka::GripperState& gripper_state);
+std::ostream& operator<<(std::ostream& ostream,
+                         const agimus_franka::GripperState& gripper_state);
 
 }  // namespace agimus_franka
