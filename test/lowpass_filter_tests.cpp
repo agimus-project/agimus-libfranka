@@ -1,10 +1,10 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 
-#include <gtest/gtest.h>
-#include <Eigen/Dense>
-
 #include <agimus_franka/lowpass_filter.h>
+#include <gtest/gtest.h>
+
+#include <Eigen/Dense>
 
 #include "helpers.h"
 
@@ -25,9 +25,9 @@ TEST(LowpassFilter, DoesFilter) {
 }
 
 TEST(CartesianLowpassFilter, CanFixNonOrthonormalRotation) {
-  // These three poses are all only barely orthonormal, such that the cartesianLowpassFilter will
-  // generate a jerky movement when it does not orthonormalize these first before applying the
-  // filter.
+  // These three poses are all only barely orthonormal, such that the
+  // cartesianLowpassFilter will generate a jerky movement when it does not
+  // orthonormalize these first before applying the filter.
   Eigen::Affine3d pose1;
   Eigen::Affine3d pose2;
   Eigen::Affine3d pose3;
@@ -52,8 +52,10 @@ TEST(CartesianLowpassFilter, CanFixNonOrthonormalRotation) {
   Eigen::Map<Eigen::Matrix4d>(&pose_array2[0], 4, 4) = pose2.matrix();
   Eigen::Map<Eigen::Matrix4d>(&pose_array3[0], 4, 4) = pose3.matrix();
 
-  auto output_array1 = cartesianLowpassFilter(0.001, pose_array2, pose_array1, 100.);
-  auto output_array2 = cartesianLowpassFilter(0.001, pose_array3, pose_array2, 100.);
+  auto output_array1 =
+      cartesianLowpassFilter(0.001, pose_array2, pose_array1, 100.);
+  auto output_array2 =
+      cartesianLowpassFilter(0.001, pose_array3, pose_array2, 100.);
   auto velocity1 = differentiateOneSample(output_array1, pose_array1, 0.001);
   auto velocity2 = differentiateOneSample(output_array2, pose_array2, 0.001);
 
@@ -63,6 +65,7 @@ TEST(CartesianLowpassFilter, CanFixNonOrthonormalRotation) {
     double acceleration2 = (velocity2[i] - velocity1[i]) / 0.001;
     jerk[i] = (acceleration2 - acceleration1) / 0.001;
   }
-  double total_jerk = std::sqrt(std::pow(jerk[3], 2) + std::pow(jerk[4], 2) + std::pow(jerk[5], 2));
+  double total_jerk = std::sqrt(std::pow(jerk[3], 2) + std::pow(jerk[4], 2) +
+                                std::pow(jerk[5], 2));
   EXPECT_LT(total_jerk, 1000);
 }

@@ -1,12 +1,11 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <algorithm>
-#include <string>
-
+#include <agimus_franka/log.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <agimus_franka/log.h>
+#include <algorithm>
+#include <string>
 
 #include "helpers.h"
 #include "logger.h"
@@ -74,7 +73,8 @@ TEST(Logger, LoggerEmptyAfterFlush) {
   agimus_franka::Logger logger(log_count);
 
   for (size_t i = 0; i < log_count; i++) {
-    logger.log(agimus_franka::RobotState{}, agimus_research_interface::robot::RobotCommand{});
+    logger.log(agimus_franka::RobotState{},
+               agimus_research_interface::robot::RobotCommand{});
   }
 
   std::vector<agimus_franka::Record> log = logger.flush();
@@ -90,7 +90,8 @@ TEST(Logger, NoLogWhenLogSizeZero) {
 
   size_t log_count = 50;
   for (size_t i = 0; i < log_count; i++) {
-    logger.log(agimus_franka::RobotState{}, agimus_research_interface::robot::RobotCommand{});
+    logger.log(agimus_franka::RobotState{},
+               agimus_research_interface::robot::RobotCommand{});
   }
 
   std::vector<agimus_franka::Record> log = logger.flush();
@@ -102,7 +103,8 @@ TEST(Logger, WellFormattedString) {
   agimus_franka::Logger logger(log_count);
 
   for (size_t i = 0; i < log_count; i++) {
-    logger.log(agimus_franka::RobotState{}, agimus_research_interface::robot::RobotCommand{});
+    logger.log(agimus_franka::RobotState{},
+               agimus_research_interface::robot::RobotCommand{});
   }
 
   std::string log = agimus_franka::logToCSV(logger.flush());
@@ -127,7 +129,8 @@ TEST(Logger, WellFormattedString) {
 
 TEST(Logger, NoDuplicateColumns) {
   agimus_franka::Logger logger(1);
-  logger.log(agimus_franka::RobotState{}, agimus_research_interface::robot::RobotCommand{});
+  logger.log(agimus_franka::RobotState{},
+             agimus_research_interface::robot::RobotCommand{});
 
   std::string log = agimus_franka::logToCSV(logger.flush());
 

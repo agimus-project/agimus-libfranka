@@ -1,11 +1,10 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
+#include <agimus_franka/control_types.h>
 #include <gtest/gtest.h>
 
 #include <exception>
 #include <limits>
-
-#include <agimus_franka/control_types.h>
 
 TEST(Torques, CanConstructFromArray) {
   std::array<double, 7> array{0, 1, 2, 3, 4, 5, 6};
@@ -20,7 +19,8 @@ TEST(Torques, CanConstructFromInitializerList) {
 }
 
 TEST(Torques, CanNotConstructFromTooSmallInitializerList) {
-  EXPECT_THROW(agimus_franka::Torques({0, 1, 2, 3, 4, 5}), std::invalid_argument);
+  EXPECT_THROW(agimus_franka::Torques({0, 1, 2, 3, 4, 5}),
+               std::invalid_argument);
 }
 
 TEST(JointPositions, CanConstructFromArray) {
@@ -36,7 +36,8 @@ TEST(JointPositions, CanConstructFromInitializerList) {
 }
 
 TEST(JointPositions, CanNotConstructFromTooSmallInitializerList) {
-  EXPECT_THROW(agimus_franka::JointPositions({0, 1, 2, 3, 4, 5}), std::invalid_argument);
+  EXPECT_THROW(agimus_franka::JointPositions({0, 1, 2, 3, 4, 5}),
+               std::invalid_argument);
 }
 
 TEST(JointVelocities, CanConstructFromArray) {
@@ -52,17 +53,20 @@ TEST(JointVelocities, CanConstructFromInitializerList) {
 }
 
 TEST(JointVelocities, CanNotConstructFromTooSmallInitializerList) {
-  EXPECT_THROW(agimus_franka::JointVelocities({0, 1, 2, 3, 4, 5}), std::invalid_argument);
+  EXPECT_THROW(agimus_franka::JointVelocities({0, 1, 2, 3, 4, 5}),
+               std::invalid_argument);
 }
 
 TEST(CartesianPose, CanConstructFromArray) {
-  std::array<double, 16> array = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+  std::array<double, 16> array = {1, 0, 0, 0, 0, 1, 0, 0,
+                                  0, 0, 1, 0, 0, 0, 0, 1};
   agimus_franka::CartesianPose p(array);
   EXPECT_EQ(array, p.O_T_EE);
 }
 
 TEST(CartesianPose, CanConstructFromArrayWithElbow) {
-  std::array<double, 16> array = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+  std::array<double, 16> array = {1, 0, 0, 0, 0, 1, 0, 0,
+                                  0, 0, 1, 0, 0, 0, 0, 1};
   std::array<double, 2> elbow = {0, -1};
   agimus_franka::CartesianPose p(array, elbow);
   EXPECT_EQ(array, p.O_T_EE);
@@ -70,23 +74,30 @@ TEST(CartesianPose, CanConstructFromArrayWithElbow) {
 }
 
 TEST(CartesianPose, CanConstructFromInitializerList) {
-  std::array<double, 16> array = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
-  agimus_franka::CartesianPose p({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});
+  std::array<double, 16> array = {1, 0, 0, 0, 0, 1, 0, 0,
+                                  0, 0, 1, 0, 0, 0, 0, 1};
+  agimus_franka::CartesianPose p(
+      {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});
   EXPECT_EQ(array, p.O_T_EE);
 }
 
 TEST(CartesianPose, CanConstructFromInitializerListWithElbow) {
-  std::array<double, 16> array = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+  std::array<double, 16> array = {1, 0, 0, 0, 0, 1, 0, 0,
+                                  0, 0, 1, 0, 0, 0, 0, 1};
   std::array<double, 2> elbow = {0, -1};
-  agimus_franka::CartesianPose p({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}, {0, -1});
+  agimus_franka::CartesianPose p(
+      {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}, {0, -1});
   EXPECT_EQ(array, p.O_T_EE);
   EXPECT_EQ(elbow, p.elbow);
 }
 
 TEST(CartesianPose, CanNotConstructFromTooSmallInitializerList) {
-  EXPECT_THROW(agimus_franka::CartesianPose({0, 1, 2, 3, 4, 5}), std::invalid_argument);
-  EXPECT_THROW(agimus_franka::CartesianPose({0, 1, 2, 3, 4, 5}, {0, 1}), std::invalid_argument);
-  EXPECT_THROW(agimus_franka::CartesianPose({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}, {0}),
+  EXPECT_THROW(agimus_franka::CartesianPose({0, 1, 2, 3, 4, 5}),
+               std::invalid_argument);
+  EXPECT_THROW(agimus_franka::CartesianPose({0, 1, 2, 3, 4, 5}, {0, 1}),
+               std::invalid_argument);
+  EXPECT_THROW(agimus_franka::CartesianPose(
+                   {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}, {0}),
                std::invalid_argument);
 }
 
@@ -119,7 +130,10 @@ TEST(CartesianVelocities, CanConstructFromInitializerListWithElbow) {
 }
 
 TEST(CartesianVelocities, CanNotConstructFromTooSmallInitializerList) {
-  EXPECT_THROW(agimus_franka::CartesianVelocities({0, 1, 2, 3, 4}), std::invalid_argument);
-  EXPECT_THROW(agimus_franka::CartesianVelocities({0, 1, 2, 3, 4}, {0, 1}), std::invalid_argument);
-  EXPECT_THROW(agimus_franka::CartesianVelocities({0, 1, 2, 3, 4, 5}, {0}), std::invalid_argument);
+  EXPECT_THROW(agimus_franka::CartesianVelocities({0, 1, 2, 3, 4}),
+               std::invalid_argument);
+  EXPECT_THROW(agimus_franka::CartesianVelocities({0, 1, 2, 3, 4}, {0, 1}),
+               std::invalid_argument);
+  EXPECT_THROW(agimus_franka::CartesianVelocities({0, 1, 2, 3, 4, 5}, {0}),
+               std::invalid_argument);
 }

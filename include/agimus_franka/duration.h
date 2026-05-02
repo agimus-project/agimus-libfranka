@@ -223,7 +223,8 @@ class Duration {
    *
    * @param[in] rhs Right-hand side of the comparison.
    *
-   * @return True if this duration is shorter than or equal to rhs, false otherwise.
+   * @return True if this duration is shorter than or equal to rhs, false
+   * otherwise.
    */
   bool operator<=(const Duration& rhs) const noexcept;
 
@@ -240,7 +241,8 @@ class Duration {
    *
    * @param[in] rhs Right-hand side of the comparison.
    *
-   * @return True if this duration is longer than or equal to rhs, false otherwise.
+   * @return True if this duration is longer than or equal to rhs, false
+   * otherwise.
    */
   bool operator>=(const Duration& rhs) const noexcept;
 

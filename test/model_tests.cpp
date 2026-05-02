@@ -1,15 +1,14 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <fstream>
-#include <memory>
-
-#include <gmock/gmock.h>
-#include <Eigen/Core>
-
 #include <agimus_franka/exception.h>
 #include <agimus_franka/model.h>
 #include <agimus_franka/robot.h>
 #include <agimus_research_interface/robot/service_types.h>
+#include <gmock/gmock.h>
+
+#include <Eigen/Core>
+#include <fstream>
+#include <memory>
 
 #include "helpers.h"
 #include "mock_server.h"
@@ -31,7 +30,8 @@ struct MockModel : public ModelLibraryInterface {
   MOCK_METHOD2(Ji_J_J8, void(const double*, double*));
   MOCK_METHOD3(Ji_J_J9, void(const double*, const double*, double*));
 
-  MOCK_METHOD5(M_NE, void(const double*, const double*, double, const double*, double*));
+  MOCK_METHOD5(M_NE, void(const double*, const double*, double, const double*,
+                          double*));
 
   MOCK_METHOD1(O_J_J1, void(double*));
   MOCK_METHOD2(O_J_J2, void(const double*, double*));
@@ -53,9 +53,10 @@ struct MockModel : public ModelLibraryInterface {
   MOCK_METHOD2(O_T_J8, void(const double*, double*));
   MOCK_METHOD3(O_T_J9, void(const double*, const double*, double*));
 
-  MOCK_METHOD6(c_NE,
-               void(const double*, const double*, const double*, double, const double*, double*));
-  MOCK_METHOD5(g_NE, void(const double*, const double*, double, const double*, double*));
+  MOCK_METHOD6(c_NE, void(const double*, const double*, const double*, double,
+                          const double*, double*));
+  MOCK_METHOD5(g_NE, void(const double*, const double*, double, const double*,
+                          double*));
 };
 
 struct Model : public ::testing::Test {
@@ -73,13 +74,15 @@ struct Model : public ::testing::Test {
     }
 
     server
-        .generic([=](decltype(server)::Socket& tcp_socket, decltype(server)::Socket&) {
+        .generic([=](decltype(server)::Socket& tcp_socket,
+                     decltype(server)::Socket&) {
           CommandHeader header;
           server.receiveRequest<LoadModelLibrary>(tcp_socket, &header);
           server.sendResponse<LoadModelLibrary>(
               tcp_socket,
               CommandHeader(Command::kLoadModelLibrary, header.command_id,
-                            sizeof(CommandMessage<LoadModelLibrary::Response>) + buffer.size()),
+                            sizeof(CommandMessage<LoadModelLibrary::Response>) +
+                                buffer.size()),
               LoadModelLibrary::Response(LoadModelLibrary::Status::kSuccess));
           tcp_socket.sendBytes(buffer.data(), buffer.size());
         })
@@ -111,13 +114,15 @@ TEST(InvalidModel, ThrowsIfInvalidModelReceived) {
 
   std::array<char, 10> buffer{};
   server
-      .generic([&](decltype(server)::Socket& tcp_socket, decltype(server)::Socket&) {
+      .generic([&](decltype(server)::Socket& tcp_socket,
+                   decltype(server)::Socket&) {
         CommandHeader header;
         server.receiveRequest<LoadModelLibrary>(tcp_socket, &header);
         server.sendResponse<LoadModelLibrary>(
             tcp_socket,
             CommandHeader(Command::kLoadModelLibrary, header.command_id,
-                          sizeof(CommandMessage<LoadModelLibrary::Response>) + buffer.size()),
+                          sizeof(CommandMessage<LoadModelLibrary::Response>) +
+                              buffer.size()),
             LoadModelLibrary::Response(LoadModelLibrary::Status::kSuccess));
         tcp_socket.sendBytes(buffer.data(), buffer.size());
       })
@@ -126,17 +131,15 @@ TEST(InvalidModel, ThrowsIfInvalidModelReceived) {
   EXPECT_THROW(robot.loadModel(), agimus_franka::ModelException);
 }
 
-TEST_F(Model, CanCreateModel) {
-  EXPECT_NO_THROW(robot.loadModel());
-}
+TEST_F(Model, CanCreateModel) { EXPECT_NO_THROW(robot.loadModel()); }
 
 TEST_F(Model, CanGetMassMatrix) {
   agimus_franka::RobotState robot_state;
   randomRobotState(robot_state);
 
   MockModel mock;
-  EXPECT_CALL(mock, M_NE(robot_state.q.data(), robot_state.I_total.data(), robot_state.m_total,
-                         robot_state.F_x_Ctotal.data(), _))
+  EXPECT_CALL(mock, M_NE(robot_state.q.data(), robot_state.I_total.data(),
+                         robot_state.m_total, robot_state.F_x_Ctotal.data(), _))
       .WillOnce(WithArgs<4>(Invoke([=](double* output) {
         for (size_t i = 0; i < 49; i++) {
           output[i] = i;
@@ -158,8 +161,9 @@ TEST_F(Model, CanGetCoriolisVector) {
   std::array<double, 7> expected_vector{12, 13, 14, 15, 16, 17, 18};
 
   MockModel mock;
-  EXPECT_CALL(mock, c_NE(robot_state.q.data(), robot_state.dq.data(), robot_state.I_total.data(),
-                         robot_state.m_total, robot_state.F_x_Ctotal.data(), _))
+  EXPECT_CALL(mock, c_NE(robot_state.q.data(), robot_state.dq.data(),
+                         robot_state.I_total.data(), robot_state.m_total,
+                         robot_state.F_x_Ctotal.data(), _))
       .WillOnce(WithArgs<5>(Invoke([=](double* output) {
         std::copy(expected_vector.cbegin(), expected_vector.cend(), output);
       })));
@@ -177,8 +181,8 @@ TEST_F(Model, CanGetGravity) {
   std::array<double, 3> gravity_earth{4, 5, 6};
 
   MockModel mock;
-  EXPECT_CALL(mock, g_NE(robot_state.q.data(), gravity_earth.data(), robot_state.m_total,
-                         robot_state.F_x_Ctotal.data(), _))
+  EXPECT_CALL(mock, g_NE(robot_state.q.data(), gravity_earth.data(),
+                         robot_state.m_total, robot_state.F_x_Ctotal.data(), _))
       .WillOnce(WithArgs<4>(Invoke([=](double* output) {
         for (size_t i = 0; i < 7; i++) {
           output[i] = i;
@@ -198,7 +202,8 @@ TEST_F(Model, CanGetJointPoses) {
   agimus_franka::RobotState robot_state;
   randomRobotState(robot_state);
 
-  std::array<double, 16> expected_pose{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}};
+  std::array<double, 16> expected_pose{
+      {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}};
 
   MockModel mock;
   EXPECT_CALL(mock, O_T_J1(robot_state.q.data(), _))
@@ -252,7 +257,8 @@ TEST_F(Model, CanGetJointPoses) {
   model_library_interface = &mock;
 
   agimus_franka::Model model(robot.loadModel());
-  for (agimus_franka::Frame joint = agimus_franka::Frame::kJoint1; joint <= agimus_franka::Frame::kStiffness; joint++) {
+  for (agimus_franka::Frame joint = agimus_franka::Frame::kJoint1;
+       joint <= agimus_franka::Frame::kStiffness; joint++) {
     auto pose = model.pose(joint, robot_state);
     EXPECT_EQ(expected_pose, pose);
   }
@@ -268,9 +274,10 @@ TEST_F(Model, CanGetBodyJacobian) {
   }
 
   MockModel mock;
-  EXPECT_CALL(mock, Ji_J_J1(_)).WillOnce(WithArgs<0>(Invoke([=](double* output) {
-    std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-  })));
+  EXPECT_CALL(mock, Ji_J_J1(_))
+      .WillOnce(WithArgs<0>(Invoke([=](double* output) {
+        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
+      })));
   EXPECT_CALL(mock, Ji_J_J2(robot_state.q.data(), _))
       .WillOnce(WithArgs<1>(Invoke([=](double* output) {
         std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
@@ -318,7 +325,8 @@ TEST_F(Model, CanGetBodyJacobian) {
   model_library_interface = &mock;
 
   agimus_franka::Model model(robot.loadModel());
-  for (agimus_franka::Frame joint = agimus_franka::Frame::kJoint1; joint <= agimus_franka::Frame::kStiffness; joint++) {
+  for (agimus_franka::Frame joint = agimus_franka::Frame::kJoint1;
+       joint <= agimus_franka::Frame::kStiffness; joint++) {
     auto jacobian = model.bodyJacobian(joint, robot_state);
     EXPECT_EQ(expected_jacobian, jacobian);
   }
@@ -384,7 +392,8 @@ TEST_F(Model, CanGetZeroJacobian) {
   model_library_interface = &mock;
 
   agimus_franka::Model model(robot.loadModel());
-  for (agimus_franka::Frame joint = agimus_franka::Frame::kJoint1; joint <= agimus_franka::Frame::kStiffness; joint++) {
+  for (agimus_franka::Frame joint = agimus_franka::Frame::kJoint1;
+       joint <= agimus_franka::Frame::kStiffness; joint++) {
     auto jacobian = model.zeroJacobian(joint, robot_state);
     EXPECT_EQ(expected_jacobian, jacobian);
   }

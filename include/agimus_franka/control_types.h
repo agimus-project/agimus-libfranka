@@ -8,7 +8,8 @@
 
 /**
  * @file control_types.h
- * Contains helper types for returning motion generation and joint-level torque commands.
+ * Contains helper types for returning motion generation and joint-level torque
+ * commands.
  */
 
 namespace agimus_franka {
@@ -28,7 +29,8 @@ enum class RealtimeConfig { kEnforce, kIgnore };
 /**
  * Helper type for control and motion generation loops.
  *
- * Used to determine whether to terminate a loop after the control callback has returned.
+ * Used to determine whether to terminate a loop after the control callback has
+ * returned.
  *
  * @see @ref callback-docs "Documentation on callbacks"
  */
@@ -47,16 +49,19 @@ class Torques : public Finishable {
   /**
    * Creates a new Torques instance.
    *
-   * @param[in] torques Desired joint-level torques without gravity and friction in \f$[Nm]\f$.
+   * @param[in] torques Desired joint-level torques without gravity and friction
+   * in \f$[Nm]\f$.
    */
   Torques(const std::array<double, 7>& torques) noexcept;
 
   /**
    * Creates a new Torques instance.
    *
-   * @param[in] torques Desired joint-level torques without gravity and friction in \f$[Nm]\f$.
+   * @param[in] torques Desired joint-level torques without gravity and friction
+   * in \f$[Nm]\f$.
    *
-   * @throw std::invalid_argument if the given initializer list has an invalid number of arguments.
+   * @throw std::invalid_argument if the given initializer list has an invalid
+   * number of arguments.
    */
   Torques(std::initializer_list<double> torques);
 
@@ -83,7 +88,8 @@ class JointPositions : public Finishable {
    *
    * @param[in] joint_positions Desired joint angles in \f$[rad]\f$.
    *
-   * @throw std::invalid_argument if the given initializer list has an invalid number of arguments.
+   * @throw std::invalid_argument if the given initializer list has an invalid
+   * number of arguments.
    */
   JointPositions(std::initializer_list<double> joint_positions);
 
@@ -101,7 +107,8 @@ class JointVelocities : public Finishable {
   /**
    * Creates a new JointVelocities instance.
    *
-   * @param[in] joint_velocities Desired joint velocities in \f$[\frac{rad}{s}]\f$.
+   * @param[in] joint_velocities Desired joint velocities in
+   * \f$[\frac{rad}{s}]\f$.
    *
    */
   JointVelocities(const std::array<double, 7>& joint_velocities) noexcept;
@@ -109,9 +116,11 @@ class JointVelocities : public Finishable {
   /**
    * Creates a new JointVelocities instance.
    *
-   * @param[in] joint_velocities Desired joint velocities in \f$[\frac{rad}{s}]\f$.
+   * @param[in] joint_velocities Desired joint velocities in
+   * \f$[\frac{rad}{s}]\f$.
    *
-   * @throw std::invalid_argument if the given initializer list has an invalid number of arguments.
+   * @throw std::invalid_argument if the given initializer list has an invalid
+   * number of arguments.
    */
   JointVelocities(std::initializer_list<double> joint_velocities);
 
@@ -129,19 +138,24 @@ class CartesianPose : public Finishable {
   /**
    * Creates a new CartesianPose instance.
    *
-   * @param[in] cartesian_pose Desired vectorized homogeneous transformation matrix \f$^O
-   * {\mathbf{T}_{EE}}_{d}\f$, column major, that transforms from the end effector frame \f$EE\f$ to
-   * base frame \f$O\f$. Equivalently, it is the desired end effector pose in base frame.
+   * @param[in] cartesian_pose Desired vectorized homogeneous transformation
+   * matrix \f$^O
+   * {\mathbf{T}_{EE}}_{d}\f$, column major, that transforms from the end
+   * effector frame \f$EE\f$ to base frame \f$O\f$. Equivalently, it is the
+   * desired end effector pose in base frame.
    */
   CartesianPose(const std::array<double, 16>& cartesian_pose) noexcept;
 
   /**
    * Creates a new CartesianPose instance.
    *
-   * @param[in] cartesian_pose Desired vectorized homogeneous transformation matrix \f$^O
-   * {\mathbf{T}_{EE}}_{d}\f$, column major, that transforms from the end effector frame \f$EE\f$ to
-   * base frame \f$O\f$. Equivalently, it is the desired end effector pose in base frame.
-   * @param[in] elbow Elbow configuration (see @ref elbow member for more details).
+   * @param[in] cartesian_pose Desired vectorized homogeneous transformation
+   * matrix \f$^O
+   * {\mathbf{T}_{EE}}_{d}\f$, column major, that transforms from the end
+   * effector frame \f$EE\f$ to base frame \f$O\f$. Equivalently, it is the
+   * desired end effector pose in base frame.
+   * @param[in] elbow Elbow configuration (see @ref elbow member for more
+   * details).
    */
   CartesianPose(const std::array<double, 16>& cartesian_pose,
                 const std::array<double, 2>& elbow) noexcept;
@@ -149,30 +163,38 @@ class CartesianPose : public Finishable {
   /**
    * Creates a new CartesianPose instance.
    *
-   * @param[in] cartesian_pose Desired vectorized homogeneous transformation matrix \f$^O
-   * {\mathbf{T}_{EE}}_{d}\f$, column major, that transforms from the end effector frame \f$EE\f$ to
-   * base frame \f$O\f$. Equivalently, it is the desired end effector pose in base frame.
+   * @param[in] cartesian_pose Desired vectorized homogeneous transformation
+   * matrix \f$^O
+   * {\mathbf{T}_{EE}}_{d}\f$, column major, that transforms from the end
+   * effector frame \f$EE\f$ to base frame \f$O\f$. Equivalently, it is the
+   * desired end effector pose in base frame.
    *
-   * @throw std::invalid_argument if the given initializer list has an invalid number of arguments.
+   * @throw std::invalid_argument if the given initializer list has an invalid
+   * number of arguments.
    */
   CartesianPose(std::initializer_list<double> cartesian_pose);
 
   /**
    * Creates a new CartesianPose instance.
    *
-   * @param[in] cartesian_pose Desired vectorized homogeneous transformation matrix \f$^O
-   * {\mathbf{T}_{EE}}_{d}\f$, column major, that transforms from the end effector frame \f$EE\f$ to
-   * base frame \f$O\f$. Equivalently, it is the desired end effector pose in base frame.
+   * @param[in] cartesian_pose Desired vectorized homogeneous transformation
+   * matrix \f$^O
+   * {\mathbf{T}_{EE}}_{d}\f$, column major, that transforms from the end
+   * effector frame \f$EE\f$ to base frame \f$O\f$. Equivalently, it is the
+   * desired end effector pose in base frame.
    *
-   * @param[in] elbow Elbow configuration (see @ref elbow member for more details).
+   * @param[in] elbow Elbow configuration (see @ref elbow member for more
+   * details).
    *
-   * @throw std::invalid_argument if a given initializer list has an invalid number of arguments.
+   * @throw std::invalid_argument if a given initializer list has an invalid
+   * number of arguments.
    */
-  CartesianPose(std::initializer_list<double> cartesian_pose, std::initializer_list<double> elbow);
+  CartesianPose(std::initializer_list<double> cartesian_pose,
+                std::initializer_list<double> elbow);
 
   /**
-   * Homogeneous transformation \f$^O{\mathbf{T}_{EE}}_{d}\f$, column major, that transforms from
-   * the end effector frame \f$EE\f$ to base frame \f$O\f$.
+   * Homogeneous transformation \f$^O{\mathbf{T}_{EE}}_{d}\f$, column major,
+   * that transforms from the end effector frame \f$EE\f$ to base frame \f$O\f$.
    * Equivalently, it is the desired end effector pose in base frame.
    */
   std::array<double, 16> O_T_EE{};  // NOLINT(readability-identifier-naming)
@@ -187,8 +209,8 @@ class CartesianPose : public Finishable {
    *    - 0 if \f$q_4 == q_{elbow-flip} \f$
    *    - -1 if \f$q_4 < q_{elbow-flip} \f$
    *    .
-   *    with \f$q_{elbow-flip}\f$ as specified in the robot interface specification page in the FCI
-   * Documentation.
+   *    with \f$q_{elbow-flip}\f$ as specified in the robot interface
+   * specification page in the FCI Documentation.
    */
   std::array<double, 2> elbow{};
 
@@ -204,28 +226,33 @@ class CartesianPose : public Finishable {
 /**
  * Stores values for Cartesian velocity motion generation.
  *
- * The Cartesian velocity of the end-effector is expressed in a frame parallel to the fixed/base
- * frame, whose origin is the same as the end-effector frame. Rotations are thus expressed around
- * the end-effector and parallel to the base frame.
+ * The Cartesian velocity of the end-effector is expressed in a frame parallel
+ * to the fixed/base frame, whose origin is the same as the end-effector frame.
+ * Rotations are thus expressed around the end-effector and parallel to the base
+ * frame.
  */
 class CartesianVelocities : public Finishable {
  public:
   /**
    * Creates a new CartesianVelocities instance.
    *
-   * @param[in] cartesian_velocities Desired Cartesian velocity with respect to the @ref o-frame
-   * "base frame O" with \f$(\dot x, \dot y, \dot z)\f$ in \f$[m/s]\f$ and \f$(\omega_x,
+   * @param[in] cartesian_velocities Desired Cartesian velocity with respect to
+   * the @ref o-frame "base frame O" with \f$(\dot x, \dot y, \dot z)\f$ in
+   * \f$[m/s]\f$ and \f$(\omega_x,
    * \omega_y, \omega_z)\f$ in \f$[rad/s]\f$.
    */
-  CartesianVelocities(const std::array<double, 6>& cartesian_velocities) noexcept;
+  CartesianVelocities(
+      const std::array<double, 6>& cartesian_velocities) noexcept;
 
   /**
    * Creates a new CartesianVelocities instance.
    *
-   * @param[in] cartesian_velocities Desired Cartesian velocity with respect to the @ref o-frame
-   * "base frame O" with \f$(\dot x, \dot y, \dot z)\f$ in \f$[m/s]\f$ and \f$(\omega_x,
+   * @param[in] cartesian_velocities Desired Cartesian velocity with respect to
+   * the @ref o-frame "base frame O" with \f$(\dot x, \dot y, \dot z)\f$ in
+   * \f$[m/s]\f$ and \f$(\omega_x,
    * \omega_y, \omega_z)\f$ in \f$[rad/s]\f$.
-   * @param[in] elbow Elbow configuration (see @ref elbow member for more details).
+   * @param[in] elbow Elbow configuration (see @ref elbow member for more
+   * details).
    */
   CartesianVelocities(const std::array<double, 6>& cartesian_velocities,
                       const std::array<double, 2>& elbow) noexcept;
@@ -233,30 +260,37 @@ class CartesianVelocities : public Finishable {
   /**
    * Creates a new CartesianVelocities instance.
    *
-   * @param[in] cartesian_velocities Desired Cartesian velocity with respect to the @ref o-frame
-   * "base frame O" with \f$(\dot x, \dot y, \dot z)\f$ in \f$[m/s]\f$ and \f$(\omega_x,
+   * @param[in] cartesian_velocities Desired Cartesian velocity with respect to
+   * the @ref o-frame "base frame O" with \f$(\dot x, \dot y, \dot z)\f$ in
+   * \f$[m/s]\f$ and \f$(\omega_x,
    * \omega_y, \omega_z)\f$ in \f$[rad/s]\f$.
    *
-   * @throw std::invalid_argument if the given initializer list has an invalid number of arguments.
+   * @throw std::invalid_argument if the given initializer list has an invalid
+   * number of arguments.
    */
   CartesianVelocities(std::initializer_list<double> cartesian_velocities);
 
   /**
    * Creates a new CartesianVelocities instance.
    *
-   * @param[in] cartesian_velocities Desired Cartesian velocity with respect to the @ref o-frame
-   * "base frame O" with \f$(\dot x, \dot y, \dot z)\f$ in \f$[m/s]\f$ and \f$(\omega_x,
+   * @param[in] cartesian_velocities Desired Cartesian velocity with respect to
+   * the @ref o-frame "base frame O" with \f$(\dot x, \dot y, \dot z)\f$ in
+   * \f$[m/s]\f$ and \f$(\omega_x,
    * \omega_y, \omega_z)\f$ in \f$[rad/s]\f$.
-   * @param[in] elbow Elbow configuration (see @ref elbow member for more details).
+   * @param[in] elbow Elbow configuration (see @ref elbow member for more
+   * details).
    *
-   * @throw std::invalid_argument if a given initializer list has an invalid number of arguments.
+   * @throw std::invalid_argument if a given initializer list has an invalid
+   * number of arguments.
    */
   CartesianVelocities(std::initializer_list<double> cartesian_velocities,
                       std::initializer_list<double> elbow);
 
   /**
-   * Cartesian velocity with respect to the @ref o-frame "base frame O" with \f$(\dot x, \dot y,
-   * \dot z)\f$ in \f$[m/s]\f$ and \f$(\omega_x, \omega_y, \omega_z)\f$ in \f$[rad/s]\f$.
+   * Cartesian velocity with respect to the @ref o-frame "base frame O" with
+   * \f$(\dot x, \dot y,
+   * \dot z)\f$ in \f$[m/s]\f$ and \f$(\omega_x, \omega_y, \omega_z)\f$ in
+   * \f$[rad/s]\f$.
    */
   std::array<double, 6> O_dP_EE{};  // NOLINT(readability-identifier-naming)
 
@@ -283,7 +317,8 @@ class CartesianVelocities : public Finishable {
 };
 
 /**
- * Helper method to indicate that a motion should stop after processing the given command.
+ * Helper method to indicate that a motion should stop after processing the
+ * given command.
  *
  * @param[in] command Last command to be executed before the motion terminates.
  *
@@ -291,13 +326,15 @@ class CartesianVelocities : public Finishable {
  *
  * @see @ref callback-docs "Documentation on callbacks"
  */
-inline Torques MotionFinished(Torques command) noexcept {  // NOLINT(readability-identifier-naming)
+inline Torques MotionFinished(
+    Torques command) noexcept {  // NOLINT(readability-identifier-naming)
   command.motion_finished = true;
   return command;
 }
 
 /**
- * Helper method to indicate that a motion should stop after processing the given command.
+ * Helper method to indicate that a motion should stop after processing the
+ * given command.
  *
  * @param[in] command Last command to be executed before the motion terminates.
  *
@@ -312,7 +349,8 @@ inline JointPositions MotionFinished(  // NOLINT(readability-identifier-naming)
 }
 
 /**
- * Helper method to indicate that a motion should stop after processing the given command.
+ * Helper method to indicate that a motion should stop after processing the
+ * given command.
  *
  * @param[in] command Last command to be executed before the motion terminates.
  *
@@ -327,7 +365,8 @@ inline JointVelocities MotionFinished(  // NOLINT(readability-identifier-naming)
 }
 
 /**
- * Helper method to indicate that a motion should stop after processing the given command.
+ * Helper method to indicate that a motion should stop after processing the
+ * given command.
  *
  * @param[in] command Last command to be executed before the motion terminates.
  *
@@ -342,7 +381,8 @@ inline CartesianPose MotionFinished(  // NOLINT(readability-identifier-naming)
 }
 
 /**
- * Helper method to indicate that a motion should stop after processing the given command.
+ * Helper method to indicate that a motion should stop after processing the
+ * given command.
  *
  * @param[in] command Last command to be executed before the motion terminates.
  *
@@ -350,7 +390,8 @@ inline CartesianPose MotionFinished(  // NOLINT(readability-identifier-naming)
  *
  * @see @ref callback-docs "Documentation on callbacks"
  */
-inline CartesianVelocities MotionFinished(  // NOLINT(readability-identifier-naming)
+inline CartesianVelocities
+MotionFinished(  // NOLINT(readability-identifier-naming)
     CartesianVelocities command) noexcept {
   command.motion_finished = true;
   return command;

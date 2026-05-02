@@ -1,31 +1,31 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
+#include <Poco/DateTimeFormatter.h>
+#include <Poco/File.h>
+#include <Poco/Path.h>
+#include <agimus_franka/active_control.h>
+#include <agimus_franka/active_motion_generator.h>
+#include <agimus_franka/exception.h>
+#include <agimus_franka/robot.h>
+
 #include <cmath>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <vector>
 
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/File.h>
-#include <Poco/Path.h>
-
-#include <agimus_franka/active_control.h>
-#include <agimus_franka/active_motion_generator.h>
-#include <agimus_franka/exception.h>
-#include <agimus_franka/robot.h>
-
 #include "examples_common.h"
 
 /**
  * @example motion_with_control_external_control_loop.cpp
- * An example showing how to use a joint velocity motion generator and torque control with an
- * external control loop.
+ * An example showing how to use a joint velocity motion generator and torque
+ * control with an external control loop.
  *
- * Additionally, this example shows how to capture and write logs in case an exception is thrown
- * during a motion.
+ * Additionally, this example shows how to capture and write logs in case an
+ * exception is thrown during a motion.
  *
- * @warning Before executing this example, make sure there is enough space in front of the robot.
+ * @warning Before executing this example, make sure there is enough space in
+ * front of the robot.
  */
 
 namespace {
@@ -33,9 +33,14 @@ namespace {
 class Controller {
  public:
   Controller(size_t dq_filter_size,
-             const std::array<double, 7>& K_P,  // NOLINT(readability-identifier-naming)
-             const std::array<double, 7>& K_D)  // NOLINT(readability-identifier-naming)
-      : dq_current_filter_position_(0), dq_filter_size_(dq_filter_size), K_P_(K_P), K_D_(K_D) {
+             const std::array<double, 7>&
+                 K_P,  // NOLINT(readability-identifier-naming)
+             const std::array<double, 7>&
+                 K_D)  // NOLINT(readability-identifier-naming)
+      : dq_current_filter_position_(0),
+        dq_filter_size_(dq_filter_size),
+        K_P_(K_P),
+        K_D_(K_D) {
     std::fill(dq_d_.begin(), dq_d_.end(), 0);
     dq_buffer_ = std::make_unique<double[]>(dq_filter_size_ * 7);
     std::fill(&dq_buffer_.get()[0], &dq_buffer_.get()[dq_filter_size_ * 7], 0);
@@ -46,7 +51,8 @@ class Controller {
 
     std::array<double, 7> tau_J_d;  // NOLINT(readability-identifier-naming)
     for (size_t i = 0; i < 7; i++) {
-      tau_J_d[i] = K_P_[i] * (state.q_d[i] - state.q[i]) + K_D_[i] * (dq_d_[i] - getDQFiltered(i));
+      tau_J_d[i] = K_P_[i] * (state.q_d[i] - state.q[i]) +
+                   K_D_[i] * (dq_d_[i] - getDQFiltered(i));
     }
     return tau_J_d;
   }
@@ -55,7 +61,8 @@ class Controller {
     for (size_t i = 0; i < 7; i++) {
       dq_buffer_.get()[dq_current_filter_position_ * 7 + i] = state.dq[i];
     }
-    dq_current_filter_position_ = (dq_current_filter_position_ + 1) % dq_filter_size_;
+    dq_current_filter_position_ =
+        (dq_current_filter_position_ + 1) % dq_filter_size_;
   }
 
   double getDQFiltered(size_t index) const {
@@ -81,9 +88,11 @@ std::vector<double> generateTrajectory(double a_max) {
   // Generating a motion with smooth velocity and acceleration.
   // Squared sine is used for the acceleration/deceleration phase.
   std::vector<double> trajectory;
-  constexpr double kTimeStep = 0.001;          // [s]
-  constexpr double kAccelerationTime = 1;      // time spend accelerating and decelerating [s]
-  constexpr double kConstantVelocityTime = 1;  // time spend with constant speed [s]
+  constexpr double kTimeStep = 0.001;  // [s]
+  constexpr double kAccelerationTime =
+      1;  // time spend accelerating and decelerating [s]
+  constexpr double kConstantVelocityTime =
+      1;  // time spend with constant speed [s]
   // obtained during the speed up
   // and slow down [rad/s^2]
   double a = 0;  // [rad/s^2]
@@ -96,7 +105,8 @@ std::vector<double> generateTrajectory(double a_max) {
       a = 0;
     } else {
       const double deceleration_time =
-          (kAccelerationTime + kConstantVelocityTime) - t;  // time spent in the deceleration phase
+          (kAccelerationTime + kConstantVelocityTime) -
+          t;  // time spent in the deceleration phase
       a = -pow(sin(deceleration_time * M_PI / kAccelerationTime), 2) * a_max;
     }
     v += a * kTimeStep;
@@ -122,7 +132,8 @@ int main(int argc, char** argv) {
   const size_t filter_size{5};
 
   // NOLINTNEXTLINE(readability-identifier-naming)
-  const std::array<double, 7> K_P{{200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 200.0}};
+  const std::array<double, 7> K_P{
+      {200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 200.0}};
   // NOLINTNEXTLINE(readability-identifier-naming)
   const std::array<double, 7> K_D{{10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0}};
   const double max_acceleration{1.0};
@@ -134,33 +145,40 @@ int main(int argc, char** argv) {
     setDefaultBehavior(robot);
 
     // First move the robot to a suitable joint configuration
-    std::array<double, 7> q_goal = {{0, -M_PI_4, 0, -3 * M_PI_4, 0, M_PI_2, M_PI_4}};
+    std::array<double, 7> q_goal = {
+        {0, -M_PI_4, 0, -3 * M_PI_4, 0, M_PI_2, M_PI_4}};
     MotionGenerator motion_generator(0.5, q_goal);
     std::cout << "WARNING: This example will move the robot! "
-              << "Please make sure to have the user stop button at hand!" << std::endl
+              << "Please make sure to have the user stop button at hand!"
+              << std::endl
               << "Press Enter to continue..." << std::endl;
     std::cin.ignore();
     robot.control(motion_generator);
     std::cout << "Finished moving to initial joint configuration." << std::endl;
 
-    // Set additional parameters always before the control loop, NEVER in the control loop!
-    // Set collision behavior.
-    robot.setCollisionBehavior(
-        {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}}, {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}},
-        {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}}, {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}},
-        {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}}, {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}},
-        {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}}, {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}});
+    // Set additional parameters always before the control loop, NEVER in the
+    // control loop! Set collision behavior.
+    robot.setCollisionBehavior({{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}},
+                               {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}},
+                               {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}},
+                               {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}},
+                               {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}},
+                               {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}},
+                               {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}},
+                               {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}});
 
     size_t index = 0;
     std::vector<double> trajectory = generateTrajectory(max_acceleration);
 
-    auto callback_control = [&](const agimus_franka::RobotState& robot_state,
-                                agimus_franka::Duration) -> agimus_franka::Torques {
+    auto callback_control =
+        [&](const agimus_franka::RobotState& robot_state,
+            agimus_franka::Duration) -> agimus_franka::Torques {
       return controller.step(robot_state);
     };
 
-    auto callback_motion_generator = [&](const agimus_franka::RobotState&,
-                                         agimus_franka::Duration period) -> agimus_franka::JointVelocities {
+    auto callback_motion_generator =
+        [&](const agimus_franka::RobotState&,
+            agimus_franka::Duration period) -> agimus_franka::JointVelocities {
       index += period.toMSec();
 
       if (index >= trajectory.size()) {
@@ -178,12 +196,14 @@ int main(int argc, char** argv) {
 
     bool motion_finished = false;
     auto active_control = robot.startJointVelocityControl(
-        agimus_research_interface::robot::Move::ControllerMode::kExternalController);
+        agimus_research_interface::robot::Move::ControllerMode::
+            kExternalController);
     while (!motion_finished) {
       auto read_once_return = active_control->readOnce();
       auto robot_state = read_once_return.first;
       auto duration = read_once_return.second;
-      auto cartesian_velocities = callback_motion_generator(robot_state, duration);
+      auto cartesian_velocities =
+          callback_motion_generator(robot_state, duration);
       auto torques = callback_control(robot_state, duration);
       motion_finished = cartesian_velocities.motion_finished;
       active_control->writeOnce(cartesian_velocities, torques);
@@ -212,8 +232,8 @@ void writeLogToFile(const std::vector<agimus_franka::Record>& log) {
     Poco::File temp_dir(temp_dir_path);
     temp_dir.createDirectories();
 
-    std::string now_string =
-        Poco::DateTimeFormatter::format(Poco::Timestamp{}, "%Y-%m-%d-%h-%m-%S-%i");
+    std::string now_string = Poco::DateTimeFormatter::format(
+        Poco::Timestamp{}, "%Y-%m-%d-%h-%m-%S-%i");
     std::string filename = std::string{"log-" + now_string + ".csv"};
     Poco::File log_file(Poco::Path(temp_dir_path, filename));
     if (!log_file.createFile()) {

@@ -9,7 +9,9 @@ Logger::Logger(size_t log_size) : log_size_(log_size) {
   commands_.resize(log_size);
 }
 
-void Logger::log(const RobotState& state, const agimus_research_interface::robot::RobotCommand& command) {
+void Logger::log(
+    const RobotState& state,
+    const agimus_research_interface::robot::RobotCommand& command) {
   if (log_size_ == 0) {
     return;
   }
@@ -31,7 +33,8 @@ std::vector<Record> Logger::flush() {
     command.joint_positions = commands_[wrapped_index].motion.q_c;
     command.joint_velocities = commands_[wrapped_index].motion.dq_c;
     command.cartesian_pose.O_T_EE = commands_[wrapped_index].motion.O_T_EE_c;
-    command.cartesian_velocities.O_dP_EE = commands_[wrapped_index].motion.O_dP_EE_c;
+    command.cartesian_velocities.O_dP_EE =
+        commands_[wrapped_index].motion.O_dP_EE_c;
     command.torques.tau_J = commands_[wrapped_index].control.tau_J_d;
 
     Record record;

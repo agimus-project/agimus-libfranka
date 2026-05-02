@@ -1,14 +1,14 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <chrono>
-#include <iostream>
-#include <thread>
-
 #include <agimus_franka/active_control.h>
 #include <agimus_franka/active_torque_control.h>
 #include <agimus_franka/duration.h>
 #include <agimus_franka/exception.h>
 #include <agimus_franka/robot.h>
+
+#include <chrono>
+#include <iostream>
+#include <thread>
 
 #include "examples_common.h"
 
@@ -16,7 +16,8 @@
  * @example communication_test.cpp
  * An example indicating the network performance.
  *
- * @warning Before executing this example, make sure there is enough space in front of the robot.
+ * @warning Before executing this example, make sure there is enough space in
+ * front of the robot.
  */
 
 int main(int argc, char** argv) {
@@ -38,21 +39,27 @@ int main(int argc, char** argv) {
     setDefaultBehavior(robot);
 
     // First move the robot to a suitable joint configuration
-    std::array<double, 7> q_goal = {{0, -M_PI_4, 0, -3 * M_PI_4, 0, M_PI_2, M_PI_4}};
+    std::array<double, 7> q_goal = {
+        {0, -M_PI_4, 0, -3 * M_PI_4, 0, M_PI_2, M_PI_4}};
     MotionGenerator motion_generator(0.5, q_goal);
     std::cout << "WARNING: This example will move the robot! "
-              << "Please make sure to have the user stop button at hand!" << std::endl
+              << "Please make sure to have the user stop button at hand!"
+              << std::endl
               << "Press Enter to continue..." << std::endl;
     std::cin.ignore();
     robot.control(motion_generator);
-    std::cout << "Finished moving to initial joint configuration." << std::endl << std::endl;
+    std::cout << "Finished moving to initial joint configuration." << std::endl
+              << std::endl;
     std::cout << "Starting communication test." << std::endl;
 
-    robot.setCollisionBehavior(
-        {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}}, {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}},
-        {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}}, {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}},
-        {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}}, {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}},
-        {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}}, {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}});
+    robot.setCollisionBehavior({{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}},
+                               {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}},
+                               {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}},
+                               {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}},
+                               {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}},
+                               {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}},
+                               {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}},
+                               {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}});
 
     agimus_franka::Torques zero_torques{{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
     auto rw_interface = robot.startTorqueControl();
@@ -71,9 +78,8 @@ int main(int argc, char** argv) {
       counter++;
 
       if (counter % 100 == 0) {
-        std::cout << "#" << counter
-                  << " Current success rate: " << robot_state.control_command_success_rate
-                  << std::endl;
+        std::cout << "#" << counter << " Current success rate: "
+                  << robot_state.control_command_success_rate << std::endl;
       }
       std::this_thread::sleep_for(std::chrono::microseconds(100));
 
@@ -86,10 +92,12 @@ int main(int argc, char** argv) {
       }
 
       if (time >= 10000) {
-        std::cout << std::endl << "Finished test, shutting down example" << std::endl;
+        std::cout << std::endl
+                  << "Finished test, shutting down example" << std::endl;
         zero_torques.motion_finished = true;
       }
-      // Sending zero torques - if EE is configured correctly, robot should not move
+      // Sending zero torques - if EE is configured correctly, robot should not
+      // move
       rw_interface->writeOnce(zero_torques);
     }
   } catch (const agimus_franka::Exception& e) {
@@ -101,31 +109,38 @@ int main(int argc, char** argv) {
 
   std::cout << std::endl
             << std::endl
-            << "#######################################################" << std::endl;
+            << "#######################################################"
+            << std::endl;
   uint64_t lost_robot_states = time - counter;
   if (lost_robot_states > 0) {
-    std::cout << "The control loop did not get executed " << lost_robot_states << " times in the"
-              << std::endl
-              << "last " << time << " milliseconds! (lost " << lost_robot_states << " robot states)"
-              << std::endl
+    std::cout << "The control loop did not get executed " << lost_robot_states
+              << " times in the" << std::endl
+              << "last " << time << " milliseconds! (lost " << lost_robot_states
+              << " robot states)" << std::endl
               << std::endl;
   }
 
-  std::cout << "Control command success rate of " << counter << " samples: " << std::endl;
+  std::cout << "Control command success rate of " << counter
+            << " samples: " << std::endl;
   std::cout << "Max: " << max_success_rate << std::endl;
   std::cout << "Avg: " << avg_success_rate << std::endl;
   std::cout << "Min: " << min_success_rate << std::endl;
 
   if (avg_success_rate < 0.90) {
     std::cout << std::endl
-              << "WARNING: THIS SETUP IS PROBABLY NOT SUFFICIENT FOR FCI!" << std::endl;
+              << "WARNING: THIS SETUP IS PROBABLY NOT SUFFICIENT FOR FCI!"
+              << std::endl;
     std::cout << "PLEASE TRY OUT A DIFFERENT PC / NIC" << std::endl;
   } else if (avg_success_rate < 0.95) {
     std::cout << std::endl << "WARNING: MANY PACKETS GOT LOST!" << std::endl;
-    std::cout << "PLEASE INSPECT YOUR SETUP AND FOLLOW ADVICE ON" << std::endl
-              << "https://agimus_frankaemika.github.io/docs/troubleshooting.html" << std::endl;
+    std::cout
+        << "PLEASE INSPECT YOUR SETUP AND FOLLOW ADVICE ON" << std::endl
+        << "https://agimus_frankaemika.github.io/docs/troubleshooting.html"
+        << std::endl;
   }
-  std::cout << "#######################################################" << std::endl << std::endl;
+  std::cout << "#######################################################"
+            << std::endl
+            << std::endl;
 
   return 0;
 }

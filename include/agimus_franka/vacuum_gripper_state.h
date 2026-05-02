@@ -2,11 +2,11 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
+#include <agimus_franka/duration.h>
+
 #include <cstdint>
 #include <ostream>
 #include <string>
-
-#include <agimus_franka/duration.h>
 
 /**
  * @file vacuum_gripper_state.h
@@ -26,7 +26,8 @@ enum class VacuumGripperDeviceStatus : uint8_t {
 };
 
 /**
- * Describes the vacuum gripper state. For more information check the cobot-pump manual.
+ * Describes the vacuum gripper state. For more information check the cobot-pump
+ * manual.
  */
 struct VacuumGripperState {
   /**
@@ -40,7 +41,8 @@ struct VacuumGripperState {
   bool part_detached{};
 
   /**
-   * Vacuum is over H2 and not yet under H2-h2. For more information check the cobot-pump manual.
+   * Vacuum is over H2 and not yet under H2-h2. For more information check the
+   * cobot-pump manual.
    */
   bool part_present{};
 
@@ -74,7 +76,8 @@ struct VacuumGripperState {
  *
  * @return Ostream instance
  */
-std::ostream& operator<<(std::ostream& ostream,
-                         const agimus_franka::VacuumGripperState& vacuum_gripper_state);
+std::ostream& operator<<(
+    std::ostream& ostream,
+    const agimus_franka::VacuumGripperState& vacuum_gripper_state);
 
 }  // namespace agimus_franka

@@ -17,16 +17,18 @@ namespace agimus_franka {
 void assertOwningLock(const std::unique_lock<std::mutex>& lock) {
   if (!lock.owns_lock()) {
     throw InvalidOperationException(
-        "libagimus_franka robot: Cannot perform this operation while another control or read operation "
+        "libagimus_franka robot: Cannot perform this operation while another "
+        "control or read operation "
         "is running.");
   }
 }
 
-Robot::Robot(const std::string& agimus_franka_address, RealtimeConfig realtime_config, size_t log_size)
-    : impl_{new Robot::Impl(
-          std::make_unique<Network>(agimus_franka_address, agimus_research_interface::robot::kCommandPort),
-          log_size,
-          realtime_config)} {}
+Robot::Robot(const std::string& agimus_franka_address,
+             RealtimeConfig realtime_config, size_t log_size)
+    : impl_{new Robot::Impl(std::make_unique<Network>(
+                                agimus_franka_address,
+                                agimus_research_interface::robot::kCommandPort),
+                            log_size, realtime_config)} {}
 
 // Has to be declared here, as the Impl type is incomplete in the header.
 Robot::~Robot() noexcept = default;
@@ -39,7 +41,8 @@ Robot::Robot(Robot&& other) noexcept {
 Robot& Robot::operator=(Robot&& other) noexcept {
   if (&other != this) {
     std::unique_lock<std::mutex> this_lock(control_mutex_, std::defer_lock);
-    std::unique_lock<std::mutex> other_lock(other.control_mutex_, std::defer_lock);
+    std::unique_lock<std::mutex> other_lock(other.control_mutex_,
+                                            std::defer_lock);
     std::lock(this_lock, other_lock);
     impl_ = std::move(other.impl_);
   }
@@ -50,125 +53,133 @@ Robot::ServerVersion Robot::serverVersion() const noexcept {
   return impl_->serverVersion();
 }
 
-void Robot::control(std::function<Torques(const RobotState&, agimus_franka::Duration)> control_callback,
-                    bool limit_rate,
-                    double cutoff_frequency) {
+void Robot::control(
+    std::function<Torques(const RobotState&, agimus_franka::Duration)>
+        control_callback,
+    bool limit_rate, double cutoff_frequency) {
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
-  ControlLoop<JointVelocities> loop(*impl_, std::move(control_callback),
-                                    [](const RobotState&, Duration) -> JointVelocities {
-                                      return {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
-                                    },
-                                    limit_rate, cutoff_frequency);
+  ControlLoop<JointVelocities> loop(
+      *impl_, std::move(control_callback),
+      [](const RobotState&, Duration) -> JointVelocities {
+        return {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
+      },
+      limit_rate, cutoff_frequency);
   loop();
 }
 
 void Robot::control(
-    std::function<Torques(const RobotState&, agimus_franka::Duration)> control_callback,
-    std::function<JointPositions(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
-    bool limit_rate,
-    double cutoff_frequency) {
+    std::function<Torques(const RobotState&, agimus_franka::Duration)>
+        control_callback,
+    std::function<JointPositions(const RobotState&, agimus_franka::Duration)>
+        motion_generator_callback,
+    bool limit_rate, double cutoff_frequency) {
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
   ControlLoop<JointPositions> loop(*impl_, std::move(control_callback),
-                                   std::move(motion_generator_callback), limit_rate,
-                                   cutoff_frequency);
-  loop();
-}
-
-void Robot::control(
-    std::function<Torques(const RobotState&, agimus_franka::Duration)> control_callback,
-    std::function<JointVelocities(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
-    bool limit_rate,
-    double cutoff_frequency) {
-  std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
-  assertOwningLock(control_lock);
-
-  ControlLoop<JointVelocities> loop(*impl_, std::move(control_callback),
-                                    std::move(motion_generator_callback), limit_rate,
-                                    cutoff_frequency);
-  loop();
-}
-
-void Robot::control(
-    std::function<Torques(const RobotState&, agimus_franka::Duration)> control_callback,
-    std::function<CartesianPose(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
-    bool limit_rate,
-    double cutoff_frequency) {
-  std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
-  assertOwningLock(control_lock);
-
-  ControlLoop<CartesianPose> loop(*impl_, std::move(control_callback),
-                                  std::move(motion_generator_callback), limit_rate,
-                                  cutoff_frequency);
-  loop();
-}
-
-void Robot::control(std::function<Torques(const RobotState&, agimus_franka::Duration)> control_callback,
-                    std::function<CartesianVelocities(const RobotState&, agimus_franka::Duration)>
-                        motion_generator_callback,
-                    bool limit_rate,
-                    double cutoff_frequency) {
-  std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
-  assertOwningLock(control_lock);
-
-  ControlLoop<CartesianVelocities> loop(*impl_, std::move(control_callback),
-                                        std::move(motion_generator_callback), limit_rate,
-                                        cutoff_frequency);
-  loop();
-}
-
-void Robot::control(
-    std::function<JointPositions(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
-    ControllerMode controller_mode,
-    bool limit_rate,
-    double cutoff_frequency) {
-  std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
-  assertOwningLock(control_lock);
-
-  ControlLoop<JointPositions> loop(*impl_, controller_mode, std::move(motion_generator_callback),
+                                   std::move(motion_generator_callback),
                                    limit_rate, cutoff_frequency);
   loop();
 }
 
 void Robot::control(
-    std::function<JointVelocities(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
-    ControllerMode controller_mode,
-    bool limit_rate,
-    double cutoff_frequency) {
+    std::function<Torques(const RobotState&, agimus_franka::Duration)>
+        control_callback,
+    std::function<JointVelocities(const RobotState&, agimus_franka::Duration)>
+        motion_generator_callback,
+    bool limit_rate, double cutoff_frequency) {
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
-  ControlLoop<JointVelocities> loop(*impl_, controller_mode, std::move(motion_generator_callback),
+  ControlLoop<JointVelocities> loop(*impl_, std::move(control_callback),
+                                    std::move(motion_generator_callback),
                                     limit_rate, cutoff_frequency);
   loop();
 }
 
 void Robot::control(
-    std::function<CartesianPose(const RobotState&, agimus_franka::Duration)> motion_generator_callback,
-    ControllerMode controller_mode,
-    bool limit_rate,
-    double cutoff_frequency) {
+    std::function<Torques(const RobotState&, agimus_franka::Duration)>
+        control_callback,
+    std::function<CartesianPose(const RobotState&, agimus_franka::Duration)>
+        motion_generator_callback,
+    bool limit_rate, double cutoff_frequency) {
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
-  ControlLoop<CartesianPose> loop(*impl_, controller_mode, std::move(motion_generator_callback),
+  ControlLoop<CartesianPose> loop(*impl_, std::move(control_callback),
+                                  std::move(motion_generator_callback),
                                   limit_rate, cutoff_frequency);
   loop();
 }
 
-void Robot::control(std::function<CartesianVelocities(const RobotState&, agimus_franka::Duration)>
+void Robot::control(
+    std::function<Torques(const RobotState&, agimus_franka::Duration)>
+        control_callback,
+    std::function<CartesianVelocities(const RobotState&,
+                                      agimus_franka::Duration)>
+        motion_generator_callback,
+    bool limit_rate, double cutoff_frequency) {
+  std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
+  assertOwningLock(control_lock);
+
+  ControlLoop<CartesianVelocities> loop(*impl_, std::move(control_callback),
+                                        std::move(motion_generator_callback),
+                                        limit_rate, cutoff_frequency);
+  loop();
+}
+
+void Robot::control(
+    std::function<JointPositions(const RobotState&, agimus_franka::Duration)>
+        motion_generator_callback,
+    ControllerMode controller_mode, bool limit_rate, double cutoff_frequency) {
+  std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
+  assertOwningLock(control_lock);
+
+  ControlLoop<JointPositions> loop(*impl_, controller_mode,
+                                   std::move(motion_generator_callback),
+                                   limit_rate, cutoff_frequency);
+  loop();
+}
+
+void Robot::control(
+    std::function<JointVelocities(const RobotState&, agimus_franka::Duration)>
+        motion_generator_callback,
+    ControllerMode controller_mode, bool limit_rate, double cutoff_frequency) {
+  std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
+  assertOwningLock(control_lock);
+
+  ControlLoop<JointVelocities> loop(*impl_, controller_mode,
+                                    std::move(motion_generator_callback),
+                                    limit_rate, cutoff_frequency);
+  loop();
+}
+
+void Robot::control(
+    std::function<CartesianPose(const RobotState&, agimus_franka::Duration)>
+        motion_generator_callback,
+    ControllerMode controller_mode, bool limit_rate, double cutoff_frequency) {
+  std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
+  assertOwningLock(control_lock);
+
+  ControlLoop<CartesianPose> loop(*impl_, controller_mode,
+                                  std::move(motion_generator_callback),
+                                  limit_rate, cutoff_frequency);
+  loop();
+}
+
+void Robot::control(std::function<CartesianVelocities(const RobotState&,
+                                                      agimus_franka::Duration)>
                         motion_generator_callback,
-                    ControllerMode controller_mode,
-                    bool limit_rate,
+                    ControllerMode controller_mode, bool limit_rate,
                     double cutoff_frequency) {
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
-  ControlLoop<CartesianVelocities> loop(
-      *impl_, controller_mode, std::move(motion_generator_callback), limit_rate, cutoff_frequency);
+  ControlLoop<CartesianVelocities> loop(*impl_, controller_mode,
+                                        std::move(motion_generator_callback),
+                                        limit_rate, cutoff_frequency);
   loop();
 }
 
@@ -192,25 +203,28 @@ RobotState Robot::readOnce() {
   return impl_->readOnce();
 }
 
-void Robot::setCollisionBehavior(const std::array<double, 7>& lower_torque_thresholds_acceleration,
-                                 const std::array<double, 7>& upper_torque_thresholds_acceleration,
-                                 const std::array<double, 7>& lower_torque_thresholds_nominal,
-                                 const std::array<double, 7>& upper_torque_thresholds_nominal,
-                                 const std::array<double, 6>& lower_force_thresholds_acceleration,
-                                 const std::array<double, 6>& upper_force_thresholds_acceleration,
-                                 const std::array<double, 6>& lower_force_thresholds_nominal,
-                                 const std::array<double, 6>& upper_force_thresholds_nominal) {
+void Robot::setCollisionBehavior(
+    const std::array<double, 7>& lower_torque_thresholds_acceleration,
+    const std::array<double, 7>& upper_torque_thresholds_acceleration,
+    const std::array<double, 7>& lower_torque_thresholds_nominal,
+    const std::array<double, 7>& upper_torque_thresholds_nominal,
+    const std::array<double, 6>& lower_force_thresholds_acceleration,
+    const std::array<double, 6>& upper_force_thresholds_acceleration,
+    const std::array<double, 6>& lower_force_thresholds_nominal,
+    const std::array<double, 6>& upper_force_thresholds_nominal) {
   impl_->executeCommand<agimus_research_interface::robot::SetCollisionBehavior>(
-      lower_torque_thresholds_acceleration, upper_torque_thresholds_acceleration,
-      lower_torque_thresholds_nominal, upper_torque_thresholds_nominal,
-      lower_force_thresholds_acceleration, upper_force_thresholds_acceleration,
-      lower_force_thresholds_nominal, upper_force_thresholds_nominal);
+      lower_torque_thresholds_acceleration,
+      upper_torque_thresholds_acceleration, lower_torque_thresholds_nominal,
+      upper_torque_thresholds_nominal, lower_force_thresholds_acceleration,
+      upper_force_thresholds_acceleration, lower_force_thresholds_nominal,
+      upper_force_thresholds_nominal);
 }
 
-void Robot::setCollisionBehavior(const std::array<double, 7>& lower_torque_thresholds,
-                                 const std::array<double, 7>& upper_torque_thresholds,
-                                 const std::array<double, 6>& lower_force_thresholds,
-                                 const std::array<double, 6>& upper_force_thresholds) {
+void Robot::setCollisionBehavior(
+    const std::array<double, 7>& lower_torque_thresholds,
+    const std::array<double, 7>& upper_torque_thresholds,
+    const std::array<double, 6>& lower_force_thresholds,
+    const std::array<double, 6>& upper_force_thresholds) {
   impl_->executeCommand<agimus_research_interface::robot::SetCollisionBehavior>(
       lower_torque_thresholds, upper_torque_thresholds, lower_torque_thresholds,
       upper_torque_thresholds, lower_force_thresholds, upper_force_thresholds,
@@ -218,86 +232,107 @@ void Robot::setCollisionBehavior(const std::array<double, 7>& lower_torque_thres
 }
 
 void Robot::setJointImpedance(
-    const std::array<double, 7>& K_theta) {  // NOLINT(readability-identifier-naming)
-  impl_->executeCommand<agimus_research_interface::robot::SetJointImpedance>(K_theta);
+    const std::array<double, 7>&
+        K_theta) {  // NOLINT(readability-identifier-naming)
+  impl_->executeCommand<agimus_research_interface::robot::SetJointImpedance>(
+      K_theta);
 }
 
 void Robot::setCartesianImpedance(
-    const std::array<double, 6>& K_x) {  // NOLINT(readability-identifier-naming)
-  impl_->executeCommand<agimus_research_interface::robot::SetCartesianImpedance>(K_x);
+    const std::array<double, 6>&
+        K_x) {  // NOLINT(readability-identifier-naming)
+  impl_
+      ->executeCommand<agimus_research_interface::robot::SetCartesianImpedance>(
+          K_x);
 }
 
-void Robot::setGuidingMode(const std::array<bool, 6>& guiding_mode, bool elbow) {
-  impl_->executeCommand<agimus_research_interface::robot::SetGuidingMode>(guiding_mode, elbow);
+void Robot::setGuidingMode(const std::array<bool, 6>& guiding_mode,
+                           bool elbow) {
+  impl_->executeCommand<agimus_research_interface::robot::SetGuidingMode>(
+      guiding_mode, elbow);
 }
 
-void Robot::setK(const std::array<double, 16>& EE_T_K) {  // NOLINT(readability-identifier-naming)
+void Robot::setK(const std::array<double, 16>&
+                     EE_T_K) {  // NOLINT(readability-identifier-naming)
   impl_->executeCommand<agimus_research_interface::robot::SetEEToK>(EE_T_K);
 }
 
-void Robot::setEE(const std::array<double, 16>& NE_T_EE) {  // NOLINT(readability-identifier-naming)
+void Robot::setEE(const std::array<double, 16>&
+                      NE_T_EE) {  // NOLINT(readability-identifier-naming)
   impl_->executeCommand<agimus_research_interface::robot::SetNEToEE>(NE_T_EE);
 }
 
-void Robot::setLoad(
-    double load_mass,
-    const std::array<double, 3>& F_x_Cload,  // NOLINT(readability-identifier-naming)
-    const std::array<double, 9>& load_inertia) {
-  impl_->executeCommand<agimus_research_interface::robot::SetLoad>(load_mass, F_x_Cload, load_inertia);
+void Robot::setLoad(double load_mass,
+                    const std::array<double, 3>&
+                        F_x_Cload,  // NOLINT(readability-identifier-naming)
+                    const std::array<double, 9>& load_inertia) {
+  impl_->executeCommand<agimus_research_interface::robot::SetLoad>(
+      load_mass, F_x_Cload, load_inertia);
 }
 
 void Robot::automaticErrorRecovery() {
-  impl_->executeCommand<agimus_research_interface::robot::AutomaticErrorRecovery>();
+  impl_->executeCommand<
+      agimus_research_interface::robot::AutomaticErrorRecovery>();
 }
 
 template <typename MotionGeneratorType>
 std::unique_ptr<ActiveControlBase> Robot::startControl(
-    const agimus_research_interface::robot::Move::ControllerMode& controller_type) {
+    const agimus_research_interface::robot::Move::ControllerMode&
+        controller_type) {
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
-  agimus_research_interface::robot::Move::MotionGeneratorMode motion_generator_mode =
-      MotionGeneratorTraits<MotionGeneratorType>::kMotionGeneratorMode;
+  agimus_research_interface::robot::Move::MotionGeneratorMode
+      motion_generator_mode =
+          MotionGeneratorTraits<MotionGeneratorType>::kMotionGeneratorMode;
 
-  uint32_t motion_id = impl_->startMotion(controller_type, motion_generator_mode,
-                                          ControlLoop<MotionGeneratorType>::kDefaultDeviation,
-                                          ControlLoop<MotionGeneratorType>::kDefaultDeviation);
-  return std::unique_ptr<ActiveControlBase>(new ActiveMotionGenerator<MotionGeneratorType>(
-      impl_, motion_id, std::move(control_lock), controller_type));
+  uint32_t motion_id =
+      impl_->startMotion(controller_type, motion_generator_mode,
+                         ControlLoop<MotionGeneratorType>::kDefaultDeviation,
+                         ControlLoop<MotionGeneratorType>::kDefaultDeviation);
+  return std::unique_ptr<ActiveControlBase>(
+      new ActiveMotionGenerator<MotionGeneratorType>(
+          impl_, motion_id, std::move(control_lock), controller_type));
 }
 
 std::unique_ptr<ActiveControlBase> Robot::startTorqueControl() {
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
-  // hint: there is no startMotion implementation for Torques, so JointVelocities is used instead
-  uint32_t motion_id =
-      impl_->startMotion(agimus_research_interface::robot::Move::ControllerMode::kExternalController,
-                         MotionGeneratorTraits<JointVelocities>::kMotionGeneratorMode,
-                         ControlLoop<JointVelocities>::kDefaultDeviation,
-                         ControlLoop<JointVelocities>::kDefaultDeviation);
+  // hint: there is no startMotion implementation for Torques, so
+  // JointVelocities is used instead
+  uint32_t motion_id = impl_->startMotion(
+      agimus_research_interface::robot::Move::ControllerMode::
+          kExternalController,
+      MotionGeneratorTraits<JointVelocities>::kMotionGeneratorMode,
+      ControlLoop<JointVelocities>::kDefaultDeviation,
+      ControlLoop<JointVelocities>::kDefaultDeviation);
 
   return std::unique_ptr<ActiveControlBase>(
       new ActiveTorqueControl(impl_, motion_id, std::move(control_lock)));
 }
 
 std::unique_ptr<ActiveControlBase> Robot::startJointPositionControl(
-    const agimus_research_interface::robot::Move::ControllerMode& control_type) {
+    const agimus_research_interface::robot::Move::ControllerMode&
+        control_type) {
   return startControl<JointPositions>(control_type);
 }
 
 std::unique_ptr<ActiveControlBase> Robot::startJointVelocityControl(
-    const agimus_research_interface::robot::Move::ControllerMode& control_type) {
+    const agimus_research_interface::robot::Move::ControllerMode&
+        control_type) {
   return startControl<JointVelocities>(control_type);
 }
 
 std::unique_ptr<ActiveControlBase> Robot::startCartesianPoseControl(
-    const agimus_research_interface::robot::Move::ControllerMode& control_type) {
+    const agimus_research_interface::robot::Move::ControllerMode&
+        control_type) {
   return startControl<CartesianPose>(control_type);
 }
 
 std::unique_ptr<ActiveControlBase> Robot::startCartesianVelocityControl(
-    const agimus_research_interface::robot::Move::ControllerMode& control_type) {
+    const agimus_research_interface::robot::Move::ControllerMode&
+        control_type) {
   return startControl<CartesianVelocities>(control_type);
 }
 
@@ -305,19 +340,24 @@ void Robot::stop() {
   impl_->executeCommand<agimus_research_interface::robot::StopMove>();
 }
 
-Model Robot::loadModel() {
-  return impl_->loadModel();
-}
+Model Robot::loadModel() { return impl_->loadModel(); }
 
-Robot::Robot(std::shared_ptr<Impl> robot_impl) : impl_(std::move(robot_impl)){};
+Robot::Robot(std::shared_ptr<Impl> robot_impl)
+    : impl_(std::move(robot_impl)) {};
 
-template std::unique_ptr<ActiveControlBase> Robot::startControl<JointVelocities>(
-    const agimus_research_interface::robot::Move::ControllerMode& controller_type);
+template std::unique_ptr<ActiveControlBase>
+Robot::startControl<JointVelocities>(
+    const agimus_research_interface::robot::Move::ControllerMode&
+        controller_type);
 template std::unique_ptr<ActiveControlBase> Robot::startControl<JointPositions>(
-    const agimus_research_interface::robot::Move::ControllerMode& controller_type);
+    const agimus_research_interface::robot::Move::ControllerMode&
+        controller_type);
 template std::unique_ptr<ActiveControlBase> Robot::startControl<CartesianPose>(
-    const agimus_research_interface::robot::Move::ControllerMode& controller_type);
-template std::unique_ptr<ActiveControlBase> Robot::startControl<CartesianVelocities>(
-    const agimus_research_interface::robot::Move::ControllerMode& controller_type);
+    const agimus_research_interface::robot::Move::ControllerMode&
+        controller_type);
+template std::unique_ptr<ActiveControlBase>
+Robot::startControl<CartesianVelocities>(
+    const agimus_research_interface::robot::Move::ControllerMode&
+        controller_type);
 
 }  // namespace agimus_franka

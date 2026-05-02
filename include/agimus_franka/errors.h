@@ -89,13 +89,13 @@ struct Errors {
    */
   const bool& force_control_safety_violation;
   /**
-   * True if a collision was detected, i.e.\ the robot exceeded a torque threshold in a joint
-   * motion.
+   * True if a collision was detected, i.e.\ the robot exceeded a torque
+   * threshold in a joint motion.
    */
   const bool& joint_reflex;
   /**
-   * True if a collision was detected, i.e.\ the robot exceeded a torque threshold in a Cartesian
-   * motion.
+   * True if a collision was detected, i.e.\ the robot exceeded a torque
+   * threshold in a Cartesian motion.
    */
   const bool& cartesian_reflex;
   /**
@@ -111,8 +111,8 @@ struct Errors {
    */
   const bool& cartesian_velocity_profile_safety_violation;
   /**
-   * True if an external joint position motion generator was started with a pose too far from the
-   * current pose.
+   * True if an external joint position motion generator was started with a pose
+   * too far from the current pose.
    */
   const bool& joint_position_motion_generator_start_pose_invalid;
   /**
@@ -124,44 +124,48 @@ struct Errors {
    */
   const bool& joint_motion_generator_velocity_limits_violation;
   /**
-   * True if commanded velocity in joint motion generators is discontinuous (target values are too
-   * far apart).
+   * True if commanded velocity in joint motion generators is discontinuous
+   * (target values are too far apart).
    */
   const bool& joint_motion_generator_velocity_discontinuity;
   /**
-   * True if commanded acceleration in joint motion generators is discontinuous (target values are
-   * too far apart).
+   * True if commanded acceleration in joint motion generators is discontinuous
+   * (target values are too far apart).
    */
   const bool& joint_motion_generator_acceleration_discontinuity;
   /**
-   * True if an external Cartesian position motion generator was started with a pose too far from
-   * the current pose.
+   * True if an external Cartesian position motion generator was started with a
+   * pose too far from the current pose.
    */
   const bool& cartesian_position_motion_generator_start_pose_invalid;
   /**
-   * True if an external Cartesian motion generator would move into an elbow limit.
+   * True if an external Cartesian motion generator would move into an elbow
+   * limit.
    */
   const bool& cartesian_motion_generator_elbow_limit_violation;
   /**
-   * True if an external Cartesian motion generator would move with too high velocity.
+   * True if an external Cartesian motion generator would move with too high
+   * velocity.
    */
   const bool& cartesian_motion_generator_velocity_limits_violation;
   /**
-   * True if commanded velocity in Cartesian motion generators is discontinuous (target values are
-   * too far apart).
+   * True if commanded velocity in Cartesian motion generators is discontinuous
+   * (target values are too far apart).
    */
   const bool& cartesian_motion_generator_velocity_discontinuity;
   /**
-   * True if commanded acceleration in Cartesian motion generators is discontinuous (target values
-   * are too far apart).
+   * True if commanded acceleration in Cartesian motion generators is
+   * discontinuous (target values are too far apart).
    */
   const bool& cartesian_motion_generator_acceleration_discontinuity;
   /**
-   * True if commanded elbow values in Cartesian motion generators are inconsistent.
+   * True if commanded elbow values in Cartesian motion generators are
+   * inconsistent.
    */
   const bool& cartesian_motion_generator_elbow_sign_inconsistent;
   /**
-   * True if the first elbow value in Cartesian motion generators is too far from initial one.
+   * True if the first elbow value in Cartesian motion generators is too far
+   * from initial one.
    */
   const bool& cartesian_motion_generator_start_elbow_invalid;
   /**
@@ -173,13 +177,13 @@ struct Errors {
    */
   const bool& cartesian_motion_generator_joint_velocity_limits_violation;
   /**
-   * True if the joint velocity in Cartesian motion generators is discontinuous after IK
-   * calculation.
+   * True if the joint velocity in Cartesian motion generators is discontinuous
+   * after IK calculation.
    */
   const bool& cartesian_motion_generator_joint_velocity_discontinuity;
   /**
-   * True if the joint acceleration in Cartesian motion generators is discontinuous after IK
-   * calculation.
+   * True if the joint acceleration in Cartesian motion generators is
+   * discontinuous after IK calculation.
    */
   const bool& cartesian_motion_generator_joint_acceleration_discontinuity;
   /**
@@ -201,7 +205,8 @@ struct Errors {
    */
   const bool& start_elbow_sign_inconsistent;
   /**
-   * True if minimum network communication quality could not be held during a motion.
+   * True if minimum network communication quality could not be held during a
+   * motion.
    */
   const bool& communication_constraints_violation;
   /**
@@ -223,8 +228,8 @@ struct Errors {
    */
   const bool& instability_detected;
   /**
-   * True if the robot is in joint position limits violation error and the user guides the robot
-   * further towards the limit.
+   * True if the robot is in joint position limits violation error and the user
+   * guides the robot further towards the limit.
    */
   const bool& joint_move_in_wrong_direction;
   /**
@@ -236,7 +241,8 @@ struct Errors {
    */
   const bool& joint_via_motion_generator_planning_joint_limit_violation;
   /**
-   * True if the gravity vector could not be initialized by measureing the base acceleration.
+   * True if the gravity vector could not be initialized by measureing the base
+   * acceleration.
    */
   const bool& base_acceleration_initialization_timeout;
   /**

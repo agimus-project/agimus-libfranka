@@ -2,11 +2,11 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #include "helpers.h"
 
+#include <gtest/gtest.h>
+
+#include <Eigen/Dense>
 #include <cstdlib>
 #include <sstream>
-
-#include <gtest/gtest.h>
-#include <Eigen/Dense>
 
 #include "load_calculations.h"
 
@@ -148,7 +148,8 @@ void testRobotStateIsZero(const agimus_franka::RobotState& actual) {
   EXPECT_EQ(0.0, actual.control_command_success_rate);
 }
 
-void testRobotStatesAreEqual(const agimus_franka::RobotState& expected, const agimus_franka::RobotState& actual) {
+void testRobotStatesAreEqual(const agimus_franka::RobotState& expected,
+                             const agimus_franka::RobotState& actual) {
   EXPECT_EQ(expected.O_T_EE, actual.O_T_EE);
   EXPECT_EQ(expected.F_T_NE, actual.F_T_NE);
   EXPECT_EQ(expected.NE_T_EE, actual.NE_T_EE);
@@ -192,13 +193,15 @@ void testRobotStatesAreEqual(const agimus_franka::RobotState& expected, const ag
   EXPECT_EQ(expected.dtheta, actual.dtheta);
   EXPECT_EQ(expected.current_errors, actual.current_errors);
   EXPECT_EQ(expected.last_motion_errors, actual.last_motion_errors);
-  EXPECT_EQ(expected.control_command_success_rate, actual.control_command_success_rate);
+  EXPECT_EQ(expected.control_command_success_rate,
+            actual.control_command_success_rate);
   EXPECT_EQ(expected.robot_mode, actual.robot_mode);
   EXPECT_EQ(expected.time, actual.time);
 }
 
-void testRobotStatesAreEqual(const agimus_research_interface::robot::RobotState& expected,
-                             const agimus_franka::RobotState& actual) {
+void testRobotStatesAreEqual(
+    const agimus_research_interface::robot::RobotState& expected,
+    const agimus_franka::RobotState& actual) {
   EXPECT_EQ(expected.O_T_EE, actual.O_T_EE);
   EXPECT_EQ(expected.F_T_NE, actual.F_T_NE);
   EXPECT_EQ(expected.NE_T_EE, actual.NE_T_EE);
@@ -212,12 +215,14 @@ void testRobotStatesAreEqual(const agimus_research_interface::robot::RobotState&
   EXPECT_EQ(expected.F_x_Cload, actual.F_x_Cload);
   EXPECT_EQ(expected.I_load, actual.I_load);
   EXPECT_EQ(expected.m_ee + expected.m_load, actual.m_total);
-  EXPECT_EQ(agimus_franka::combineCenterOfMass(expected.m_ee, expected.F_x_Cee, expected.m_load,
-                                        expected.F_x_Cload),
-            actual.F_x_Ctotal);
-  EXPECT_EQ(agimus_franka::combineInertiaTensor(expected.m_ee, expected.F_x_Cee, expected.I_ee,
-                                         expected.m_load, expected.F_x_Cload, expected.I_load,
-                                         actual.m_total, actual.F_x_Ctotal),
+  EXPECT_EQ(
+      agimus_franka::combineCenterOfMass(expected.m_ee, expected.F_x_Cee,
+                                         expected.m_load, expected.F_x_Cload),
+      actual.F_x_Ctotal);
+  EXPECT_EQ(agimus_franka::combineInertiaTensor(
+                expected.m_ee, expected.F_x_Cee, expected.I_ee, expected.m_load,
+                expected.F_x_Cload, expected.I_load, actual.m_total,
+                actual.F_x_Ctotal),
             actual.I_total);
   EXPECT_EQ(expected.elbow, actual.elbow);
   EXPECT_EQ(expected.elbow_d, actual.elbow_d);
@@ -246,11 +251,14 @@ void testRobotStatesAreEqual(const agimus_research_interface::robot::RobotState&
   EXPECT_EQ(expected.theta, actual.theta);
   EXPECT_EQ(expected.dtheta, actual.dtheta);
   EXPECT_EQ(agimus_franka::Errors(expected.errors), actual.current_errors);
-  EXPECT_EQ(agimus_franka::Errors(expected.reflex_reason), actual.last_motion_errors);
+  EXPECT_EQ(agimus_franka::Errors(expected.reflex_reason),
+            actual.last_motion_errors);
   EXPECT_EQ(expected.message_id, actual.time.toMSec());
-  EXPECT_EQ(expected.control_command_success_rate, actual.control_command_success_rate);
+  EXPECT_EQ(expected.control_command_success_rate,
+            actual.control_command_success_rate);
 
-  agimus_franka::RobotMode expected_robot_mode = agimus_franka::RobotMode::kOther;
+  agimus_franka::RobotMode expected_robot_mode =
+      agimus_franka::RobotMode::kOther;
   switch (expected.robot_mode) {
     case agimus_research_interface::robot::RobotMode::kOther:
       expected_robot_mode = agimus_franka::RobotMode::kOther;
@@ -281,9 +289,7 @@ double randomDouble() {
   return 10.0 * static_cast<double>(std::rand()) / RAND_MAX;
 }
 
-bool randomBool() {
-  return static_cast<bool>(std::rand() % 2);
-}
+bool randomBool() { return static_cast<bool>(std::rand() % 2); }
 
 std::array<double, 16> identityMatrix() {
   std::array<double, 16> matrix{};
@@ -423,7 +429,8 @@ void randomRobotState(agimus_franka::RobotState& robot_state) {
   for (double& element : robot_state.dtheta) {
     element = randomDouble();
   }
-  std::array<bool, sizeof(agimus_research_interface::robot::RobotState::errors)> errors{};
+  std::array<bool, sizeof(agimus_research_interface::robot::RobotState::errors)>
+      errors{};
   for (bool& error : errors) {
     error = randomBool();
   }
@@ -433,10 +440,12 @@ void randomRobotState(agimus_franka::RobotState& robot_state) {
   }
   robot_state.last_motion_errors = agimus_franka::Errors(errors);
   robot_state.control_command_success_rate = randomDouble();
-  robot_state.time = agimus_franka::Duration(static_cast<uint64_t>(std::rand()));
+  robot_state.time =
+      agimus_franka::Duration(static_cast<uint64_t>(std::rand()));
 }
 
-void randomRobotState(agimus_research_interface::robot::RobotState& robot_state) {
+void randomRobotState(
+    agimus_research_interface::robot::RobotState& robot_state) {
   // Reset to all-zeros first
   robot_state = agimus_research_interface::robot::RobotState();
   for (double& element : robot_state.O_T_EE) {
@@ -554,11 +563,14 @@ void randomRobotState(agimus_research_interface::robot::RobotState& robot_state)
   }
   robot_state.message_id = static_cast<uint32_t>(std::rand());
   robot_state.control_command_success_rate = randomDouble();
-  robot_state.motion_generator_mode = agimus_research_interface::robot::MotionGeneratorMode::kIdle;
-  robot_state.controller_mode = agimus_research_interface::robot::ControllerMode::kJointImpedance;
+  robot_state.motion_generator_mode =
+      agimus_research_interface::robot::MotionGeneratorMode::kIdle;
+  robot_state.controller_mode =
+      agimus_research_interface::robot::ControllerMode::kJointImpedance;
 }
 
-void randomRobotCommand(agimus_research_interface::robot::RobotCommand& robot_command) {
+void randomRobotCommand(
+    agimus_research_interface::robot::RobotCommand& robot_command) {
   // Reset to all-zeros first
   robot_command = agimus_research_interface::robot::RobotCommand();
   for (double& element : robot_command.motion.q_c) {
@@ -593,23 +605,27 @@ void testMotionGeneratorCommandsAreEqual(
   EXPECT_EQ(expected.O_dP_EE_c, actual.O_dP_EE_c);
   EXPECT_EQ(expected.elbow_c, actual.elbow_c);
   EXPECT_EQ(expected.valid_elbow, actual.valid_elbow);
-  EXPECT_EQ(expected.motion_generation_finished, actual.motion_generation_finished);
+  EXPECT_EQ(expected.motion_generation_finished,
+            actual.motion_generation_finished);
 }
 
-void testControllerCommandsAreEqual(const agimus_research_interface::robot::ControllerCommand& expected,
-                                    const agimus_research_interface::robot::ControllerCommand& actual) {
+void testControllerCommandsAreEqual(
+    const agimus_research_interface::robot::ControllerCommand& expected,
+    const agimus_research_interface::robot::ControllerCommand& actual) {
   EXPECT_EQ(expected.tau_J_d, actual.tau_J_d);
 }
 
-void testRobotCommandsAreEqual(const agimus_research_interface::robot::RobotCommand& expected,
-                               const agimus_research_interface::robot::RobotCommand& actual) {
+void testRobotCommandsAreEqual(
+    const agimus_research_interface::robot::RobotCommand& expected,
+    const agimus_research_interface::robot::RobotCommand& actual) {
   testMotionGeneratorCommandsAreEqual(expected.motion, actual.motion);
   testControllerCommandsAreEqual(expected.control, actual.control);
   EXPECT_EQ(expected.message_id, actual.message_id);
 }
 
-void testRobotCommandsAreEqual(const agimus_research_interface::robot::RobotCommand& expected,
-                               const agimus_franka::RobotCommand actual) {
+void testRobotCommandsAreEqual(
+    const agimus_research_interface::robot::RobotCommand& expected,
+    const agimus_franka::RobotCommand actual) {
   agimus_research_interface::robot::RobotCommand fci_command = expected;
   fci_command.motion.q_c = actual.joint_positions.q;
   fci_command.motion.dq_c = actual.joint_velocities.dq;
@@ -620,14 +636,16 @@ void testRobotCommandsAreEqual(const agimus_research_interface::robot::RobotComm
 }
 
 void randomGripperState(agimus_franka::GripperState& gripper_state) {
-  gripper_state.time = agimus_franka::Duration(static_cast<uint64_t>(std::rand()));
+  gripper_state.time =
+      agimus_franka::Duration(static_cast<uint64_t>(std::rand()));
   gripper_state.temperature = static_cast<uint16_t>(std::rand());
   gripper_state.is_grasped = randomBool();
   gripper_state.max_width = randomDouble();
   gripper_state.width = randomDouble();
 }
 
-void randomGripperState(agimus_research_interface::gripper::GripperState& gripper_state) {
+void randomGripperState(
+    agimus_research_interface::gripper::GripperState& gripper_state) {
   // Reset to all-zeros first
   gripper_state = agimus_research_interface::gripper::GripperState();
   gripper_state.message_id = static_cast<uint32_t>(std::rand());
@@ -646,8 +664,9 @@ void testGripperStatesAreEqual(const agimus_franka::GripperState& expected,
   EXPECT_EQ(expected.temperature, actual.temperature);
 }
 
-void testGripperStatesAreEqual(const agimus_research_interface::gripper::GripperState& expected,
-                               const agimus_franka::GripperState& actual) {
+void testGripperStatesAreEqual(
+    const agimus_research_interface::gripper::GripperState& expected,
+    const agimus_franka::GripperState& actual) {
   EXPECT_EQ(expected.message_id, actual.time.toMSec());
   EXPECT_EQ(expected.width, actual.width);
   EXPECT_EQ(expected.max_width, actual.max_width);
@@ -664,8 +683,10 @@ std::array<double, 6> differentiateOneSample(std::array<double, 16> value,
 
   dx.head(3) << (pose.translation() - last_pose.translation()) / delta_t;
   auto delta_rotation = (pose.linear() - last_pose.linear()) / delta_t;
-  Eigen::Matrix3d rotational_twist = delta_rotation * last_pose.linear().transpose();
-  dx.tail(3) << rotational_twist(2, 1), rotational_twist(0, 2), rotational_twist(1, 0);
+  Eigen::Matrix3d rotational_twist =
+      delta_rotation * last_pose.linear().transpose();
+  dx.tail(3) << rotational_twist(2, 1), rotational_twist(0, 2),
+      rotational_twist(1, 0);
 
   std::array<double, 6> twist{};
   Eigen::Map<Eigen::Matrix<double, 6, 1>>(&twist[0], 6, 1) = dx;
@@ -676,8 +697,8 @@ namespace agimus_research_interface {
 namespace robot {
 
 bool operator==(const Move::Deviation& left, const Move::Deviation& right) {
-  return left.translation == right.translation && left.rotation == right.rotation &&
-         left.elbow == right.elbow;
+  return left.translation == right.translation &&
+         left.rotation == right.rotation && left.elbow == right.elbow;
 }
 
 }  // namespace robot
@@ -686,15 +707,22 @@ bool operator==(const Move::Deviation& left, const Move::Deviation& right) {
 namespace agimus_franka {
 
 bool operator==(const Errors& lhs, const Errors& rhs) {
-  return lhs.joint_position_limits_violation == rhs.joint_position_limits_violation &&
-         lhs.cartesian_position_limits_violation == rhs.cartesian_position_limits_violation &&
-         lhs.self_collision_avoidance_violation == rhs.self_collision_avoidance_violation &&
+  return lhs.joint_position_limits_violation ==
+             rhs.joint_position_limits_violation &&
+         lhs.cartesian_position_limits_violation ==
+             rhs.cartesian_position_limits_violation &&
+         lhs.self_collision_avoidance_violation ==
+             rhs.self_collision_avoidance_violation &&
          lhs.joint_velocity_violation == rhs.joint_velocity_violation &&
          lhs.cartesian_velocity_violation == rhs.cartesian_velocity_violation &&
-         lhs.force_control_safety_violation == rhs.force_control_safety_violation &&
-         lhs.joint_reflex == rhs.joint_reflex && lhs.cartesian_reflex == rhs.cartesian_reflex &&
-         lhs.max_goal_pose_deviation_violation == rhs.max_goal_pose_deviation_violation &&
-         lhs.max_path_pose_deviation_violation == rhs.max_path_pose_deviation_violation &&
+         lhs.force_control_safety_violation ==
+             rhs.force_control_safety_violation &&
+         lhs.joint_reflex == rhs.joint_reflex &&
+         lhs.cartesian_reflex == rhs.cartesian_reflex &&
+         lhs.max_goal_pose_deviation_violation ==
+             rhs.max_goal_pose_deviation_violation &&
+         lhs.max_path_pose_deviation_violation ==
+             rhs.max_path_pose_deviation_violation &&
          lhs.cartesian_velocity_profile_safety_violation ==
              rhs.cartesian_velocity_profile_safety_violation &&
          lhs.joint_position_motion_generator_start_pose_invalid ==
@@ -733,44 +761,54 @@ bool operator==(const Errors& lhs, const Errors& rhs) {
              rhs.cartesian_position_motion_generator_invalid_frame &&
          lhs.force_controller_desired_force_tolerance_violation ==
              rhs.force_controller_desired_force_tolerance_violation &&
-         lhs.controller_torque_discontinuity == rhs.controller_torque_discontinuity &&
-         lhs.start_elbow_sign_inconsistent == rhs.start_elbow_sign_inconsistent &&
-         lhs.communication_constraints_violation == rhs.communication_constraints_violation &&
+         lhs.controller_torque_discontinuity ==
+             rhs.controller_torque_discontinuity &&
+         lhs.start_elbow_sign_inconsistent ==
+             rhs.start_elbow_sign_inconsistent &&
+         lhs.communication_constraints_violation ==
+             rhs.communication_constraints_violation &&
          lhs.power_limit_violation == rhs.power_limit_violation &&
          lhs.joint_p2p_insufficient_torque_for_planning ==
              rhs.joint_p2p_insufficient_torque_for_planning &&
          lhs.tau_j_range_violation == rhs.tau_j_range_violation &&
          lhs.instability_detected == rhs.instability_detected &&
-         lhs.joint_move_in_wrong_direction == rhs.joint_move_in_wrong_direction &&
+         lhs.joint_move_in_wrong_direction ==
+             rhs.joint_move_in_wrong_direction &&
          lhs.cartesian_spline_motion_generator_violation ==
              rhs.cartesian_spline_motion_generator_violation &&
          lhs.joint_via_motion_generator_planning_joint_limit_violation ==
              rhs.joint_via_motion_generator_planning_joint_limit_violation &&
          lhs.base_acceleration_initialization_timeout ==
              rhs.base_acceleration_initialization_timeout &&
-         lhs.base_acceleration_invalid_reading == rhs.base_acceleration_invalid_reading;
+         lhs.base_acceleration_invalid_reading ==
+             rhs.base_acceleration_invalid_reading;
 }
 
 bool operator==(const RobotState& lhs, const RobotState& rhs) {
-  return lhs.O_T_EE == rhs.O_T_EE && lhs.O_T_EE_d == rhs.O_T_EE_d && lhs.F_T_EE == rhs.F_T_EE &&
-         lhs.F_T_NE == rhs.F_T_NE && lhs.NE_T_EE == rhs.NE_T_EE && lhs.EE_T_K == rhs.EE_T_K &&
-         lhs.m_ee == rhs.m_ee && lhs.I_ee == rhs.I_ee && lhs.F_x_Cee == rhs.F_x_Cee &&
-         lhs.m_load == rhs.m_load && lhs.I_load == rhs.I_load && lhs.F_x_Cload == rhs.F_x_Cload &&
+  return lhs.O_T_EE == rhs.O_T_EE && lhs.O_T_EE_d == rhs.O_T_EE_d &&
+         lhs.F_T_EE == rhs.F_T_EE && lhs.F_T_NE == rhs.F_T_NE &&
+         lhs.NE_T_EE == rhs.NE_T_EE && lhs.EE_T_K == rhs.EE_T_K &&
+         lhs.m_ee == rhs.m_ee && lhs.I_ee == rhs.I_ee &&
+         lhs.F_x_Cee == rhs.F_x_Cee && lhs.m_load == rhs.m_load &&
+         lhs.I_load == rhs.I_load && lhs.F_x_Cload == rhs.F_x_Cload &&
          lhs.m_total == rhs.m_total && lhs.I_total == rhs.I_total &&
-         lhs.F_x_Ctotal == rhs.F_x_Ctotal && lhs.elbow == rhs.elbow && lhs.elbow_d == rhs.elbow_d &&
-         lhs.elbow_c == rhs.elbow_c && lhs.delbow_c == rhs.delbow_c &&
-         lhs.ddelbow_c == rhs.ddelbow_c && lhs.tau_J == rhs.tau_J && lhs.tau_J_d == rhs.tau_J_d &&
-         lhs.dtau_J == rhs.dtau_J && lhs.q == rhs.q && lhs.q_d == rhs.q_d && lhs.dq == rhs.dq &&
-         lhs.dq_d == rhs.dq_d && lhs.ddq_d == rhs.ddq_d && lhs.joint_contact == rhs.joint_contact &&
+         lhs.F_x_Ctotal == rhs.F_x_Ctotal && lhs.elbow == rhs.elbow &&
+         lhs.elbow_d == rhs.elbow_d && lhs.elbow_c == rhs.elbow_c &&
+         lhs.delbow_c == rhs.delbow_c && lhs.ddelbow_c == rhs.ddelbow_c &&
+         lhs.tau_J == rhs.tau_J && lhs.tau_J_d == rhs.tau_J_d &&
+         lhs.dtau_J == rhs.dtau_J && lhs.q == rhs.q && lhs.q_d == rhs.q_d &&
+         lhs.dq == rhs.dq && lhs.dq_d == rhs.dq_d && lhs.ddq_d == rhs.ddq_d &&
+         lhs.joint_contact == rhs.joint_contact &&
          lhs.cartesian_contact == rhs.cartesian_contact &&
          lhs.joint_collision == rhs.joint_collision &&
          lhs.cartesian_collision == rhs.cartesian_collision &&
          lhs.tau_ext_hat_filtered == rhs.tau_ext_hat_filtered &&
-         lhs.O_F_ext_hat_K == rhs.O_F_ext_hat_K && lhs.K_F_ext_hat_K == rhs.K_F_ext_hat_K &&
+         lhs.O_F_ext_hat_K == rhs.O_F_ext_hat_K &&
+         lhs.K_F_ext_hat_K == rhs.K_F_ext_hat_K &&
          lhs.O_dP_EE_d == rhs.O_dP_EE_d && lhs.O_ddP_O == rhs.O_ddP_O &&
          lhs.O_T_EE_c == rhs.O_T_EE_c && lhs.O_dP_EE_c == rhs.O_dP_EE_c &&
-         lhs.O_ddP_EE_c == rhs.O_ddP_EE_c && lhs.theta == rhs.theta && lhs.dtheta == rhs.dtheta &&
-         lhs.current_errors == rhs.current_errors &&
+         lhs.O_ddP_EE_c == rhs.O_ddP_EE_c && lhs.theta == rhs.theta &&
+         lhs.dtheta == rhs.dtheta && lhs.current_errors == rhs.current_errors &&
          lhs.last_motion_errors == rhs.last_motion_errors &&
          lhs.control_command_success_rate == rhs.control_command_success_rate &&
          lhs.robot_mode == rhs.robot_mode && lhs.time == rhs.time;

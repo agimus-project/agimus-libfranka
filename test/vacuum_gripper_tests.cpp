@@ -1,13 +1,12 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <atomic>
-#include <functional>
-
-#include <gmock/gmock.h>
-
 #include <agimus_franka/exception.h>
 #include <agimus_franka/vacuum_gripper.h>
 #include <agimus_research_interface/vacuum_gripper/types.h>
+#include <gmock/gmock.h>
+
+#include <atomic>
+#include <functional>
 
 #include "helpers.h"
 #include "mock_server.h"
@@ -31,7 +30,8 @@ TEST(VacuumGripper, CanPerformHandshake) {
   VacuumGripperMockServer server;
 
   VacuumGripper vacuum_gripper("127.0.0.1");
-  EXPECT_EQ(agimus_research_interface::vacuum_gripper::kVersion, vacuum_gripper.serverVersion());
+  EXPECT_EQ(agimus_research_interface::vacuum_gripper::kVersion,
+            vacuum_gripper.serverVersion());
 }
 
 TEST(VacuumGripper, ThrowsOnIncompatibleLibraryVersion) {

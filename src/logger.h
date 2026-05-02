@@ -2,13 +2,13 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
-#include <deque>
-#include <string>
-#include <vector>
-
 #include <agimus_franka/log.h>
 #include <agimus_franka/robot_state.h>
 #include <agimus_research_interface/robot/rbk_types.h>
+
+#include <deque>
+#include <string>
+#include <vector>
 
 namespace agimus_franka {
 
@@ -16,7 +16,8 @@ class Logger {
  public:
   explicit Logger(size_t log_size);
 
-  void log(const RobotState& state, const agimus_research_interface::robot::RobotCommand& command);
+  void log(const RobotState& state,
+           const agimus_research_interface::robot::RobotCommand& command);
 
   std::vector<agimus_franka::Record> flush();
 

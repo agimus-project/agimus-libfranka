@@ -2,13 +2,13 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
-#include <cmath>
-#include <functional>
-
 #include <agimus_franka/control_types.h>
 #include <agimus_franka/duration.h>
 #include <agimus_franka/robot_state.h>
 #include <agimus_research_interface/robot/rbk_types.h>
+
+#include <cmath>
+#include <functional>
 
 #include "robot_control.h"
 
@@ -17,50 +17,48 @@ namespace agimus_franka {
 template <typename T>
 class ControlLoop {
  public:
-  static constexpr agimus_research_interface::robot::Move::Deviation kDefaultDeviation{10.0, 3.12,
-                                                                                2 * M_PI};
+  static constexpr agimus_research_interface::robot::Move::Deviation
+      kDefaultDeviation{10.0, 3.12, 2 * M_PI};
 
-  using ControlCallback = std::function<Torques(const RobotState&, agimus_franka::Duration)>;
-  using MotionGeneratorCallback = std::function<T(const RobotState&, agimus_franka::Duration)>;
+  using ControlCallback =
+      std::function<Torques(const RobotState&, agimus_franka::Duration)>;
+  using MotionGeneratorCallback =
+      std::function<T(const RobotState&, agimus_franka::Duration)>;
 
-  ControlLoop(RobotControl& robot,
-              ControlCallback control_callback,
-              MotionGeneratorCallback motion_callback,
-              bool limit_rate,
+  ControlLoop(RobotControl& robot, ControlCallback control_callback,
+              MotionGeneratorCallback motion_callback, bool limit_rate,
               double cutoff_frequency);
-  ControlLoop(RobotControl& robot,
-              ControllerMode controller_mode,
-              MotionGeneratorCallback motion_callback,
-              bool limit_rate,
+  ControlLoop(RobotControl& robot, ControllerMode controller_mode,
+              MotionGeneratorCallback motion_callback, bool limit_rate,
               double cutoff_frequency);
 
   void operator()();
 
  protected:
-  ControlLoop(RobotControl& robot,
-              MotionGeneratorCallback motion_callback,
-              ControlCallback control_callback,
-              bool limit_rate,
+  ControlLoop(RobotControl& robot, MotionGeneratorCallback motion_callback,
+              ControlCallback control_callback, bool limit_rate,
               double cutoff_frequency);
 
-  bool spinControl(const RobotState& robot_state,
-                   agimus_franka::Duration time_step,
-                   agimus_research_interface::robot::ControllerCommand* command);
-  bool spinMotion(const RobotState& robot_state,
-                  agimus_franka::Duration time_step,
-                  agimus_research_interface::robot::MotionGeneratorCommand* command);
+  bool spinControl(
+      const RobotState& robot_state, agimus_franka::Duration time_step,
+      agimus_research_interface::robot::ControllerCommand* command);
+  bool spinMotion(
+      const RobotState& robot_state, agimus_franka::Duration time_step,
+      agimus_research_interface::robot::MotionGeneratorCommand* command);
 
  private:
   RobotControl& robot_;
-  const MotionGeneratorCallback motion_callback_;  // NOLINT(readability-identifier-naming)
-  const ControlCallback control_callback_;         // NOLINT(readability-identifier-naming)
-  const bool limit_rate_;                          // NOLINT(readability-identifier-naming)
-  const double cutoff_frequency_;                  // NOLINT(readability-identifier-naming)
+  const MotionGeneratorCallback
+      motion_callback_;  // NOLINT(readability-identifier-naming)
+  const ControlCallback
+      control_callback_;           // NOLINT(readability-identifier-naming)
+  const bool limit_rate_;          // NOLINT(readability-identifier-naming)
+  const double cutoff_frequency_;  // NOLINT(readability-identifier-naming)
   uint32_t motion_id_ = 0;
 
-  void convertMotion(const T& motion,
-                     const RobotState& robot_state,
-                     agimus_research_interface::robot::MotionGeneratorCommand* command);
+  void convertMotion(
+      const T& motion, const RobotState& robot_state,
+      agimus_research_interface::robot::MotionGeneratorCommand* command);
 };
 
 }  // namespace agimus_franka

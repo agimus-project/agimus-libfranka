@@ -1,24 +1,23 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <array>
-#include <iostream>
-
-#include <Eigen/Core>
-
 #include <agimus_franka/duration.h>
 #include <agimus_franka/exception.h>
 #include <agimus_franka/model.h>
 #include <agimus_franka/robot.h>
 
+#include <Eigen/Core>
+#include <array>
+#include <iostream>
+
 #include "examples_common.h"
 
 /**
  * @example force_control.cpp
- * A simple PI force controller that renders in the Z axis the gravitational force corresponding
- * to a target mass of 1 kg.
+ * A simple PI force controller that renders in the Z axis the gravitational
+ * force corresponding to a target mass of 1 kg.
  *
- * @warning: make sure that no endeffector is mounted and that the robot's last joint is in contact
- * with a horizontal rigid surface before starting.
+ * @warning: make sure that no endeffector is mounted and that the robot's last
+ * joint is in contact with a horizontal rigid surface before starting.
  */
 
 int main(int argc, char** argv) {
@@ -42,18 +41,21 @@ int main(int argc, char** argv) {
     agimus_franka::Model model = robot.loadModel();
 
     // set collision behavior
-    robot.setCollisionBehavior({{100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0}},
-                               {{100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0}},
-                               {{100.0, 100.0, 100.0, 100.0, 100.0, 100.0}},
-                               {{100.0, 100.0, 100.0, 100.0, 100.0, 100.0}});
+    robot.setCollisionBehavior(
+        {{100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0}},
+        {{100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0}},
+        {{100.0, 100.0, 100.0, 100.0, 100.0, 100.0}},
+        {{100.0, 100.0, 100.0, 100.0, 100.0, 100.0}});
 
     agimus_franka::RobotState initial_state = robot.readOnce();
 
     Eigen::VectorXd initial_tau_ext(7), tau_error_integral(7);
     // Bias torque sensor
     std::array<double, 7> gravity_array = model.gravity(initial_state);
-    Eigen::Map<Eigen::Matrix<double, 7, 1>> initial_tau_measured(initial_state.tau_J.data());
-    Eigen::Map<Eigen::Matrix<double, 7, 1>> initial_gravity(gravity_array.data());
+    Eigen::Map<Eigen::Matrix<double, 7, 1>> initial_tau_measured(
+        initial_state.tau_J.data());
+    Eigen::Map<Eigen::Matrix<double, 7, 1>> initial_gravity(
+        gravity_array.data());
     initial_tau_ext = initial_tau_measured - initial_gravity;
 
     // init integrator
@@ -66,15 +68,17 @@ int main(int argc, char** argv) {
       return Eigen::Vector3d(robot_state.O_T_EE[12], robot_state.O_T_EE[13],
                              robot_state.O_T_EE[14]);
     };
-    auto force_control_callback = [&](const agimus_franka::RobotState& robot_state,
-                                      agimus_franka::Duration period) -> agimus_franka::Torques {
+    auto force_control_callback =
+        [&](const agimus_franka::RobotState& robot_state,
+            agimus_franka::Duration period) -> agimus_franka::Torques {
       time += period.toSec();
 
       if (time == 0.0) {
         initial_position = get_position(robot_state);
       }
 
-      if (time > 0 && (get_position(robot_state) - initial_position).norm() > 0.01) {
+      if (time > 0 &&
+          (get_position(robot_state) - initial_position).norm() > 0.01) {
         throw std::runtime_error("Aborting; too far away from starting pose!");
       }
 
@@ -82,9 +86,12 @@ int main(int argc, char** argv) {
       std::array<double, 42> jacobian_array =
           model.zeroJacobian(agimus_franka::Frame::kEndEffector, robot_state);
 
-      Eigen::Map<const Eigen::Matrix<double, 6, 7>> jacobian(jacobian_array.data());
-      Eigen::Map<const Eigen::Matrix<double, 7, 1>> tau_measured(robot_state.tau_J.data());
-      Eigen::Map<const Eigen::Matrix<double, 7, 1>> gravity(gravity_array.data());
+      Eigen::Map<const Eigen::Matrix<double, 6, 7>> jacobian(
+          jacobian_array.data());
+      Eigen::Map<const Eigen::Matrix<double, 7, 1>> tau_measured(
+          robot_state.tau_J.data());
+      Eigen::Map<const Eigen::Matrix<double, 7, 1>> gravity(
+          gravity_array.data());
 
       Eigen::VectorXd tau_d(7), desired_force_torque(6), tau_cmd(7), tau_ext(7);
       desired_force_torque.setZero();
@@ -96,15 +103,18 @@ int main(int argc, char** argv) {
       tau_cmd << tau_d + k_p * (tau_d - tau_ext) + k_i * tau_error_integral;
 
       // Smoothly update the mass to reach the desired target value
-      desired_mass = filter_gain * target_mass + (1 - filter_gain) * desired_mass;
+      desired_mass =
+          filter_gain * target_mass + (1 - filter_gain) * desired_mass;
 
       std::array<double, 7> tau_d_array{};
       Eigen::VectorXd::Map(&tau_d_array[0], 7) = tau_cmd;
       return tau_d_array;
     };
-    std::cout << "WARNING: Make sure sure that no endeffector is mounted and that the robot's last "
+    std::cout << "WARNING: Make sure sure that no endeffector is mounted and "
+                 "that the robot's last "
                  "joint is "
-                 "in contact with a horizontal rigid surface before starting. Keep in mind that "
+                 "in contact with a horizontal rigid surface before starting. "
+                 "Keep in mind that "
                  "collision thresholds are set to high values."
               << std::endl
               << "Press Enter to continue..." << std::endl;

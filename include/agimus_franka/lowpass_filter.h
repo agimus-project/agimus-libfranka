@@ -24,21 +24,25 @@ constexpr double kDefaultCutoffFrequency = 100.0;
  *
  * @param[in] sample_time Sample time constant
  * @param[in] y Current value of the signal to be filtered
- * @param[in] y_last Value of the signal to be filtered in the previous time step
+ * @param[in] y_last Value of the signal to be filtered in the previous time
+ * step
  * @param[in] cutoff_frequency Cutoff frequency of the low-pass filter
  *
  * @throw std::invalid_argument if y is infinite or NaN.
  * @throw std::invalid_argument if y_last is infinite or NaN.
- * @throw std::invalid_argument if cutoff_frequency is zero, negative, infinite or NaN.
+ * @throw std::invalid_argument if cutoff_frequency is zero, negative, infinite
+ * or NaN.
  * @throw std::invalid_argument if sample_time is negative, infinite or NaN.
  *
  * @return Filtered value.
  */
-double lowpassFilter(double sample_time, double y, double y_last, double cutoff_frequency);
+double lowpassFilter(double sample_time, double y, double y_last,
+                     double cutoff_frequency);
 
 /**
- * Applies a first-order low-pass filter to the translation and spherical linear interpolation
- * to the rotation of a transformation matrix which represents a Cartesian Motion.
+ * Applies a first-order low-pass filter to the translation and spherical linear
+ * interpolation to the rotation of a transformation matrix which represents a
+ * Cartesian Motion.
  *
  * @param[in] sample_time Sample time constant
  * @param[in] y Current Cartesian transformation matrix to be filtered
@@ -47,7 +51,8 @@ double lowpassFilter(double sample_time, double y, double y_last, double cutoff_
  *
  * @throw std::invalid_argument if elements of y is infinite or NaN.
  * @throw std::invalid_argument if elements of y_last is infinite or NaN.
- * @throw std::invalid_argument if cutoff_frequency is zero, negative, infinite or NaN.
+ * @throw std::invalid_argument if cutoff_frequency is zero, negative, infinite
+ * or NaN.
  * @throw std::invalid_argument if sample_time is negative, infinite or NaN.
  *
  * @return Filtered Cartesian transformation matrix.

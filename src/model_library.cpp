@@ -8,25 +8,43 @@ namespace agimus_franka {
 
 ModelLibrary::ModelLibrary(agimus_franka::Network& network)
     : loader_(LibraryDownloader(network).path()),
-      body_jacobian_joint1{reinterpret_cast<decltype(&Ji_J_J1)>(loader_.getSymbol("Ji_J_J1"))},
-      body_jacobian_joint2{reinterpret_cast<decltype(&Ji_J_J2)>(loader_.getSymbol("Ji_J_J2"))},
-      body_jacobian_joint3{reinterpret_cast<decltype(&Ji_J_J3)>(loader_.getSymbol("Ji_J_J3"))},
-      body_jacobian_joint4{reinterpret_cast<decltype(&Ji_J_J4)>(loader_.getSymbol("Ji_J_J4"))},
-      body_jacobian_joint5{reinterpret_cast<decltype(&Ji_J_J5)>(loader_.getSymbol("Ji_J_J5"))},
-      body_jacobian_joint6{reinterpret_cast<decltype(&Ji_J_J6)>(loader_.getSymbol("Ji_J_J6"))},
-      body_jacobian_joint7{reinterpret_cast<decltype(&Ji_J_J7)>(loader_.getSymbol("Ji_J_J7"))},
-      body_jacobian_flange{reinterpret_cast<decltype(&Ji_J_J8)>(loader_.getSymbol("Ji_J_J8"))},
-      body_jacobian_ee{reinterpret_cast<decltype(&Ji_J_J9)>(loader_.getSymbol("Ji_J_J9"))},
+      body_jacobian_joint1{
+          reinterpret_cast<decltype(&Ji_J_J1)>(loader_.getSymbol("Ji_J_J1"))},
+      body_jacobian_joint2{
+          reinterpret_cast<decltype(&Ji_J_J2)>(loader_.getSymbol("Ji_J_J2"))},
+      body_jacobian_joint3{
+          reinterpret_cast<decltype(&Ji_J_J3)>(loader_.getSymbol("Ji_J_J3"))},
+      body_jacobian_joint4{
+          reinterpret_cast<decltype(&Ji_J_J4)>(loader_.getSymbol("Ji_J_J4"))},
+      body_jacobian_joint5{
+          reinterpret_cast<decltype(&Ji_J_J5)>(loader_.getSymbol("Ji_J_J5"))},
+      body_jacobian_joint6{
+          reinterpret_cast<decltype(&Ji_J_J6)>(loader_.getSymbol("Ji_J_J6"))},
+      body_jacobian_joint7{
+          reinterpret_cast<decltype(&Ji_J_J7)>(loader_.getSymbol("Ji_J_J7"))},
+      body_jacobian_flange{
+          reinterpret_cast<decltype(&Ji_J_J8)>(loader_.getSymbol("Ji_J_J8"))},
+      body_jacobian_ee{
+          reinterpret_cast<decltype(&Ji_J_J9)>(loader_.getSymbol("Ji_J_J9"))},
       mass{reinterpret_cast<decltype(&M_NE)>(loader_.getSymbol("M_NE"))},
-      zero_jacobian_joint1{reinterpret_cast<decltype(&O_J_J1)>(loader_.getSymbol("O_J_J1"))},
-      zero_jacobian_joint2{reinterpret_cast<decltype(&O_J_J2)>(loader_.getSymbol("O_J_J2"))},
-      zero_jacobian_joint3{reinterpret_cast<decltype(&O_J_J3)>(loader_.getSymbol("O_J_J3"))},
-      zero_jacobian_joint4{reinterpret_cast<decltype(&O_J_J4)>(loader_.getSymbol("O_J_J4"))},
-      zero_jacobian_joint5{reinterpret_cast<decltype(&O_J_J5)>(loader_.getSymbol("O_J_J5"))},
-      zero_jacobian_joint6{reinterpret_cast<decltype(&O_J_J6)>(loader_.getSymbol("O_J_J6"))},
-      zero_jacobian_joint7{reinterpret_cast<decltype(&O_J_J7)>(loader_.getSymbol("O_J_J7"))},
-      zero_jacobian_flange{reinterpret_cast<decltype(&O_J_J8)>(loader_.getSymbol("O_J_J8"))},
-      zero_jacobian_ee{reinterpret_cast<decltype(&O_J_J9)>(loader_.getSymbol("O_J_J9"))},
+      zero_jacobian_joint1{
+          reinterpret_cast<decltype(&O_J_J1)>(loader_.getSymbol("O_J_J1"))},
+      zero_jacobian_joint2{
+          reinterpret_cast<decltype(&O_J_J2)>(loader_.getSymbol("O_J_J2"))},
+      zero_jacobian_joint3{
+          reinterpret_cast<decltype(&O_J_J3)>(loader_.getSymbol("O_J_J3"))},
+      zero_jacobian_joint4{
+          reinterpret_cast<decltype(&O_J_J4)>(loader_.getSymbol("O_J_J4"))},
+      zero_jacobian_joint5{
+          reinterpret_cast<decltype(&O_J_J5)>(loader_.getSymbol("O_J_J5"))},
+      zero_jacobian_joint6{
+          reinterpret_cast<decltype(&O_J_J6)>(loader_.getSymbol("O_J_J6"))},
+      zero_jacobian_joint7{
+          reinterpret_cast<decltype(&O_J_J7)>(loader_.getSymbol("O_J_J7"))},
+      zero_jacobian_flange{
+          reinterpret_cast<decltype(&O_J_J8)>(loader_.getSymbol("O_J_J8"))},
+      zero_jacobian_ee{
+          reinterpret_cast<decltype(&O_J_J9)>(loader_.getSymbol("O_J_J9"))},
       joint1{reinterpret_cast<decltype(&O_T_J1)>(loader_.getSymbol("O_T_J1"))},
       joint2{reinterpret_cast<decltype(&O_T_J2)>(loader_.getSymbol("O_T_J2"))},
       joint3{reinterpret_cast<decltype(&O_T_J3)>(loader_.getSymbol("O_T_J3"))},

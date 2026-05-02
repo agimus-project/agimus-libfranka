@@ -6,22 +6,23 @@ namespace agimus_franka {
 
 Duration::Duration() noexcept : duration_{0u} {}
 
-Duration::Duration(std::chrono::duration<uint64_t, std::milli> duration) noexcept
+Duration::Duration(
+    std::chrono::duration<uint64_t, std::milli> duration) noexcept
     : duration_{duration} {}
 
 Duration::Duration(uint64_t milliseconds) noexcept : duration_{milliseconds} {}
 
-Duration::operator std::chrono::duration<uint64_t, std::milli>() const noexcept {
+Duration::operator std::chrono::duration<uint64_t, std::milli>()
+    const noexcept {
   return duration_;
 }
 
 double Duration::toSec() const noexcept {
-  return std::chrono::duration_cast<std::chrono::duration<double>>(duration_).count();
+  return std::chrono::duration_cast<std::chrono::duration<double>>(duration_)
+      .count();
 }
 
-uint64_t Duration::toMSec() const noexcept {
-  return duration_.count();
-}
+uint64_t Duration::toMSec() const noexcept { return duration_.count(); }
 
 Duration Duration::operator+(const Duration& rhs) const noexcept {
   return duration_ + rhs.duration_;

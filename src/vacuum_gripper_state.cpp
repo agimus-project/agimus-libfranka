@@ -6,8 +6,9 @@
 
 namespace agimus_franka {
 
-std::ostream& operator<<(std::ostream& ostream,
-                         const agimus_franka::VacuumGripperState& vacuum_gripper_state) {
+std::ostream& operator<<(
+    std::ostream& ostream,
+    const agimus_franka::VacuumGripperState& vacuum_gripper_state) {
   std::string device_status;
   switch (vacuum_gripper_state.device_status) {
     case VacuumGripperDeviceStatus::kGreen:
@@ -26,7 +27,8 @@ std::ostream& operator<<(std::ostream& ostream,
 
   ostream << "{\"in_control_range\": " << vacuum_gripper_state.in_control_range
           << ", \"part_detached\": " << vacuum_gripper_state.part_detached
-          << ", \"part_present\": " << vacuum_gripper_state.part_present << ", \"device_status\": "
+          << ", \"part_present\": " << vacuum_gripper_state.part_present
+          << ", \"device_status\": "
           << "\"" << device_status << "\""
           << ", \"actual_power\": " << vacuum_gripper_state.actual_power
           << ", \"vacuum\": " << vacuum_gripper_state.vacuum

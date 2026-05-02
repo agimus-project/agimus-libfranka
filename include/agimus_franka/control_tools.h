@@ -27,27 +27,33 @@ inline bool isValidElbow(const std::array<double, 2>& elbow) noexcept {
 }
 
 /**
- * Determines whether the given array represents a valid homogeneous transformation matrix.
+ * Determines whether the given array represents a valid homogeneous
+ * transformation matrix.
  *
  * @param[in] transform 4x4 matrix in column-major format.
  *
- * @return True if the array represents a homogeneous transformation matrix, otherwise false.
+ * @return True if the array represents a homogeneous transformation matrix,
+ * otherwise false.
  */
-inline bool isHomogeneousTransformation(const std::array<double, 16>& transform) noexcept {
+inline bool isHomogeneousTransformation(
+    const std::array<double, 16>& transform) noexcept {
   constexpr double kOrthonormalThreshold = 1e-5;
 
-  if (transform[3] != 0.0 || transform[7] != 0.0 || transform[11] != 0.0 || transform[15] != 1.0) {
+  if (transform[3] != 0.0 || transform[7] != 0.0 || transform[11] != 0.0 ||
+      transform[15] != 1.0) {
     return false;
   }
   for (size_t j = 0; j < 3; ++j) {  // i..column
-    if (std::abs(std::sqrt(std::pow(transform[j * 4 + 0], 2) + std::pow(transform[j * 4 + 1], 2) +
+    if (std::abs(std::sqrt(std::pow(transform[j * 4 + 0], 2) +
+                           std::pow(transform[j * 4 + 1], 2) +
                            std::pow(transform[j * 4 + 2], 2)) -
                  1.0) > kOrthonormalThreshold) {
       return false;
     }
   }
   for (size_t i = 0; i < 3; ++i) {  // j..row
-    if (std::abs(std::sqrt(std::pow(transform[0 * 4 + i], 2) + std::pow(transform[1 * 4 + i], 2) +
+    if (std::abs(std::sqrt(std::pow(transform[0 * 4 + i], 2) +
+                           std::pow(transform[1 * 4 + i], 2) +
                            std::pow(transform[2 * 4 + i], 2)) -
                  1.0) > kOrthonormalThreshold) {
       return false;
@@ -84,15 +90,16 @@ bool setCurrentThreadToHighestSchedulerPriority(std::string* error_message);
  */
 template <size_t N>
 inline void checkFinite(const std::array<double, N>& array) {
-  if (!std::all_of(array.begin(), array.end(),
-                   [](double array_element) { return std::isfinite(array_element); })) {
+  if (!std::all_of(array.begin(), array.end(), [](double array_element) {
+        return std::isfinite(array_element);
+      })) {
     throw std::invalid_argument("Commanding value is infinite or NaN.");
   }
 }
 
 /**
- * Checks if all elements of the transformation matrix are finite and if it is a homogeneous
- * transformation
+ * Checks if all elements of the transformation matrix are finite and if it is a
+ * homogeneous transformation
  *
  * @param transform the transformation matrix to check
  */
@@ -100,13 +107,15 @@ inline void checkMatrix(const std::array<double, 16>& transform) {
   checkFinite(transform);
   if (!isHomogeneousTransformation(transform)) {
     throw std::invalid_argument(
-        "libagimus_franka: Attempt to set invalid transformation in motion generator. Has to be column "
+        "libagimus_franka: Attempt to set invalid transformation in motion "
+        "generator. Has to be column "
         "major!");
   }
 }
 
 /**
- * Checks if all elements of the elbow vector are finite and if the elbow configuration is valid
+ * Checks if all elements of the elbow vector are finite and if the elbow
+ * configuration is valid
  *
  * @param elbow the elbow vector to check
  */
@@ -114,7 +123,8 @@ inline void checkElbow(const std::array<double, 2>& elbow) {
   checkFinite(elbow);
   if (!isValidElbow(elbow)) {
     throw std::invalid_argument(
-        "Invalid elbow configuration given! Only +1 or -1 are allowed for the sign of the 4th "
+        "Invalid elbow configuration given! Only +1 or -1 are allowed for the "
+        "sign of the 4th "
         "joint.");
   }
 }

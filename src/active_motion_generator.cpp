@@ -24,27 +24,36 @@ void ActiveMotionGenerator<MotionGeneratorType>::writeOnce(
     const MotionGeneratorType& motion_generator_input,
     const std::optional<const Torques>& control_input) {
   if (control_finished) {
-    throw agimus_franka::ControlException("writeOnce must not be called after the motion has finished.");
+    throw agimus_franka::ControlException(
+        "writeOnce must not be called after the motion has finished.");
   }
 
   if (control_input.has_value() &&
-      controller_type_ != agimus_research_interface::robot::Move::ControllerMode::kExternalController) {
-    throw agimus_franka::ControlException("Torques can only be commanded in kExternalController mode.");
+      controller_type_ != agimus_research_interface::robot::Move::
+                              ControllerMode::kExternalController) {
+    throw agimus_franka::ControlException(
+        "Torques can only be commanded in kExternalController mode.");
   }
 
   if (!control_input.has_value() &&
-      controller_type_ == agimus_research_interface::robot::Move::ControllerMode::kExternalController) {
+      controller_type_ == agimus_research_interface::robot::Move::
+                              ControllerMode::kExternalController) {
     throw agimus_franka::ControlException(
-        "Torque command missing, please use writeOnce(const MotionGeneratorType& "
-        "motion_generator_input, const Torques& control_input) for external controllers.");
+        "Torque command missing, please use writeOnce(const "
+        "MotionGeneratorType& "
+        "motion_generator_input, const Torques& control_input) for external "
+        "controllers.");
   }
 
-  if (motion_generator_input.motion_finished || isTorqueControlFinished(control_input)) {
-    auto motion_command = robot_impl->createMotionCommand(motion_generator_input);
+  if (motion_generator_input.motion_finished ||
+      isTorqueControlFinished(control_input)) {
+    auto motion_command =
+        robot_impl->createMotionCommand(motion_generator_input);
     if (!control_input.has_value()) {
       robot_impl->finishMotion(motion_id, &motion_command, nullptr);
     } else {
-      auto control_command = robot_impl->createControllerCommand(control_input.value());
+      auto control_command =
+          robot_impl->createControllerCommand(control_input.value());
       robot_impl->finishMotion(motion_id, &motion_command, &control_command);
     }
 

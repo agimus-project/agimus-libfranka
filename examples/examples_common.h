@@ -2,14 +2,13 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
-#include <array>
-
-#include <Eigen/Core>
-
 #include <agimus_franka/control_types.h>
 #include <agimus_franka/duration.h>
 #include <agimus_franka/robot.h>
 #include <agimus_franka/robot_state.h>
+
+#include <Eigen/Core>
+#include <array>
 
 /**
  * @file examples_common.h
@@ -24,9 +23,9 @@
 void setDefaultBehavior(agimus_franka::Robot& robot);
 
 /**
- * An example showing how to generate a joint pose motion to a goal position. Adapted from:
- * Wisama Khalil and Etienne Dombre. 2002. Modeling, Identification and Control of Robots
- * (Kogan Page Science Paper edition).
+ * An example showing how to generate a joint pose motion to a goal position.
+ * Adapted from: Wisama Khalil and Etienne Dombre. 2002. Modeling,
+ * Identification and Control of Robots (Kogan Page Science Paper edition).
  */
 class MotionGenerator {
  public:
@@ -46,7 +45,9 @@ class MotionGenerator {
    *
    * @return Joint positions for use inside a control loop.
    */
-  agimus_franka::JointPositions operator()(const agimus_franka::RobotState& robot_state, agimus_franka::Duration period);
+  agimus_franka::JointPositions operator()(
+      const agimus_franka::RobotState& robot_state,
+      agimus_franka::Duration period);
 
  private:
   using Vector7d = Eigen::Matrix<double, 7, 1, Eigen::ColMajor>;
@@ -69,7 +70,8 @@ class MotionGenerator {
 
   double time_ = 0.0;
 
-  Vector7d dq_max_ = (Vector7d() << 2.0, 2.0, 2.0, 2.0, 2.5, 2.5, 2.5).finished();
+  Vector7d dq_max_ =
+      (Vector7d() << 2.0, 2.0, 2.0, 2.0, 2.5, 2.5, 2.5).finished();
   Vector7d ddq_max_start_ = (Vector7d() << 5, 5, 5, 5, 5, 5, 5).finished();
   Vector7d ddq_max_goal_ = (Vector7d() << 5, 5, 5, 5, 5, 5, 5).finished();
 };

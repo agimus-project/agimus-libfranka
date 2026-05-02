@@ -3,7 +3,6 @@
 #include "library_loader.h"
 
 #include <Poco/Exception.h>
-
 #include <agimus_franka/exception.h>
 
 using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
@@ -15,9 +14,11 @@ LibraryLoader::LibraryLoader(const std::string& filepath) try {
 } catch (const Poco::LibraryAlreadyLoadedException& e) {
   throw ModelException("libagimus_franka: Model library already loaded"s);
 } catch (const Poco::LibraryLoadException& e) {
-  throw ModelException("libagimus_franka: Cannot load model library: "s + e.what());
+  throw ModelException("libagimus_franka: Cannot load model library: "s +
+                       e.what());
 } catch (const Poco::Exception& e) {
-  throw ModelException("libagimus_franka: Error while loading library: "s + e.what());
+  throw ModelException("libagimus_franka: Error while loading library: "s +
+                       e.what());
 }
 
 LibraryLoader::~LibraryLoader() {
@@ -30,9 +31,11 @@ LibraryLoader::~LibraryLoader() {
 void* LibraryLoader::getSymbol(const std::string& symbol_name) try {
   return library_.getSymbol(symbol_name);
 } catch (const Poco::NotFoundException& e) {
-  throw ModelException("libagimus_franka: Symbol cannot be found: "s + e.what());
+  throw ModelException("libagimus_franka: Symbol cannot be found: "s +
+                       e.what());
 } catch (const Poco::Exception& e) {
-  throw ModelException("libagimus_franka: Error while fetching symbols: "s + e.what());
+  throw ModelException("libagimus_franka: Error while fetching symbols: "s +
+                       e.what());
 }
 
 }  // namespace agimus_franka

@@ -1,16 +1,15 @@
 // Copyright (c) 2023 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
+#include <agimus_franka/lowpass_filter.h>
+#include <gmock/gmock.h>
+
 #include <exception>
 #include <functional>
 
-#include <gmock/gmock.h>
-
-#include <agimus_franka/lowpass_filter.h>
 #include "control_loop.h"
-#include "motion_generator_traits.h"
-
 #include "helpers.h"
 #include "mock_robot_control.h"
+#include "motion_generator_traits.h"
 
 using namespace ::testing;
 
@@ -50,7 +49,8 @@ struct MockMotionCallback {
 };
 
 double getCutoffFreq(bool filter) {
-  return (filter) ? agimus_franka::kDefaultCutoffFrequency : agimus_franka::kMaxCutoffFrequency;
+  return (filter) ? agimus_franka::kDefaultCutoffFrequency
+                  : agimus_franka::kMaxCutoffFrequency;
 }
 
 template <bool LimitRate, bool Filter>
@@ -98,8 +98,9 @@ class ControlLoops : public ::testing::Test {
   using MotionGeneratorCallback = typename Loop::MotionGeneratorCallback;
   using ControlCallback = typename Loop::ControlCallback;
 
-  const agimus_research_interface::robot::Move::MotionGeneratorMode kMotionGeneratorMode =
-      agimus_franka::MotionGeneratorTraits<TMotion>::kMotionGeneratorMode;
+  const agimus_research_interface::robot::Move::MotionGeneratorMode
+      kMotionGeneratorMode =
+          agimus_franka::MotionGeneratorTraits<TMotion>::kMotionGeneratorMode;
 
   static constexpr bool kLimitRate = T::kLimitRate;
   static constexpr bool kFilter = T::kFilter;
@@ -116,8 +117,9 @@ class ControlLoopWithTransformationMatrix : public ::testing::Test {
   using MotionGeneratorCallback = typename Loop::MotionGeneratorCallback;
   using ControlCallback = typename Loop::ControlCallback;
 
-  const agimus_research_interface::robot::Move::MotionGeneratorMode kMotionGeneratorMode =
-      agimus_franka::MotionGeneratorTraits<TMotion>::kMotionGeneratorMode;
+  const agimus_research_interface::robot::Move::MotionGeneratorMode
+      kMotionGeneratorMode =
+          agimus_franka::MotionGeneratorTraits<TMotion>::kMotionGeneratorMode;
 
   static constexpr bool kLimitRate = T::kLimitRate;
   static constexpr bool kFilter = T::kFilter;
@@ -132,8 +134,9 @@ class ControlLoopWithElbow : public ::testing::Test {
   using MotionGeneratorCallback = typename Loop::MotionGeneratorCallback;
   using ControlCallback = typename Loop::ControlCallback;
 
-  const agimus_research_interface::robot::Move::MotionGeneratorMode kMotionGeneratorMode =
-      agimus_franka::MotionGeneratorTraits<TMotion>::kMotionGeneratorMode;
+  const agimus_research_interface::robot::Move::MotionGeneratorMode
+      kMotionGeneratorMode =
+          agimus_franka::MotionGeneratorTraits<TMotion>::kMotionGeneratorMode;
 
   static constexpr bool kLimitRate = T::kLimitRate;
   static constexpr bool kFilter = T::kFilter;
@@ -161,47 +164,59 @@ JointPositions ControlLoops<JointPositionMotion<false, false>>::createMotion() {
 }
 
 template <>
-JointPositions ControlLoops<JointPositionMotion<true, true>>::createInvalidMotion(
+JointPositions
+ControlLoops<JointPositionMotion<true, true>>::createInvalidMotion(
     double invalid_value) {
   return JointPositions({0, 1, invalid_value, 3, 4, 5, 6});
 }
 
 template <>
-JointPositions ControlLoops<JointPositionMotion<false, true>>::createInvalidMotion(
+JointPositions
+ControlLoops<JointPositionMotion<false, true>>::createInvalidMotion(
     double invalid_value) {
   return JointPositions({0, 1, invalid_value, 3, 4, 5, 6});
 }
 
 template <>
-JointPositions ControlLoops<JointPositionMotion<true, false>>::createInvalidMotion(
+JointPositions
+ControlLoops<JointPositionMotion<true, false>>::createInvalidMotion(
     double invalid_value) {
   return JointPositions({0, 1, invalid_value, 3, 4, 5, 6});
 }
 
 template <>
-JointPositions ControlLoops<JointPositionMotion<false, false>>::createInvalidMotion(
+JointPositions
+ControlLoops<JointPositionMotion<false, false>>::createInvalidMotion(
     double invalid_value) {
   return JointPositions({0, 1, invalid_value, 3, 4, 5, 6});
 }
 
 template <>
-auto ControlLoops<JointPositionMotion<true, true>>::getField(const JointPositions& values) {
-  return Field(&agimus_research_interface::robot::MotionGeneratorCommand::q_c, Lt(values.q));
+auto ControlLoops<JointPositionMotion<true, true>>::getField(
+    const JointPositions& values) {
+  return Field(&agimus_research_interface::robot::MotionGeneratorCommand::q_c,
+               Lt(values.q));
 }
 
 template <>
-auto ControlLoops<JointPositionMotion<false, true>>::getField(const JointPositions& values) {
-  return Field(&agimus_research_interface::robot::MotionGeneratorCommand::q_c, Lt(values.q));
+auto ControlLoops<JointPositionMotion<false, true>>::getField(
+    const JointPositions& values) {
+  return Field(&agimus_research_interface::robot::MotionGeneratorCommand::q_c,
+               Lt(values.q));
 }
 
 template <>
-auto ControlLoops<JointPositionMotion<true, false>>::getField(const JointPositions& values) {
-  return Field(&agimus_research_interface::robot::MotionGeneratorCommand::q_c, Lt(values.q));
+auto ControlLoops<JointPositionMotion<true, false>>::getField(
+    const JointPositions& values) {
+  return Field(&agimus_research_interface::robot::MotionGeneratorCommand::q_c,
+               Lt(values.q));
 }
 
 template <>
-auto ControlLoops<JointPositionMotion<false, false>>::getField(const JointPositions& values) {
-  return Field(&agimus_research_interface::robot::MotionGeneratorCommand::q_c, Eq(values.q));
+auto ControlLoops<JointPositionMotion<false, false>>::getField(
+    const JointPositions& values) {
+  return Field(&agimus_research_interface::robot::MotionGeneratorCommand::q_c,
+               Eq(values.q));
 }
 
 template <>
@@ -220,52 +235,65 @@ JointVelocities ControlLoops<JointVelocityMotion<true, false>>::createMotion() {
 }
 
 template <>
-JointVelocities ControlLoops<JointVelocityMotion<false, false>>::createMotion() {
+JointVelocities
+ControlLoops<JointVelocityMotion<false, false>>::createMotion() {
   return JointVelocities({0, 1, 2, 3, 4, 5, 6});
 }
 
 template <>
-JointVelocities ControlLoops<JointVelocityMotion<true, true>>::createInvalidMotion(
+JointVelocities
+ControlLoops<JointVelocityMotion<true, true>>::createInvalidMotion(
     double invalid_value) {
   return JointVelocities({0, 1, invalid_value, 3, 4, 5, 6});
 }
 
 template <>
-JointVelocities ControlLoops<JointVelocityMotion<false, true>>::createInvalidMotion(
+JointVelocities
+ControlLoops<JointVelocityMotion<false, true>>::createInvalidMotion(
     double invalid_value) {
   return JointVelocities({0, 1, invalid_value, 3, 4, 5, 6});
 }
 
 template <>
-JointVelocities ControlLoops<JointVelocityMotion<true, false>>::createInvalidMotion(
+JointVelocities
+ControlLoops<JointVelocityMotion<true, false>>::createInvalidMotion(
     double invalid_value) {
   return JointVelocities({0, 1, invalid_value, 3, 4, 5, 6});
 }
 
 template <>
-JointVelocities ControlLoops<JointVelocityMotion<false, false>>::createInvalidMotion(
+JointVelocities
+ControlLoops<JointVelocityMotion<false, false>>::createInvalidMotion(
     double invalid_value) {
   return JointVelocities({0, 1, invalid_value, 3, 4, 5, 6});
 }
 
 template <>
-auto ControlLoops<JointVelocityMotion<true, true>>::getField(const JointVelocities& velocities) {
-  return Field(&agimus_research_interface::robot::MotionGeneratorCommand::dq_c, Lt(velocities.dq));
+auto ControlLoops<JointVelocityMotion<true, true>>::getField(
+    const JointVelocities& velocities) {
+  return Field(&agimus_research_interface::robot::MotionGeneratorCommand::dq_c,
+               Lt(velocities.dq));
 }
 
 template <>
-auto ControlLoops<JointVelocityMotion<false, true>>::getField(const JointVelocities& velocities) {
-  return Field(&agimus_research_interface::robot::MotionGeneratorCommand::dq_c, Lt(velocities.dq));
+auto ControlLoops<JointVelocityMotion<false, true>>::getField(
+    const JointVelocities& velocities) {
+  return Field(&agimus_research_interface::robot::MotionGeneratorCommand::dq_c,
+               Lt(velocities.dq));
 }
 
 template <>
-auto ControlLoops<JointVelocityMotion<true, false>>::getField(const JointVelocities& velocities) {
-  return Field(&agimus_research_interface::robot::MotionGeneratorCommand::dq_c, Lt(velocities.dq));
+auto ControlLoops<JointVelocityMotion<true, false>>::getField(
+    const JointVelocities& velocities) {
+  return Field(&agimus_research_interface::robot::MotionGeneratorCommand::dq_c,
+               Lt(velocities.dq));
 }
 
 template <>
-auto ControlLoops<JointVelocityMotion<false, false>>::getField(const JointVelocities& velocities) {
-  return Field(&agimus_research_interface::robot::MotionGeneratorCommand::dq_c, Eq(velocities.dq));
+auto ControlLoops<JointVelocityMotion<false, false>>::getField(
+    const JointVelocities& velocities) {
+  return Field(&agimus_research_interface::robot::MotionGeneratorCommand::dq_c,
+               Eq(velocities.dq));
 }
 
 template <>
@@ -289,269 +317,341 @@ CartesianPose ControlLoops<CartesianPoseMotion<false, false>>::createMotion() {
 }
 
 template <>
-CartesianPose ControlLoops<CartesianPoseMotion<true, true>>::createInvalidMotion(
+CartesianPose
+ControlLoops<CartesianPoseMotion<true, true>>::createInvalidMotion(
     double invalid_value) {
-  return CartesianPose(
-      {1.0, 0.0, 0.0, invalid_value, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0});
+  return CartesianPose({1.0, 0.0, 0.0, invalid_value, 0.0, 1.0, 0.0, 0.0, 0.0,
+                        0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0});
 }
 
 template <>
-CartesianPose ControlLoops<CartesianPoseMotion<false, true>>::createInvalidMotion(
+CartesianPose
+ControlLoops<CartesianPoseMotion<false, true>>::createInvalidMotion(
     double invalid_value) {
-  return CartesianPose(
-      {1.0, 0.0, 0.0, invalid_value, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0});
+  return CartesianPose({1.0, 0.0, 0.0, invalid_value, 0.0, 1.0, 0.0, 0.0, 0.0,
+                        0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0});
 }
 
 template <>
-CartesianPose ControlLoops<CartesianPoseMotion<true, false>>::createInvalidMotion(
+CartesianPose
+ControlLoops<CartesianPoseMotion<true, false>>::createInvalidMotion(
     double invalid_value) {
-  return CartesianPose(
-      {1.0, 0.0, 0.0, invalid_value, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0});
+  return CartesianPose({1.0, 0.0, 0.0, invalid_value, 0.0, 1.0, 0.0, 0.0, 0.0,
+                        0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0});
 }
 
 template <>
-CartesianPose ControlLoops<CartesianPoseMotion<false, false>>::createInvalidMotion(
+CartesianPose
+ControlLoops<CartesianPoseMotion<false, false>>::createInvalidMotion(
     double invalid_value) {
-  return CartesianPose(
-      {1.0, 0.0, 0.0, invalid_value, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0});
+  return CartesianPose({1.0, 0.0, 0.0, invalid_value, 0.0, 1.0, 0.0, 0.0, 0.0,
+                        0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0});
 }
 
 template <>
 CartesianPose ControlLoopWithTransformationMatrix<
     CartesianPoseMotion<true, true>>::createInvalidTransformationMatrix() {
-  return CartesianPose(
-      {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
+  return CartesianPose({0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0, 0.0});
 }
 
 template <>
 CartesianPose ControlLoopWithTransformationMatrix<
     CartesianPoseMotion<false, true>>::createInvalidTransformationMatrix() {
-  return CartesianPose(
-      {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
+  return CartesianPose({0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0, 0.0});
 }
 
 template <>
 CartesianPose ControlLoopWithTransformationMatrix<
     CartesianPoseMotion<true, false>>::createInvalidTransformationMatrix() {
-  return CartesianPose(
-      {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
+  return CartesianPose({0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0, 0.0});
 }
 
 template <>
 CartesianPose ControlLoopWithTransformationMatrix<
     CartesianPoseMotion<false, false>>::createInvalidTransformationMatrix() {
-  return CartesianPose(
-      {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
+  return CartesianPose({0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0, 0.0});
 }
 
 template <>
-auto ControlLoops<CartesianPoseMotion<true, true>>::getField(const CartesianPose& pose) {
-  return AllOf(Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_T_EE_c, Eq(pose.O_T_EE)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
-                     Eq(std::array<double, 2>({0, 0}))),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::valid_elbow, Eq(false)));
+auto ControlLoops<CartesianPoseMotion<true, true>>::getField(
+    const CartesianPose& pose) {
+  return AllOf(
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_T_EE_c,
+            Eq(pose.O_T_EE)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
+            Eq(std::array<double, 2>({0, 0}))),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::
+                valid_elbow,
+            Eq(false)));
 }
 
 template <>
-auto ControlLoops<CartesianPoseMotion<false, true>>::getField(const CartesianPose& pose) {
-  return AllOf(Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_T_EE_c, Eq(pose.O_T_EE)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
-                     Eq(std::array<double, 2>({0, 0}))),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::valid_elbow, Eq(false)));
+auto ControlLoops<CartesianPoseMotion<false, true>>::getField(
+    const CartesianPose& pose) {
+  return AllOf(
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_T_EE_c,
+            Eq(pose.O_T_EE)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
+            Eq(std::array<double, 2>({0, 0}))),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::
+                valid_elbow,
+            Eq(false)));
 }
 
 template <>
-auto ControlLoops<CartesianPoseMotion<true, false>>::getField(const CartesianPose& pose) {
-  return AllOf(Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_T_EE_c, Eq(pose.O_T_EE)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
-                     Eq(std::array<double, 2>({0, 0}))),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::valid_elbow, Eq(false)));
+auto ControlLoops<CartesianPoseMotion<true, false>>::getField(
+    const CartesianPose& pose) {
+  return AllOf(
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_T_EE_c,
+            Eq(pose.O_T_EE)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
+            Eq(std::array<double, 2>({0, 0}))),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::
+                valid_elbow,
+            Eq(false)));
 }
 
 template <>
-auto ControlLoops<CartesianPoseMotion<false, false>>::getField(const CartesianPose& pose) {
-  return AllOf(Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_T_EE_c, Eq(pose.O_T_EE)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
-                     Eq(std::array<double, 2>({0, 0}))),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::valid_elbow, Eq(false)));
+auto ControlLoops<CartesianPoseMotion<false, false>>::getField(
+    const CartesianPose& pose) {
+  return AllOf(
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_T_EE_c,
+            Eq(pose.O_T_EE)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
+            Eq(std::array<double, 2>({0, 0}))),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::
+                valid_elbow,
+            Eq(false)));
 }
 
 template <>
-CartesianPose ControlLoops<CartesianPoseMotionWithElbow<true, true>>::createMotion() {
-  return CartesianPose({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}, {0, 1});
+CartesianPose
+ControlLoops<CartesianPoseMotionWithElbow<true, true>>::createMotion() {
+  return CartesianPose({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+                       {0, 1});
 }
 
 template <>
-CartesianPose ControlLoops<CartesianPoseMotionWithElbow<false, true>>::createMotion() {
-  return CartesianPose({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}, {0, 1});
+CartesianPose
+ControlLoops<CartesianPoseMotionWithElbow<false, true>>::createMotion() {
+  return CartesianPose({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+                       {0, 1});
 }
 
 template <>
-CartesianPose ControlLoops<CartesianPoseMotionWithElbow<true, false>>::createMotion() {
-  return CartesianPose({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}, {0, 1});
+CartesianPose
+ControlLoops<CartesianPoseMotionWithElbow<true, false>>::createMotion() {
+  return CartesianPose({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+                       {0, 1});
 }
 
 template <>
-CartesianPose ControlLoops<CartesianPoseMotionWithElbow<false, false>>::createMotion() {
-  return CartesianPose({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}, {0, 1});
+CartesianPose
+ControlLoops<CartesianPoseMotionWithElbow<false, false>>::createMotion() {
+  return CartesianPose({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+                       {0, 1});
 }
 
 template <>
-CartesianPose ControlLoops<CartesianPoseMotionWithElbow<true, true>>::createInvalidMotion(
+CartesianPose
+ControlLoops<CartesianPoseMotionWithElbow<true, true>>::createInvalidMotion(
     double invalid_value) {
-  return CartesianPose(
-      {1.0, 0.0, 0.0, invalid_value, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0},
-      {0, 1});
+  return CartesianPose({1.0, 0.0, 0.0, invalid_value, 0.0, 1.0, 0.0, 0.0, 0.0,
+                        0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0},
+                       {0, 1});
 }
 
 template <>
-CartesianPose ControlLoops<CartesianPoseMotionWithElbow<false, true>>::createInvalidMotion(
+CartesianPose
+ControlLoops<CartesianPoseMotionWithElbow<false, true>>::createInvalidMotion(
     double invalid_value) {
-  return CartesianPose(
-      {1.0, 0.0, 0.0, invalid_value, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0},
-      {0, 1});
+  return CartesianPose({1.0, 0.0, 0.0, invalid_value, 0.0, 1.0, 0.0, 0.0, 0.0,
+                        0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0},
+                       {0, 1});
 }
 
 template <>
-CartesianPose ControlLoops<CartesianPoseMotionWithElbow<true, false>>::createInvalidMotion(
+CartesianPose
+ControlLoops<CartesianPoseMotionWithElbow<true, false>>::createInvalidMotion(
     double invalid_value) {
-  return CartesianPose(
-      {1.0, 0.0, 0.0, invalid_value, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0},
-      {0, 1});
+  return CartesianPose({1.0, 0.0, 0.0, invalid_value, 0.0, 1.0, 0.0, 0.0, 0.0,
+                        0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0},
+                       {0, 1});
 }
 
 template <>
-CartesianPose ControlLoops<CartesianPoseMotionWithElbow<false, false>>::createInvalidMotion(
+CartesianPose
+ControlLoops<CartesianPoseMotionWithElbow<false, false>>::createInvalidMotion(
     double invalid_value) {
-  return CartesianPose(
-      {1.0, 0.0, 0.0, invalid_value, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0},
-      {0, 1});
+  return CartesianPose({1.0, 0.0, 0.0, invalid_value, 0.0, 1.0, 0.0, 0.0, 0.0,
+                        0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0},
+                       {0, 1});
 }
 
 template <>
-CartesianPose ControlLoopWithTransformationMatrix<
-    CartesianPoseMotionWithElbow<true, true>>::createInvalidTransformationMatrix() {
-  return CartesianPose(
-      {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, {0, 1});
+CartesianPose ControlLoopWithTransformationMatrix<CartesianPoseMotionWithElbow<
+    true, true>>::createInvalidTransformationMatrix() {
+  return CartesianPose({0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0, 0.0},
+                       {0, 1});
 }
 
 template <>
-CartesianPose ControlLoopWithTransformationMatrix<
-    CartesianPoseMotionWithElbow<false, true>>::createInvalidTransformationMatrix() {
-  return CartesianPose(
-      {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, {0, 1});
+CartesianPose ControlLoopWithTransformationMatrix<CartesianPoseMotionWithElbow<
+    false, true>>::createInvalidTransformationMatrix() {
+  return CartesianPose({0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0, 0.0},
+                       {0, 1});
 }
 
 template <>
-CartesianPose ControlLoopWithTransformationMatrix<
-    CartesianPoseMotionWithElbow<true, false>>::createInvalidTransformationMatrix() {
-  return CartesianPose(
-      {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, {0, 1});
+CartesianPose ControlLoopWithTransformationMatrix<CartesianPoseMotionWithElbow<
+    true, false>>::createInvalidTransformationMatrix() {
+  return CartesianPose({0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0, 0.0},
+                       {0, 1});
 }
 
 template <>
-CartesianPose ControlLoopWithTransformationMatrix<
-    CartesianPoseMotionWithElbow<false, false>>::createInvalidTransformationMatrix() {
-  return CartesianPose(
-      {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, {0, 1});
+CartesianPose ControlLoopWithTransformationMatrix<CartesianPoseMotionWithElbow<
+    false, false>>::createInvalidTransformationMatrix() {
+  return CartesianPose({0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0, 0.0},
+                       {0, 1});
 }
 
 template <>
-CartesianPose ControlLoopWithElbow<CartesianPoseMotionWithElbow<true, true>>::createElbowConfig(
-    double position,
-    double sign) {
-  return CartesianPose({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}, {position, sign});
+CartesianPose ControlLoopWithElbow<CartesianPoseMotionWithElbow<true, true>>::
+    createElbowConfig(double position, double sign) {
+  return CartesianPose({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+                       {position, sign});
 }
 
 template <>
-CartesianPose ControlLoopWithElbow<CartesianPoseMotionWithElbow<false, true>>::createElbowConfig(
-    double position,
-    double sign) {
-  return CartesianPose({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}, {position, sign});
+CartesianPose ControlLoopWithElbow<CartesianPoseMotionWithElbow<false, true>>::
+    createElbowConfig(double position, double sign) {
+  return CartesianPose({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+                       {position, sign});
 }
 
 template <>
-CartesianPose ControlLoopWithElbow<CartesianPoseMotionWithElbow<true, false>>::createElbowConfig(
-    double position,
-    double sign) {
-  return CartesianPose({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}, {position, sign});
+CartesianPose ControlLoopWithElbow<CartesianPoseMotionWithElbow<true, false>>::
+    createElbowConfig(double position, double sign) {
+  return CartesianPose({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+                       {position, sign});
 }
 
 template <>
-CartesianPose ControlLoopWithElbow<CartesianPoseMotionWithElbow<false, false>>::createElbowConfig(
-    double position,
-    double sign) {
-  return CartesianPose({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}, {position, sign});
+CartesianPose ControlLoopWithElbow<CartesianPoseMotionWithElbow<false, false>>::
+    createElbowConfig(double position, double sign) {
+  return CartesianPose({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+                       {position, sign});
 }
 
 template <>
-auto ControlLoops<CartesianPoseMotionWithElbow<true, true>>::getField(const CartesianPose& pose) {
-  return AllOf(Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_T_EE_c, Eq(pose.O_T_EE)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c, Eq(pose.elbow)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::valid_elbow, Eq(true)));
+auto ControlLoops<CartesianPoseMotionWithElbow<true, true>>::getField(
+    const CartesianPose& pose) {
+  return AllOf(
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_T_EE_c,
+            Eq(pose.O_T_EE)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
+            Eq(pose.elbow)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::
+                valid_elbow,
+            Eq(true)));
 }
 
 template <>
-auto ControlLoops<CartesianPoseMotionWithElbow<false, true>>::getField(const CartesianPose& pose) {
-  return AllOf(Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_T_EE_c, Eq(pose.O_T_EE)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c, Eq(pose.elbow)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::valid_elbow, Eq(true)));
+auto ControlLoops<CartesianPoseMotionWithElbow<false, true>>::getField(
+    const CartesianPose& pose) {
+  return AllOf(
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_T_EE_c,
+            Eq(pose.O_T_EE)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
+            Eq(pose.elbow)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::
+                valid_elbow,
+            Eq(true)));
 }
 
 template <>
-auto ControlLoops<CartesianPoseMotionWithElbow<true, false>>::getField(const CartesianPose& pose) {
-  return AllOf(Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_T_EE_c, Eq(pose.O_T_EE)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c, Eq(pose.elbow)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::valid_elbow, Eq(true)));
+auto ControlLoops<CartesianPoseMotionWithElbow<true, false>>::getField(
+    const CartesianPose& pose) {
+  return AllOf(
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_T_EE_c,
+            Eq(pose.O_T_EE)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
+            Eq(pose.elbow)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::
+                valid_elbow,
+            Eq(true)));
 }
 
 template <>
-auto ControlLoops<CartesianPoseMotionWithElbow<false, false>>::getField(const CartesianPose& pose) {
-  return AllOf(Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_T_EE_c, Eq(pose.O_T_EE)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c, Eq(pose.elbow)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::valid_elbow, Eq(true)));
+auto ControlLoops<CartesianPoseMotionWithElbow<false, false>>::getField(
+    const CartesianPose& pose) {
+  return AllOf(
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_T_EE_c,
+            Eq(pose.O_T_EE)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
+            Eq(pose.elbow)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::
+                valid_elbow,
+            Eq(true)));
 }
 
 template <>
-CartesianVelocities ControlLoops<CartesianVelocityMotion<true, true>>::createMotion() {
+CartesianVelocities
+ControlLoops<CartesianVelocityMotion<true, true>>::createMotion() {
   return CartesianVelocities({0, 1, 2, 3, 4, 5});
 }
 
 template <>
-CartesianVelocities ControlLoops<CartesianVelocityMotion<false, true>>::createMotion() {
+CartesianVelocities
+ControlLoops<CartesianVelocityMotion<false, true>>::createMotion() {
   return CartesianVelocities({0, 1, 2, 3, 4, 5});
 }
 
 template <>
-CartesianVelocities ControlLoops<CartesianVelocityMotion<true, false>>::createMotion() {
+CartesianVelocities
+ControlLoops<CartesianVelocityMotion<true, false>>::createMotion() {
   return CartesianVelocities({0, 1, 2, 3, 4, 5});
 }
 
 template <>
-CartesianVelocities ControlLoops<CartesianVelocityMotion<false, false>>::createMotion() {
+CartesianVelocities
+ControlLoops<CartesianVelocityMotion<false, false>>::createMotion() {
   return CartesianVelocities({0, 1, 2, 3, 4, 5});
 }
 
 template <>
-CartesianVelocities ControlLoops<CartesianVelocityMotion<true, true>>::createInvalidMotion(
+CartesianVelocities
+ControlLoops<CartesianVelocityMotion<true, true>>::createInvalidMotion(
     double invalid_value) {
   return CartesianVelocities({0, 1, invalid_value, 3, 4, 5});
 }
 
 template <>
-CartesianVelocities ControlLoops<CartesianVelocityMotion<false, true>>::createInvalidMotion(
+CartesianVelocities
+ControlLoops<CartesianVelocityMotion<false, true>>::createInvalidMotion(
     double invalid_value) {
   return CartesianVelocities({0, 1, invalid_value, 3, 4, 5});
 }
 
 template <>
-CartesianVelocities ControlLoops<CartesianVelocityMotion<true, false>>::createInvalidMotion(
+CartesianVelocities
+ControlLoops<CartesianVelocityMotion<true, false>>::createInvalidMotion(
     double invalid_value) {
   return CartesianVelocities({0, 1, invalid_value, 3, 4, 5});
 }
 
 template <>
-CartesianVelocities ControlLoops<CartesianVelocityMotion<false, false>>::createInvalidMotion(
+CartesianVelocities
+ControlLoops<CartesianVelocityMotion<false, false>>::createInvalidMotion(
     double invalid_value) {
   return CartesianVelocities({0, 1, invalid_value, 3, 4, 5});
 }
@@ -559,184 +659,206 @@ CartesianVelocities ControlLoops<CartesianVelocityMotion<false, false>>::createI
 template <>
 auto ControlLoops<CartesianVelocityMotion<true, true>>::getField(
     const CartesianVelocities& cartesian_velocities) {
-  return AllOf(Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_dP_EE_c,
-                     Lt(cartesian_velocities.O_dP_EE)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
-                     Eq(std::array<double, 2>({0, 0}))),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::valid_elbow, Eq(false)));
+  return AllOf(
+      Field(
+          &agimus_research_interface::robot::MotionGeneratorCommand::O_dP_EE_c,
+          Lt(cartesian_velocities.O_dP_EE)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
+            Eq(std::array<double, 2>({0, 0}))),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::
+                valid_elbow,
+            Eq(false)));
 }
 
 template <>
 auto ControlLoops<CartesianVelocityMotion<false, true>>::getField(
     const CartesianVelocities& cartesian_velocities) {
-  return AllOf(Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_dP_EE_c,
-                     Lt(cartesian_velocities.O_dP_EE)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
-                     Eq(std::array<double, 2>({0, 0}))),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::valid_elbow, Eq(false)));
+  return AllOf(
+      Field(
+          &agimus_research_interface::robot::MotionGeneratorCommand::O_dP_EE_c,
+          Lt(cartesian_velocities.O_dP_EE)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
+            Eq(std::array<double, 2>({0, 0}))),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::
+                valid_elbow,
+            Eq(false)));
 }
 
 template <>
 auto ControlLoops<CartesianVelocityMotion<true, false>>::getField(
     const CartesianVelocities& cartesian_velocities) {
-  return AllOf(Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_dP_EE_c,
-                     Lt(cartesian_velocities.O_dP_EE)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
-                     Eq(std::array<double, 2>({0, 0}))),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::valid_elbow, Eq(false)));
+  return AllOf(
+      Field(
+          &agimus_research_interface::robot::MotionGeneratorCommand::O_dP_EE_c,
+          Lt(cartesian_velocities.O_dP_EE)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
+            Eq(std::array<double, 2>({0, 0}))),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::
+                valid_elbow,
+            Eq(false)));
 }
 
 template <>
 auto ControlLoops<CartesianVelocityMotion<false, false>>::getField(
     const CartesianVelocities& cartesian_velocities) {
-  return AllOf(Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_dP_EE_c,
-                     Eq(cartesian_velocities.O_dP_EE)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
-                     Eq(std::array<double, 2>({0, 0}))),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::valid_elbow, Eq(false)));
-}
-
-template <>
-CartesianVelocities ControlLoops<CartesianVelocityMotionWithElbow<true, true>>::createMotion() {
-  return CartesianVelocities({0, 1, 2, 3, 4, 5}, {0, -1});
-}
-
-template <>
-CartesianVelocities ControlLoops<CartesianVelocityMotionWithElbow<false, true>>::createMotion() {
-  return CartesianVelocities({0, 1, 2, 3, 4, 5}, {0, -1});
-}
-
-template <>
-CartesianVelocities ControlLoops<CartesianVelocityMotionWithElbow<true, false>>::createMotion() {
-  return CartesianVelocities({0, 1, 2, 3, 4, 5}, {0, -1});
-}
-
-template <>
-CartesianVelocities ControlLoops<CartesianVelocityMotionWithElbow<false, false>>::createMotion() {
-  return CartesianVelocities({0, 1, 2, 3, 4, 5}, {0, -1});
-}
-
-template <>
-CartesianVelocities ControlLoops<CartesianVelocityMotionWithElbow<true, true>>::createInvalidMotion(
-    double invalid_value) {
-  return CartesianVelocities({0, 1, invalid_value, 3, 4, 5}, {0, -1});
+  return AllOf(
+      Field(
+          &agimus_research_interface::robot::MotionGeneratorCommand::O_dP_EE_c,
+          Eq(cartesian_velocities.O_dP_EE)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
+            Eq(std::array<double, 2>({0, 0}))),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::
+                valid_elbow,
+            Eq(false)));
 }
 
 template <>
 CartesianVelocities
-ControlLoops<CartesianVelocityMotionWithElbow<false, true>>::createInvalidMotion(
-    double invalid_value) {
-  return CartesianVelocities({0, 1, invalid_value, 3, 4, 5}, {0, -1});
+ControlLoops<CartesianVelocityMotionWithElbow<true, true>>::createMotion() {
+  return CartesianVelocities({0, 1, 2, 3, 4, 5}, {0, -1});
 }
 
 template <>
 CartesianVelocities
-ControlLoops<CartesianVelocityMotionWithElbow<true, false>>::createInvalidMotion(
-    double invalid_value) {
-  return CartesianVelocities({0, 1, invalid_value, 3, 4, 5}, {0, -1});
+ControlLoops<CartesianVelocityMotionWithElbow<false, true>>::createMotion() {
+  return CartesianVelocities({0, 1, 2, 3, 4, 5}, {0, -1});
 }
 
 template <>
 CartesianVelocities
-ControlLoops<CartesianVelocityMotionWithElbow<false, false>>::createInvalidMotion(
+ControlLoops<CartesianVelocityMotionWithElbow<true, false>>::createMotion() {
+  return CartesianVelocities({0, 1, 2, 3, 4, 5}, {0, -1});
+}
+
+template <>
+CartesianVelocities
+ControlLoops<CartesianVelocityMotionWithElbow<false, false>>::createMotion() {
+  return CartesianVelocities({0, 1, 2, 3, 4, 5}, {0, -1});
+}
+
+template <>
+CartesianVelocities
+ControlLoops<CartesianVelocityMotionWithElbow<true, true>>::createInvalidMotion(
     double invalid_value) {
   return CartesianVelocities({0, 1, invalid_value, 3, 4, 5}, {0, -1});
 }
 
 template <>
-CartesianVelocities ControlLoopWithElbow<
-    CartesianVelocityMotionWithElbow<true, true>>::createElbowConfig(double position, double sign) {
+CartesianVelocities ControlLoops<CartesianVelocityMotionWithElbow<
+    false, true>>::createInvalidMotion(double invalid_value) {
+  return CartesianVelocities({0, 1, invalid_value, 3, 4, 5}, {0, -1});
+}
+
+template <>
+CartesianVelocities ControlLoops<CartesianVelocityMotionWithElbow<
+    true, false>>::createInvalidMotion(double invalid_value) {
+  return CartesianVelocities({0, 1, invalid_value, 3, 4, 5}, {0, -1});
+}
+
+template <>
+CartesianVelocities ControlLoops<CartesianVelocityMotionWithElbow<
+    false, false>>::createInvalidMotion(double invalid_value) {
+  return CartesianVelocities({0, 1, invalid_value, 3, 4, 5}, {0, -1});
+}
+
+template <>
+CartesianVelocities ControlLoopWithElbow<CartesianVelocityMotionWithElbow<
+    true, true>>::createElbowConfig(double position, double sign) {
   return CartesianVelocities({0, 1, 2, 3, 4, 5}, {position, sign});
 }
 
 template <>
-CartesianVelocities
-ControlLoopWithElbow<CartesianVelocityMotionWithElbow<false, true>>::createElbowConfig(
-    double position,
-    double sign) {
+CartesianVelocities ControlLoopWithElbow<CartesianVelocityMotionWithElbow<
+    false, true>>::createElbowConfig(double position, double sign) {
   return CartesianVelocities({0, 1, 2, 3, 4, 5}, {position, sign});
 }
 
 template <>
-CartesianVelocities
-ControlLoopWithElbow<CartesianVelocityMotionWithElbow<true, false>>::createElbowConfig(
-    double position,
-    double sign) {
+CartesianVelocities ControlLoopWithElbow<CartesianVelocityMotionWithElbow<
+    true, false>>::createElbowConfig(double position, double sign) {
   return CartesianVelocities({0, 1, 2, 3, 4, 5}, {position, sign});
 }
 
 template <>
-CartesianVelocities
-ControlLoopWithElbow<CartesianVelocityMotionWithElbow<false, false>>::createElbowConfig(
-    double position,
-    double sign) {
+CartesianVelocities ControlLoopWithElbow<CartesianVelocityMotionWithElbow<
+    false, false>>::createElbowConfig(double position, double sign) {
   return CartesianVelocities({0, 1, 2, 3, 4, 5}, {position, sign});
 }
 
 template <>
 auto ControlLoops<CartesianVelocityMotionWithElbow<true, true>>::getField(
     const CartesianVelocities& cartesian_velocities) {
-  return AllOf(Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_dP_EE_c,
-                     Lt(cartesian_velocities.O_dP_EE)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
-                     Eq(cartesian_velocities.elbow)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::valid_elbow, Eq(true)));
+  return AllOf(
+      Field(
+          &agimus_research_interface::robot::MotionGeneratorCommand::O_dP_EE_c,
+          Lt(cartesian_velocities.O_dP_EE)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
+            Eq(cartesian_velocities.elbow)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::
+                valid_elbow,
+            Eq(true)));
 }
 
 template <>
 auto ControlLoops<CartesianVelocityMotionWithElbow<false, true>>::getField(
     const CartesianVelocities& cartesian_velocities) {
-  return AllOf(Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_dP_EE_c,
-                     Lt(cartesian_velocities.O_dP_EE)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
-                     Eq(cartesian_velocities.elbow)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::valid_elbow, Eq(true)));
+  return AllOf(
+      Field(
+          &agimus_research_interface::robot::MotionGeneratorCommand::O_dP_EE_c,
+          Lt(cartesian_velocities.O_dP_EE)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
+            Eq(cartesian_velocities.elbow)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::
+                valid_elbow,
+            Eq(true)));
 }
 
 template <>
 auto ControlLoops<CartesianVelocityMotionWithElbow<true, false>>::getField(
     const CartesianVelocities& cartesian_velocities) {
-  return AllOf(Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_dP_EE_c,
-                     Lt(cartesian_velocities.O_dP_EE)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
-                     Eq(cartesian_velocities.elbow)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::valid_elbow, Eq(true)));
+  return AllOf(
+      Field(
+          &agimus_research_interface::robot::MotionGeneratorCommand::O_dP_EE_c,
+          Lt(cartesian_velocities.O_dP_EE)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
+            Eq(cartesian_velocities.elbow)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::
+                valid_elbow,
+            Eq(true)));
 }
 
 template <>
 auto ControlLoops<CartesianVelocityMotionWithElbow<false, false>>::getField(
     const CartesianVelocities& cartesian_velocities) {
-  return AllOf(Field(&agimus_research_interface::robot::MotionGeneratorCommand::O_dP_EE_c,
-                     Eq(cartesian_velocities.O_dP_EE)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
-                     Eq(cartesian_velocities.elbow)),
-               Field(&agimus_research_interface::robot::MotionGeneratorCommand::valid_elbow, Eq(true)));
+  return AllOf(
+      Field(
+          &agimus_research_interface::robot::MotionGeneratorCommand::O_dP_EE_c,
+          Eq(cartesian_velocities.O_dP_EE)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::elbow_c,
+            Eq(cartesian_velocities.elbow)),
+      Field(&agimus_research_interface::robot::MotionGeneratorCommand::
+                valid_elbow,
+            Eq(true)));
 }
 
-using MotionTypes = ::testing::Types<JointPositionMotion<false, true>,
-                                     JointVelocityMotion<false, true>,
-                                     CartesianPoseMotion<false, true>,
-                                     CartesianPoseMotionWithElbow<false, true>,
-                                     CartesianVelocityMotion<false, true>,
-                                     CartesianVelocityMotionWithElbow<false, true>,
-                                     JointPositionMotion<true, true>,
-                                     JointVelocityMotion<true, true>,
-                                     CartesianPoseMotion<true, true>,
-                                     CartesianPoseMotionWithElbow<true, true>,
-                                     CartesianVelocityMotion<true, true>,
-                                     CartesianVelocityMotionWithElbow<true, true>,
-                                     JointPositionMotion<false, false>,
-                                     JointVelocityMotion<false, false>,
-                                     CartesianPoseMotion<false, false>,
-                                     CartesianPoseMotionWithElbow<false, false>,
-                                     CartesianVelocityMotion<false, false>,
-                                     CartesianVelocityMotionWithElbow<false, false>,
-                                     JointPositionMotion<true, false>,
-                                     JointVelocityMotion<true, false>,
-                                     CartesianPoseMotion<true, false>,
-                                     CartesianPoseMotionWithElbow<true, false>,
-                                     CartesianVelocityMotion<true, false>,
-                                     CartesianVelocityMotionWithElbow<true, false>>;
+using MotionTypes = ::testing::Types<
+    JointPositionMotion<false, true>, JointVelocityMotion<false, true>,
+    CartesianPoseMotion<false, true>, CartesianPoseMotionWithElbow<false, true>,
+    CartesianVelocityMotion<false, true>,
+    CartesianVelocityMotionWithElbow<false, true>,
+    JointPositionMotion<true, true>, JointVelocityMotion<true, true>,
+    CartesianPoseMotion<true, true>, CartesianPoseMotionWithElbow<true, true>,
+    CartesianVelocityMotion<true, true>,
+    CartesianVelocityMotionWithElbow<true, true>,
+    JointPositionMotion<false, false>, JointVelocityMotion<false, false>,
+    CartesianPoseMotion<false, false>,
+    CartesianPoseMotionWithElbow<false, false>,
+    CartesianVelocityMotion<false, false>,
+    CartesianVelocityMotionWithElbow<false, false>,
+    JointPositionMotion<true, false>, JointVelocityMotion<true, false>,
+    CartesianPoseMotion<true, false>, CartesianPoseMotionWithElbow<true, false>,
+    CartesianVelocityMotion<true, false>,
+    CartesianVelocityMotionWithElbow<true, false>>;
 
 TYPED_TEST_CASE(ControlLoops, MotionTypes);
 
@@ -744,18 +866,20 @@ TYPED_TEST(ControlLoops, CanNotConstructWithoutMotionCallback) {
   StrictMock<MockRobotControl> robot;
 
   EXPECT_THROW(
-      typename TestFixture::Loop loop(robot,
-                                      [](const RobotState&, Duration) {
-                                        return Torques({0, 1, 2, 3, 4, 5, 6});
-                                      },
-                                      typename TestFixture::MotionGeneratorCallback(),
-                                      TestFixture::kLimitRate, getCutoffFreq(TestFixture::kFilter)),
+      typename TestFixture::Loop loop(
+          robot,
+          [](const RobotState&, Duration) {
+            return Torques({0, 1, 2, 3, 4, 5, 6});
+          },
+          typename TestFixture::MotionGeneratorCallback(),
+          TestFixture::kLimitRate, getCutoffFreq(TestFixture::kFilter)),
       std::invalid_argument);
 
   EXPECT_THROW(
-      typename TestFixture::Loop loop(robot, ControllerMode::kCartesianImpedance,
-                                      typename TestFixture::MotionGeneratorCallback(),
-                                      TestFixture::kLimitRate, getCutoffFreq(TestFixture::kFilter)),
+      typename TestFixture::Loop loop(
+          robot, ControllerMode::kCartesianImpedance,
+          typename TestFixture::MotionGeneratorCallback(),
+          TestFixture::kLimitRate, getCutoffFreq(TestFixture::kFilter)),
       std::invalid_argument);
 }
 
@@ -763,43 +887,48 @@ TYPED_TEST(ControlLoops, CanNotConstructWithoutControlCallback) {
   StrictMock<MockRobotControl> robot;
 
   EXPECT_THROW(
-      typename TestFixture::Loop loop(robot, typename TestFixture::ControlCallback(),
-                                      std::bind(&TestFixture::createMotion, this),
-                                      TestFixture::kLimitRate, getCutoffFreq(TestFixture::kFilter)),
+      typename TestFixture::Loop loop(
+          robot, typename TestFixture::ControlCallback(),
+          std::bind(&TestFixture::createMotion, this), TestFixture::kLimitRate,
+          getCutoffFreq(TestFixture::kFilter)),
       std::invalid_argument);
 }
 
 TYPED_TEST(ControlLoops, CanConstructWithMotionAndControllerCallback) {
   MockRobotControl robot;
   EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
-                                 this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
+                                 this->kMotionGeneratorMode,
+                                 TestFixture::Loop::kDefaultDeviation,
                                  TestFixture::Loop::kDefaultDeviation))
       .WillOnce(Return(100));
 
-  EXPECT_NO_THROW(typename TestFixture::Loop(robot,
-                                             [](const RobotState&, Duration) {
-                                               return Torques({0, 1, 2, 3, 4, 5, 6});
-                                             },
-                                             std::bind(&TestFixture::createMotion, this),
-                                             TestFixture::kLimitRate,
-                                             getCutoffFreq(TestFixture::kFilter)));
+  EXPECT_NO_THROW(typename TestFixture::Loop(
+      robot,
+      [](const RobotState&, Duration) {
+        return Torques({0, 1, 2, 3, 4, 5, 6});
+      },
+      std::bind(&TestFixture::createMotion, this), TestFixture::kLimitRate,
+      getCutoffFreq(TestFixture::kFilter)));
 }
 
 TYPED_TEST(ControlLoops, CanConstructWithMotionCallbackAndControllerMode) {
   MockRobotControl robot;
   EXPECT_CALL(robot, startMotion(Move::ControllerMode::kCartesianImpedance,
-                                 this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
+                                 this->kMotionGeneratorMode,
+                                 TestFixture::Loop::kDefaultDeviation,
                                  TestFixture::Loop::kDefaultDeviation))
       .WillOnce(Return(200));
 
   EXPECT_NO_THROW(typename TestFixture::Loop(
-      robot, ControllerMode::kCartesianImpedance, std::bind(&TestFixture::createMotion, this),
-      TestFixture::kLimitRate, getCutoffFreq(TestFixture::kFilter)));
+      robot, ControllerMode::kCartesianImpedance,
+      std::bind(&TestFixture::createMotion, this), TestFixture::kLimitRate,
+      getCutoffFreq(TestFixture::kFilter)));
 }
 
 TYPED_TEST(ControlLoops, SpinOnceWithMotionCallbackAndControllerMode) {
   StrictMock<MockRobotControl> robot;
-  EXPECT_CALL(robot, startMotion(Move::ControllerMode::kJointImpedance, this->kMotionGeneratorMode,
+  EXPECT_CALL(robot, startMotion(Move::ControllerMode::kJointImpedance,
+                                 this->kMotionGeneratorMode,
                                  TestFixture::Loop::kDefaultDeviation,
                                  TestFixture::Loop::kDefaultDeviation))
       .WillOnce(Return(200));
@@ -810,7 +939,8 @@ TYPED_TEST(ControlLoops, SpinOnceWithMotionCallbackAndControllerMode) {
 
   RobotState robot_state = generateValidRobotState();
   Duration duration(1);
-  EXPECT_CALL(motion_callback, invoke(Ref(robot_state), duration)).WillOnce(Return(motion));
+  EXPECT_CALL(motion_callback, invoke(Ref(robot_state), duration))
+      .WillOnce(Return(motion));
 
   typename TestFixture::Loop loop(
       robot, ControllerMode::kJointImpedance,
@@ -826,7 +956,8 @@ TYPED_TEST(ControlLoops, SpinOnceWithMotionCallbackAndControllerMode) {
 TYPED_TEST(ControlLoops, SpinOnceWithMotionAndControllerCallback) {
   StrictMock<MockRobotControl> robot;
   EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
-                                 this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
+                                 this->kMotionGeneratorMode,
+                                 TestFixture::Loop::kDefaultDeviation,
                                  TestFixture::Loop::kDefaultDeviation))
       .WillOnce(Return(200));
 
@@ -839,8 +970,10 @@ TYPED_TEST(ControlLoops, SpinOnceWithMotionAndControllerCallback) {
 
   RobotState robot_state = generateValidRobotState();
   Duration duration(2);
-  EXPECT_CALL(control_callback, invoke(Ref(robot_state), duration)).WillOnce(Return(torques));
-  EXPECT_CALL(motion_callback, invoke(Ref(robot_state), duration)).WillOnce(Return(motion));
+  EXPECT_CALL(control_callback, invoke(Ref(robot_state), duration))
+      .WillOnce(Return(torques));
+  EXPECT_CALL(motion_callback, invoke(Ref(robot_state), duration))
+      .WillOnce(Return(motion));
 
   typename TestFixture::Loop loop(
       robot, std::bind(&MockControlCallback::invoke, &control_callback, _1, _2),
@@ -868,20 +1001,23 @@ TYPED_TEST(ControlLoops, SpinOnceWithMotionAndControllerCallback) {
       EXPECT_EQ(torques.tau_J, command.control.tau_J_d);
     } else {
       for (size_t i = 0; i < torques.tau_J.size(); i++) {
-        EXPECT_PRED_FORMAT2(testing::DoubleLE, command.control.tau_J_d[i], torques.tau_J[i]);
+        EXPECT_PRED_FORMAT2(testing::DoubleLE, command.control.tau_J_d[i],
+                            torques.tau_J[i]);
       }
     }
   }
 }
 
 TYPED_TEST(ControlLoops, SpinOnceWithInvalidMotionAndControllerCallback) {
-  std::array<double, 3> invalid_values = {std::numeric_limits<double>::quiet_NaN(),
-                                          std::numeric_limits<double>::signaling_NaN(),
-                                          std::numeric_limits<double>::infinity()};
+  std::array<double, 3> invalid_values = {
+      std::numeric_limits<double>::quiet_NaN(),
+      std::numeric_limits<double>::signaling_NaN(),
+      std::numeric_limits<double>::infinity()};
   for (size_t i = 0; i < invalid_values.size(); i++) {
     StrictMock<MockRobotControl> robot;
     EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
-                                   this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
+                                   this->kMotionGeneratorMode,
+                                   TestFixture::Loop::kDefaultDeviation,
                                    TestFixture::Loop::kDefaultDeviation))
         .WillOnce(Return(200));
     MockControlCallback control_callback;
@@ -890,19 +1026,23 @@ TYPED_TEST(ControlLoops, SpinOnceWithInvalidMotionAndControllerCallback) {
 
     RobotState robot_state = generateValidRobotState();
     Duration duration(2);
-    EXPECT_CALL(control_callback, invoke(Ref(robot_state), duration)).WillOnce(Return(torques));
+    EXPECT_CALL(control_callback, invoke(Ref(robot_state), duration))
+        .WillOnce(Return(torques));
     EXPECT_CALL(motion_callback, invoke(Ref(robot_state), duration))
         .WillOnce(Return(this->createInvalidMotion(invalid_values[i])));
 
     typename TestFixture::Loop loop(
-        robot, std::bind(&MockControlCallback::invoke, &control_callback, _1, _2),
+        robot,
+        std::bind(&MockControlCallback::invoke, &control_callback, _1, _2),
         std::bind(&decltype(motion_callback)::invoke, &motion_callback, _1, _2),
         TestFixture::kLimitRate, getCutoffFreq(TestFixture::kFilter));
 
     RobotCommand command;
     randomRobotCommand(command);
-    EXPECT_THROW(loop.spinMotion(robot_state, duration, &command.motion), std::invalid_argument);
-    EXPECT_THROW(loop.spinControl(robot_state, duration, &command.control), std::invalid_argument);
+    EXPECT_THROW(loop.spinMotion(robot_state, duration, &command.motion),
+                 std::invalid_argument);
+    EXPECT_THROW(loop.spinControl(robot_state, duration, &command.control),
+                 std::invalid_argument);
   }
 }
 
@@ -911,14 +1051,16 @@ TYPED_TEST(ControlLoops, SpinOnceWithFinishingMotionCallback) {
   {
     InSequence s;
     EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
-                                   this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
+                                   this->kMotionGeneratorMode,
+                                   TestFixture::Loop::kDefaultDeviation,
                                    TestFixture::Loop::kDefaultDeviation))
         .WillOnce(Return(200));
     EXPECT_CALL(robot, finishMotion(200, _, _));
   }
 
   NiceMock<MockControlCallback> control_callback;
-  ON_CALL(control_callback, invoke(_, _)).WillByDefault(Return(Torques({0, 1, 2, 3, 4, 5, 6})));
+  ON_CALL(control_callback, invoke(_, _))
+      .WillByDefault(Return(Torques({0, 1, 2, 3, 4, 5, 6})));
 
   RobotState robot_state = generateValidRobotState();
 
@@ -944,7 +1086,8 @@ TYPED_TEST(ControlLoops, SpinOnceWithFinishingMotionCallback) {
 
   EXPECT_CALL(robot, update(_, _)).WillOnce(Return(robot_state));
   EXPECT_CALL(motion_callback, invoke(_, zero_duration))
-      .WillOnce(DoAll(SaveArg<0>(&robot_state), Return(MotionFinished(this->createMotion()))));
+      .WillOnce(DoAll(SaveArg<0>(&robot_state),
+                      Return(MotionFinished(this->createMotion()))));
 
   loop();
 }
@@ -954,21 +1097,25 @@ TYPED_TEST(ControlLoops, LoopWithThrowingMotionCallback) {
   {
     InSequence s;
     EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
-                                   this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
+                                   this->kMotionGeneratorMode,
+                                   TestFixture::Loop::kDefaultDeviation,
                                    TestFixture::Loop::kDefaultDeviation))
         .WillOnce(Return(200));
     EXPECT_CALL(robot, cancelMotion(200));
   }
 
   NiceMock<MockControlCallback> control_callback;
-  ON_CALL(control_callback, invoke(_, _)).WillByDefault(Return(Torques({0, 1, 2, 3, 4, 5, 6})));
+  ON_CALL(control_callback, invoke(_, _))
+      .WillByDefault(Return(Torques({0, 1, 2, 3, 4, 5, 6})));
 
   MockMotionCallback<typename TestFixture::TMotion> motion_callback;
-  EXPECT_CALL(motion_callback, invoke(_, _)).WillOnce(Throw(std::domain_error("")));
+  EXPECT_CALL(motion_callback, invoke(_, _))
+      .WillOnce(Throw(std::domain_error("")));
 
   try {
     typename TestFixture::Loop loop(
-        robot, std::bind(&MockControlCallback::invoke, &control_callback, _1, _2),
+        robot,
+        std::bind(&MockControlCallback::invoke, &control_callback, _1, _2),
         std::bind(&decltype(motion_callback)::invoke, &motion_callback, _1, _2),
         TestFixture::kLimitRate, getCutoffFreq(TestFixture::kFilter));
 
@@ -982,7 +1129,8 @@ TYPED_TEST(ControlLoops, SpinOnceWithFinishingMotionCallbackAndControllerMode) {
   {
     InSequence s;
     EXPECT_CALL(robot, startMotion(Move::ControllerMode::kCartesianImpedance,
-                                   this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
+                                   this->kMotionGeneratorMode,
+                                   TestFixture::Loop::kDefaultDeviation,
                                    TestFixture::Loop::kDefaultDeviation))
         .WillOnce(Return(200));
     EXPECT_CALL(robot, finishMotion(200, _, nullptr));
@@ -1000,13 +1148,15 @@ TYPED_TEST(ControlLoops, SpinOnceWithFinishingMotionCallbackAndControllerMode) {
       std::bind(&decltype(motion_callback)::invoke, &motion_callback, _1, _2),
       TestFixture::kLimitRate, getCutoffFreq(TestFixture::kFilter));
 
-  // Use ASSERT to abort on failure because loop() in next line would block otherwise.
+  // Use ASSERT to abort on failure because loop() in next line would block
+  // otherwise.
   MotionGeneratorCommand motion_command{};
   ASSERT_FALSE(loop.spinMotion(robot_state, duration, &motion_command));
 
   EXPECT_CALL(robot, update(_, _)).WillOnce(Return(robot_state));
   EXPECT_CALL(motion_callback, invoke(_, zero_duration))
-      .WillOnce(DoAll(SaveArg<0>(&robot_state), Return(MotionFinished(this->createMotion()))));
+      .WillOnce(DoAll(SaveArg<0>(&robot_state),
+                      Return(MotionFinished(this->createMotion()))));
   loop();
 }
 
@@ -1015,14 +1165,16 @@ TYPED_TEST(ControlLoops, LoopWithThrowingMotionCallbackAndControllerMode) {
   {
     InSequence s;
     EXPECT_CALL(robot, startMotion(Move::ControllerMode::kJointImpedance,
-                                   this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
+                                   this->kMotionGeneratorMode,
+                                   TestFixture::Loop::kDefaultDeviation,
                                    TestFixture::Loop::kDefaultDeviation))
         .WillOnce(Return(200));
     EXPECT_CALL(robot, cancelMotion(200));
   }
 
   MockMotionCallback<typename TestFixture::TMotion> motion_callback;
-  EXPECT_CALL(motion_callback, invoke(_, _)).WillOnce(Throw(std::domain_error("")));
+  EXPECT_CALL(motion_callback, invoke(_, _))
+      .WillOnce(Throw(std::domain_error("")));
 
   try {
     typename TestFixture::Loop loop(
@@ -1040,14 +1192,16 @@ TYPED_TEST(ControlLoops, SpinOnceWithFinishingControlCallback) {
   {
     InSequence s;
     EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
-                                   this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
+                                   this->kMotionGeneratorMode,
+                                   TestFixture::Loop::kDefaultDeviation,
                                    TestFixture::Loop::kDefaultDeviation))
         .WillOnce(Return(200));
     EXPECT_CALL(robot, finishMotion(200, _, _));
   }
 
   NiceMock<MockMotionCallback<typename TestFixture::TMotion>> motion_callback;
-  ON_CALL(motion_callback, invoke(_, _)).WillByDefault(Return(this->createMotion()));
+  ON_CALL(motion_callback, invoke(_, _))
+      .WillByDefault(Return(this->createMotion()));
 
   MockControlCallback control_callback;
   RobotState robot_state = generateValidRobotState();
@@ -1073,7 +1227,8 @@ TYPED_TEST(ControlLoops, SpinOnceWithFinishingControlCallback) {
 
   EXPECT_CALL(robot, update(_, _)).WillOnce(Return(robot_state));
   EXPECT_CALL(control_callback, invoke(_, zero_duration))
-      .WillOnce(DoAll(SaveArg<0>(&robot_state), Return(MotionFinished(zero_torques))));
+      .WillOnce(DoAll(SaveArg<0>(&robot_state),
+                      Return(MotionFinished(zero_torques))));
   loop();
 }
 
@@ -1082,7 +1237,8 @@ TYPED_TEST(ControlLoops, LoopWithThrowingControlCallback) {
   {
     InSequence s;
     EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
-                                   this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
+                                   this->kMotionGeneratorMode,
+                                   TestFixture::Loop::kDefaultDeviation,
                                    TestFixture::Loop::kDefaultDeviation))
         .WillOnce(Return(200));
     EXPECT_CALL(robot, cancelMotion(200));
@@ -1092,14 +1248,17 @@ TYPED_TEST(ControlLoops, LoopWithThrowingControlCallback) {
   ON_CALL(robot, update(_, _)).WillByDefault(Return(robot_state));
 
   NiceMock<MockControlCallback> control_callback;
-  EXPECT_CALL(control_callback, invoke(_, _)).WillOnce(Throw(std::domain_error("")));
+  EXPECT_CALL(control_callback, invoke(_, _))
+      .WillOnce(Throw(std::domain_error("")));
 
   NiceMock<MockMotionCallback<typename TestFixture::TMotion>> motion_callback;
-  ON_CALL(motion_callback, invoke(_, _)).WillByDefault(Return(this->createMotion()));
+  ON_CALL(motion_callback, invoke(_, _))
+      .WillByDefault(Return(this->createMotion()));
 
   try {
     typename TestFixture::Loop loop(
-        robot, std::bind(&MockControlCallback::invoke, &control_callback, _1, _2),
+        robot,
+        std::bind(&MockControlCallback::invoke, &control_callback, _1, _2),
         std::bind(&decltype(motion_callback)::invoke, &motion_callback, _1, _2),
         TestFixture::kLimitRate, getCutoffFreq(TestFixture::kFilter));
     loop();
@@ -1107,11 +1266,13 @@ TYPED_TEST(ControlLoops, LoopWithThrowingControlCallback) {
   }
 }
 
-TYPED_TEST(ControlLoops, GetsCorrectControlTimeStepWithMotionAndControlCallback) {
+TYPED_TEST(ControlLoops,
+           GetsCorrectControlTimeStepWithMotionAndControlCallback) {
   NiceMock<MockRobotControl> robot;
 
   NiceMock<MockMotionCallback<typename TestFixture::TMotion>> motion_callback;
-  ON_CALL(motion_callback, invoke(_, _)).WillByDefault(Return(this->createMotion()));
+  ON_CALL(motion_callback, invoke(_, _))
+      .WillByDefault(Return(this->createMotion()));
 
   MockControlCallback control_callback;
   RobotState robot_state = generateValidRobotState();
@@ -1123,22 +1284,24 @@ TYPED_TEST(ControlLoops, GetsCorrectControlTimeStepWithMotionAndControlCallback)
   size_t control_count = 0;
   EXPECT_CALL(control_callback, invoke(_, _))
       .Times(ticks.size())
-      .WillRepeatedly(Invoke([&](const RobotState&, Duration duration) -> Torques {
-        EXPECT_EQ(ticks.at(control_count), duration.toMSec());
+      .WillRepeatedly(
+          Invoke([&](const RobotState&, Duration duration) -> Torques {
+            EXPECT_EQ(ticks.at(control_count), duration.toMSec());
 
-        if (++control_count == ticks.size()) {
-          return MotionFinished(zero_torques);
-        }
-        return zero_torques;
-      }));
+            if (++control_count == ticks.size()) {
+              return MotionFinished(zero_torques);
+            }
+            return zero_torques;
+          }));
   size_t robot_count = 0;
   EXPECT_CALL(robot, update(_, _))
       .Times(ticks.size())
-      .WillRepeatedly(Invoke([&](const MotionGeneratorCommand*, const ControllerCommand*) {
-        robot_state.time += Duration(ticks.at(robot_count));
-        robot_count++;
-        return robot_state;
-      }));
+      .WillRepeatedly(
+          Invoke([&](const MotionGeneratorCommand*, const ControllerCommand*) {
+            robot_state.time += Duration(ticks.at(robot_count));
+            robot_count++;
+            return robot_state;
+          }));
 
   typename TestFixture::Loop loop(
       robot, std::bind(&MockControlCallback::invoke, &control_callback, _1, _2),
@@ -1147,7 +1310,8 @@ TYPED_TEST(ControlLoops, GetsCorrectControlTimeStepWithMotionAndControlCallback)
   loop();
 }
 
-TYPED_TEST(ControlLoops, GetsCorrectMotionTimeStepWithMotionAndControlCallback) {
+TYPED_TEST(ControlLoops,
+           GetsCorrectMotionTimeStepWithMotionAndControlCallback) {
   NiceMock<MockRobotControl> robot;
 
   NiceMock<MockControlCallback> control_callback;
@@ -1162,24 +1326,26 @@ TYPED_TEST(ControlLoops, GetsCorrectMotionTimeStepWithMotionAndControlCallback) 
   size_t control_count = 0;
   EXPECT_CALL(motion_callback, invoke(_, _))
       .Times(ticks.size())
-      .WillRepeatedly(
-          Invoke([&](const RobotState&, Duration duration) -> typename TestFixture::TMotion {
-            EXPECT_EQ(ticks.at(control_count), duration.toMSec());
+      .WillRepeatedly(Invoke([&](const RobotState&, Duration duration) ->
+                             typename TestFixture::TMotion {
+                               EXPECT_EQ(ticks.at(control_count),
+                                         duration.toMSec());
 
-            if (++control_count == ticks.size()) {
-              return MotionFinished(this->createMotion());
-            }
-            return this->createMotion();
-          }));
+                               if (++control_count == ticks.size()) {
+                                 return MotionFinished(this->createMotion());
+                               }
+                               return this->createMotion();
+                             }));
 
   size_t robot_count = 0;
   EXPECT_CALL(robot, update(_, _))
       .Times(ticks.size())
-      .WillRepeatedly(Invoke([&](const MotionGeneratorCommand*, const ControllerCommand*) {
-        robot_state.time += Duration(ticks.at(robot_count));
-        robot_count++;
-        return robot_state;
-      }));
+      .WillRepeatedly(
+          Invoke([&](const MotionGeneratorCommand*, const ControllerCommand*) {
+            robot_state.time += Duration(ticks.at(robot_count));
+            robot_count++;
+            return robot_state;
+          }));
 
   typename TestFixture::Loop loop(
       robot, std::bind(&MockControlCallback::invoke, &control_callback, _1, _2),
@@ -1199,23 +1365,25 @@ TYPED_TEST(ControlLoops, GetsCorrectTimeStepWithMotionCallback) {
   size_t control_count = 0;
   EXPECT_CALL(motion_callback, invoke(_, _))
       .Times(ticks.size())
-      .WillRepeatedly(
-          Invoke([&](const RobotState&, Duration duration) -> typename TestFixture::TMotion {
-            EXPECT_EQ(ticks.at(control_count), duration.toMSec());
+      .WillRepeatedly(Invoke([&](const RobotState&, Duration duration) ->
+                             typename TestFixture::TMotion {
+                               EXPECT_EQ(ticks.at(control_count),
+                                         duration.toMSec());
 
-            if (++control_count == ticks.size()) {
-              return MotionFinished(this->createMotion());
-            }
-            return this->createMotion();
-          }));
+                               if (++control_count == ticks.size()) {
+                                 return MotionFinished(this->createMotion());
+                               }
+                               return this->createMotion();
+                             }));
   size_t robot_count = 0;
   EXPECT_CALL(robot, update(_, _))
       .Times(ticks.size())
-      .WillRepeatedly(Invoke([&](const MotionGeneratorCommand*, const ControllerCommand*) {
-        robot_state.time += Duration(ticks.at(robot_count));
-        robot_count++;
-        return robot_state;
-      }));
+      .WillRepeatedly(
+          Invoke([&](const MotionGeneratorCommand*, const ControllerCommand*) {
+            robot_state.time += Duration(ticks.at(robot_count));
+            robot_count++;
+            return robot_state;
+          }));
 
   typename TestFixture::Loop loop(
       robot, ControllerMode::kJointImpedance,
@@ -1225,21 +1393,22 @@ TYPED_TEST(ControlLoops, GetsCorrectTimeStepWithMotionCallback) {
   loop();
 }
 
-using CartesianPoseMotionTypes = ::testing::Types<CartesianPoseMotion<false, true>,
-                                                  CartesianPoseMotionWithElbow<false, true>,
-                                                  CartesianPoseMotion<true, true>,
-                                                  CartesianPoseMotionWithElbow<true, true>,
-                                                  CartesianPoseMotion<false, false>,
-                                                  CartesianPoseMotionWithElbow<false, false>,
-                                                  CartesianPoseMotion<true, false>,
-                                                  CartesianPoseMotionWithElbow<true, false>>;
+using CartesianPoseMotionTypes = ::testing::Types<
+    CartesianPoseMotion<false, true>, CartesianPoseMotionWithElbow<false, true>,
+    CartesianPoseMotion<true, true>, CartesianPoseMotionWithElbow<true, true>,
+    CartesianPoseMotion<false, false>,
+    CartesianPoseMotionWithElbow<false, false>,
+    CartesianPoseMotion<true, false>,
+    CartesianPoseMotionWithElbow<true, false>>;
 
 TYPED_TEST_CASE(ControlLoopWithTransformationMatrix, CartesianPoseMotionTypes);
 
-TYPED_TEST(ControlLoopWithTransformationMatrix, SpinOnceWithInvalidTransformationMatrix) {
+TYPED_TEST(ControlLoopWithTransformationMatrix,
+           SpinOnceWithInvalidTransformationMatrix) {
   StrictMock<MockRobotControl> robot;
   EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
-                                 this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
+                                 this->kMotionGeneratorMode,
+                                 TestFixture::Loop::kDefaultDeviation,
                                  TestFixture::Loop::kDefaultDeviation))
       .WillOnce(Return(200));
   MockControlCallback control_callback;
@@ -1248,7 +1417,8 @@ TYPED_TEST(ControlLoopWithTransformationMatrix, SpinOnceWithInvalidTransformatio
 
   RobotState robot_state = generateValidRobotState();
   Duration duration(2);
-  EXPECT_CALL(control_callback, invoke(Ref(robot_state), duration)).WillOnce(Return(torques));
+  EXPECT_CALL(control_callback, invoke(Ref(robot_state), duration))
+      .WillOnce(Return(torques));
   EXPECT_CALL(motion_callback, invoke(Ref(robot_state), duration))
       .WillOnce(Return(this->createInvalidTransformationMatrix()));
 
@@ -1259,29 +1429,33 @@ TYPED_TEST(ControlLoopWithTransformationMatrix, SpinOnceWithInvalidTransformatio
 
   RobotCommand command;
   randomRobotCommand(command);
-  EXPECT_THROW(loop.spinMotion(robot_state, duration, &command.motion), std::invalid_argument);
+  EXPECT_THROW(loop.spinMotion(robot_state, duration, &command.motion),
+               std::invalid_argument);
   EXPECT_TRUE(loop.spinControl(robot_state, duration, &command.control));
 }
 
-using ElbowMotionTypes = ::testing::Types<CartesianPoseMotionWithElbow<false, true>,
-                                          CartesianVelocityMotionWithElbow<false, true>,
-                                          CartesianPoseMotionWithElbow<true, true>,
-                                          CartesianVelocityMotionWithElbow<true, true>,
-                                          CartesianPoseMotionWithElbow<false, false>,
-                                          CartesianVelocityMotionWithElbow<false, false>,
-                                          CartesianPoseMotionWithElbow<true, false>,
-                                          CartesianVelocityMotionWithElbow<true, false>>;
+using ElbowMotionTypes =
+    ::testing::Types<CartesianPoseMotionWithElbow<false, true>,
+                     CartesianVelocityMotionWithElbow<false, true>,
+                     CartesianPoseMotionWithElbow<true, true>,
+                     CartesianVelocityMotionWithElbow<true, true>,
+                     CartesianPoseMotionWithElbow<false, false>,
+                     CartesianVelocityMotionWithElbow<false, false>,
+                     CartesianPoseMotionWithElbow<true, false>,
+                     CartesianVelocityMotionWithElbow<true, false>>;
 
 TYPED_TEST_CASE(ControlLoopWithElbow, ElbowMotionTypes);
 
 TYPED_TEST(ControlLoopWithElbow, SpinOnceWithInvalidElbowCallback) {
-  std::array<double, 3> invalid_values = {std::numeric_limits<double>::quiet_NaN(),
-                                          std::numeric_limits<double>::signaling_NaN(),
-                                          std::numeric_limits<double>::infinity()};
+  std::array<double, 3> invalid_values = {
+      std::numeric_limits<double>::quiet_NaN(),
+      std::numeric_limits<double>::signaling_NaN(),
+      std::numeric_limits<double>::infinity()};
   for (size_t i = 0; i < invalid_values.size(); i++) {
     StrictMock<MockRobotControl> robot;
     EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
-                                   this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
+                                   this->kMotionGeneratorMode,
+                                   TestFixture::Loop::kDefaultDeviation,
                                    TestFixture::Loop::kDefaultDeviation))
         .WillOnce(Return(200));
     MockControlCallback control_callback;
@@ -1290,18 +1464,22 @@ TYPED_TEST(ControlLoopWithElbow, SpinOnceWithInvalidElbowCallback) {
 
     RobotState robot_state = generateValidRobotState();
     Duration duration(2);
-    EXPECT_CALL(control_callback, invoke(Ref(robot_state), duration)).WillOnce(Return(torques));
+    EXPECT_CALL(control_callback, invoke(Ref(robot_state), duration))
+        .WillOnce(Return(torques));
     EXPECT_CALL(motion_callback, invoke(Ref(robot_state), duration))
-        .WillOnce(Return(this->createElbowConfig(invalid_values[i], invalid_values[i])));
+        .WillOnce(Return(
+            this->createElbowConfig(invalid_values[i], invalid_values[i])));
 
     typename TestFixture::Loop loop(
-        robot, std::bind(&MockControlCallback::invoke, &control_callback, _1, _2),
+        robot,
+        std::bind(&MockControlCallback::invoke, &control_callback, _1, _2),
         std::bind(&decltype(motion_callback)::invoke, &motion_callback, _1, _2),
         TestFixture::kLimitRate, getCutoffFreq(TestFixture::kFilter));
 
     RobotCommand command;
     randomRobotCommand(command);
-    EXPECT_THROW(loop.spinMotion(robot_state, duration, &command.motion), std::invalid_argument);
+    EXPECT_THROW(loop.spinMotion(robot_state, duration, &command.motion),
+                 std::invalid_argument);
     EXPECT_TRUE(loop.spinControl(robot_state, duration, &command.control));
   }
 }

@@ -12,26 +12,26 @@ struct MotionGeneratorTraits {};
 
 template <>
 struct MotionGeneratorTraits<JointPositions> {
-  static constexpr auto kMotionGeneratorMode =
-      agimus_research_interface::robot::Move::MotionGeneratorMode::kJointPosition;
+  static constexpr auto kMotionGeneratorMode = agimus_research_interface::
+      robot::Move::MotionGeneratorMode::kJointPosition;
 };
 
 template <>
 struct MotionGeneratorTraits<JointVelocities> {
-  static constexpr auto kMotionGeneratorMode =
-      agimus_research_interface::robot::Move::MotionGeneratorMode::kJointVelocity;
+  static constexpr auto kMotionGeneratorMode = agimus_research_interface::
+      robot::Move::MotionGeneratorMode::kJointVelocity;
 };
 
 template <>
 struct MotionGeneratorTraits<CartesianPose> {
-  static constexpr auto kMotionGeneratorMode =
-      agimus_research_interface::robot::Move::MotionGeneratorMode::kCartesianPosition;
+  static constexpr auto kMotionGeneratorMode = agimus_research_interface::
+      robot::Move::MotionGeneratorMode::kCartesianPosition;
 };
 
 template <>
 struct MotionGeneratorTraits<CartesianVelocities> {
-  static constexpr auto kMotionGeneratorMode =
-      agimus_research_interface::robot::Move::MotionGeneratorMode::kCartesianVelocity;
+  static constexpr auto kMotionGeneratorMode = agimus_research_interface::
+      robot::Move::MotionGeneratorMode::kCartesianVelocity;
 };
 
 }  // namespace agimus_franka

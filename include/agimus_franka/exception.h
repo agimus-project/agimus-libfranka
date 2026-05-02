@@ -2,10 +2,10 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
+#include <agimus_franka/log.h>
+
 #include <stdexcept>
 #include <string>
-
-#include <agimus_franka/log.h>
 
 /**
  * @file exception.h
@@ -29,8 +29,8 @@ struct ModelException : public Exception {
 };
 
 /**
- * NetworkException is thrown if a connection to the robot cannot be established, or when a timeout
- * occurs.
+ * NetworkException is thrown if a connection to the robot cannot be
+ * established, or when a timeout occurs.
  */
 struct NetworkException : public Exception {
   using Exception::Exception;
@@ -44,7 +44,8 @@ struct ProtocolException : public Exception {
 };
 
 /**
- * IncompatibleVersionException is thrown if the robot does not support this version of libagimus_franka.
+ * IncompatibleVersionException is thrown if the robot does not support this
+ * version of libagimus_franka.
  */
 struct IncompatibleVersionException : public Exception {
   /**
@@ -52,7 +53,8 @@ struct IncompatibleVersionException : public Exception {
    * @param[in] server_version Protocol version on the Control side.
    * @param[in] library_version Protocol version of libagimus_franka.
    */
-  IncompatibleVersionException(uint16_t server_version, uint16_t library_version) noexcept;
+  IncompatibleVersionException(uint16_t server_version,
+                               uint16_t library_version) noexcept;
 
   /**
    * Control's protocol version.
@@ -65,9 +67,10 @@ struct IncompatibleVersionException : public Exception {
 };
 
 /**
- * ControlException is thrown if an error occurs during motion generation or torque control.
- * The exception holds a vector with the last received robot states. The number of recorded
- * states can be configured in the Robot constructor.
+ * ControlException is thrown if an error occurs during motion generation or
+ * torque control. The exception holds a vector with the last received robot
+ * states. The number of recorded states can be configured in the Robot
+ * constructor.
  *
  */
 struct ControlException : public Exception {
@@ -77,7 +80,9 @@ struct ControlException : public Exception {
    * @param[in] what Explanatory string.
    * @param[in] log Vector of last received states and commands.
    */
-  explicit ControlException(const std::string& what, std::vector<agimus_franka::Record> log = {}) noexcept;
+  explicit ControlException(
+      const std::string& what,
+      std::vector<agimus_franka::Record> log = {}) noexcept;
 
   /**
    * Vector of states and commands logged just before the exception occurred.
